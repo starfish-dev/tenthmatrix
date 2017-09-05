@@ -1,0 +1,246 @@
+<% include include/main-header %>
+
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>System Preferences</h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">System Preferences</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/system_preference" method="POST" id="contentForm">
+            						
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="system_preferences">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="_id">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences._id !== 'undefined' && system_preferences._id !== null) { %><%= system_preferences._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						<input type="hidden" class="form-control" name="type" value="default">
+            						<input type="hidden" class="form-control" id="main_logo_uuid" name="main_logo_uuid" value="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.main_logo_uuid !== 'undefined' && system_preferences.main_logo_uuid !== null) { %><%= system_preferences.main_logo_uuid %><% } %>">
+            						<input type="hidden" class="form-control" id="thumbnail_logo_uuid" name="thumbnail_logo_uuid" value="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.thumbnail_logo_uuid !== 'undefined' && system_preferences.thumbnail_logo_uuid !== null) { %><%= system_preferences.thumbnail_logo_uuid %><% } %>">
+            						
+            						
+            						<div class="row"><div class="col-md-12 col-sm-6 col-xs-12">
+            						<div class="form-group">
+                  						<label class="control-label col-md-2" for="first-name">Default Name<span class="required">*</span></label>
+                  						<div class="col-md-6">
+                    						<input type="text" required="required" id="name" name="name" class="form-control col-md-5 col-xs-12" value="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.name !== 'undefined' && system_preferences.name !== null) { %><%= system_preferences.name %><% } %>" onblur="copy_content();" onkeyup="copy_content();">
+                  						</div>
+                					</div>
+                								<div class="form-group">
+                  									<label class="control-label col-md-2" for="website_url">Page Title<span class="required">*</span></label>
+                  									<div class="col-md-6">
+                    									<input type="text" required="required" id="page_title" name="page_title" class="form-control col-md-5 col-xs-12" value="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.page_title !== 'undefined' && system_preferences.page_title !== null) { %><%= system_preferences.page_title %><% } %>">
+                  									</div>
+                								</div>
+              						
+                					<div class="form-group">
+                  						<label class="control-label col-md-2" for="">Meta Description</label>
+                  						<div class="col-md-6">
+                   							<textarea class="form-control" id="meta_description" name="meta_description"><% if (typeof system_preferences !== 'undefined' && typeof system_preferences.meta_description !== 'undefined' && system_preferences.meta_description !== null) { %><%= system_preferences.meta_description %><% } %></textarea>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-2" for="">Meta Keywords</label>
+                  						<div class="col-md-6">
+                   							<textarea class="form-control" id="meta_keywords" name="meta_keywords"><% if (typeof system_preferences !== 'undefined' && typeof system_preferences.meta_keywords !== 'undefined' && system_preferences.meta_keywords !== null) { %><%= system_preferences.meta_keywords %><% } %></textarea>
+                  						</div>
+                					</div>
+									
+                					<% if (typeof system_preferences !== 'undefined' && typeof system_preferences._id !== 'undefined' && system_preferences._id !== null) { %>
+                					<div class="well" style="overflow:hidden;">
+   										<h4 style="margin-top:0px;">System Logo's</h4>
+   										<div class="col-md-6 col-sm-6 col-xs-12">
+   										<div class="form-group">
+    										<div class="col-sm-12" align="center">
+    											<img src="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.main_logo_uuid !== 'undefined' && system_preferences.main_logo_uuid !== null && system_preferences.main_logo_uuid !== "") { %><%= backendDirectory %>/file/<%= system_preferences.main_logo_uuid %>?<%= Math.random(); %><% }else{ %>images/no_image.png<% } %>" class="img-responsive" style="border:1px solid #ddd;" onerror="this.src=img/no-avatar.jpg"/>
+    										</div>
+  										</div>
+  										<div class="form-group">
+    										<label for="" class="col-md-3 control-label">Main Logo</label>
+    										<div class="col-md-6">
+    											<input type="file" id="file" class="form-control col-md-5 col-xs-12" value="">
+    										</div>
+    										<div class="col-md-3"><button type="reset" class="btn btn-danger btn-sm" onClick="upload_single_file('file', 'main_logo_uuid');">Upload</button></div>
+  										</div>
+  										</div>
+  										<div class="col-md-6 col-sm-6 col-xs-12">
+  										<div class="form-group">
+    										<div class="col-sm-12" align="center">
+    											<img src="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.thumbnail_logo_uuid !== 'undefined' && system_preferences.thumbnail_logo_uuid !== null && system_preferences.thumbnail_logo_uuid !== "") { %><%= backendDirectory %>/file/<%= system_preferences.thumbnail_logo_uuid %>?<%= Math.random(); %><% }else{ %>images/no_image.png<% } %>" class="img-responsive" style="border:1px solid #ddd;" onerror="this.src=img/no-avatar.jpg"/>
+    										</div>
+  										</div>
+  										<div class="form-group">
+    										<label for="" class="col-md-3 control-label">Thumbnail Logo</label>
+    										<div class="col-md-6">
+    											<input type="file" id="thumbnail_file" class="form-control col-md-5 col-xs-12" value="">
+    										</div>
+    										<div class="col-md-3"><button type="reset" class="btn btn-danger btn-sm" onClick="upload_single_file('thumbnail_file', 'thumbnail_logo_uuid');">Upload</button></div>
+  										</div>
+  										</div>
+  										</div>
+  									<% } %>
+                					</div></div>
+
+                					<div class="row">
+                					<div class="col-sm-6 col-xs-12">
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-12" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm" id="submitBtn">Submit</button>
+               								</div>
+               							</div>
+                					</div>
+                					</div>
+                					</div>
+            					</form>
+              				</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+<!-- modal box start -->
+<div class="modal fade" id="processingPrompt" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+        <div class="modal-content">
+        	<div class="modal-body" style="text-align:center" >
+                <h4>Uploading image, please wait and don't refresh the page while processing!</h4>.<br /> <img id="imgAjaxLoading" src="img/loading.gif" width="109" height="25" style="border-width: 0px;">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal box end -->		
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/jquery.validate.js"></script>
+<script type="text/javascript">
+
+function upload_single_file(id, uuid_div_id){
+$(".uploadFile").remove();
+if( $('#'+id).length )	{
+	if($('#'+id).val().length>0)	{
+		$('#processingPrompt').modal('show');
+		var guidStr=$("#"+uuid_div_id).val();
+		if(guidStr==""){
+			guidStr= guid();
+		}
+		var data = new FormData();
+		data.append('related_collection', $("#table_name").val());
+		data.append('uuid', guidStr);
+		data.append('collection_id', $("#id").val());
+		data.append('type', $("#table_name").val());
+		
+		var filesize=Number($('#'+id)[0].files[0].size)/(1024*1024);
+		
+		if(filesize>5){
+			$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>The file size larger than 5MB is not allowed</div>');
+			$('#'+id).focus();
+		}else{
+			var files= $('#'+id)[0].files;
+			var fileNameStr =files[0].name;
+				$.each(files, function(key, value){
+					data.append('file', value);
+				});
+			
+				$.ajax({
+					url: backendDirectory+'/find_remove_file',
+					type: 'POST',
+					data: {'uuid' : guidStr},
+					dataType: 'json',
+					success: function(response){
+						if(response.success){
+							$.ajax({
+								url: backendDirectory+'/upload',
+								type: 'POST',
+								data: data,
+								dataType: 'json',
+								contentType: false,
+								enctype: 'multipart/form-data',
+								cache: false,
+								processData: false, // Don't process the files
+								success: function(response){	
+									$('#processingPrompt').modal('hide');
+									if(response.success && response._id && response._id!=""){
+										$("#"+uuid_div_id).val(guidStr);
+										$("#file").prop('disabled', true);	//disable the file field
+										$( "#submitBtn" ).trigger( "click" );
+									} else if(response.error) {
+										$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>'+response.error+'</div>');
+									}else {
+										$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Sorry, error in uploading file!</div>');
+									}
+								}
+							});
+						}else {
+							$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Sorry, error in uploading file!</div>');
+						}
+					}
+				});
+		}
+	}	else {
+		$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Please select file for upload!</div>');
+	}
+}	else {
+$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Please select file for upload!</div>');
+}
+}
+function copy_content(){
+	var valStr=$("#name").val();
+	$("#page_title").val(valStr);
+}
+$(function () {
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				if (element.attr("name") == "established_on" ) {
+                	$(element).closest('div').after(error);
+            	}else{
+					$(element).closest('div').append(error);
+				}
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name: { required: true },
+				page_title: { required: true }
+			},
+			submitHandler: function(form) {
+				//save data as json in data field, use dataAsJson function to populate that field
+ 				dataAsJson('contentForm', form);
+ 			}
+		});	
+});
+</script>
+</body>
+</html>

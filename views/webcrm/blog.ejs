@@ -1,0 +1,327 @@
+<% include include/main-header %>
+<link rel="stylesheet" href="css/chosen.css">
+<link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
+<link rel="stylesheet" href="css/jquery.tag-editor.css" />
+<style>
+#select_systems_chosen{
+width : 100%!important;
+}
+</style></head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Blog <small><% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj.Document %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Blog</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			
+		<div class="row" id="printMessageDivID">
+			
+      		<div class="panel-body no-padding-top bg-white">
+      			<% include include/display_returned_msg %>
+      			<form class="form-horizontal" action="<%= backendDirectory %>/save/blog" method="POST" id="contentForm">
+      				<input type="hidden" class="form-control" id="table_name" name="table_name" value="documents">
+      				<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="Code">
+      				<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      				<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      				<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+     				<input type="hidden" class="form-control" id="data" name="data" value="">
+     				<input type="hidden" class="form-control" id="uploaded_file_uuid" name="uploaded_file_uuid" value="<% if (typeof contentObj.uploaded_file_uuid !== 'undefined' && contentObj.uploaded_file_uuid !== null) { %><%= contentObj.uploaded_file_uuid %><% } %>">
+            		<input type="hidden" class="form-control" id="uploaded_file_name" name="uploaded_file_name" value="<% if (typeof contentObj.uploaded_file_name !== 'undefined' && contentObj.uploaded_file_name !== null) { %><%= contentObj.uploaded_file_name %><% } %>">
+            		<input type="hidden" class="form-control" id="maintain_history" name="maintain_history" value="false">
+     					
+     				<div data-example-id="togglable-tabs">
+    					<ul id="new-customer-tab" class="nav nav-tabs" role="tablist">
+      						<li role="presentation" class="active"><a href="#customerinfo" id="home-tab" role="tab" data-toggle="tab" aria-controls="customer-info" aria-expanded="true">Blog Editor</a></li>
+     						<li role="presentation"><a href="#licenceno" role="tab" id="profile-tab" data-toggle="tab" aria-controls="licenceno">Search Optimisation</a></li>  
+     						<li role="presentation"><a href="#tab4" role="tab" id="profile-tab" data-toggle="tab" aria-controls="tab4">Blog Comments</a></li>  
+     						<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null  && authenticatedUser.access_right == "11"  && authenticatedUser.access_right == 11) {
+     							if (typeof authenticatedUser.active_system_uuid !== 'undefined' && authenticatedUser.active_system_uuid !== null  && typeof contentObj.uuid_system !== 'undefined' && contentObj.uuid_system !== null && authenticatedUser.active_system_uuid==contentObj.uuid_system) {	%>
+            					<li role="presentation"><a href="#tab5" role="tab" id="sharing-tab" data-toggle="tab" aria-controls="tab5">Sharing</a></li>
+            				<% }
+            				} %>
+     					</ul>
+    					<div id="myTabContent" class="tab-content" style="padding-top:25px; border-left: 1px solid #ddd; border-right: 1px solid #ddd;  border-bottom: 1px solid #ddd; padding-bottom:25px; padding-left:15px; padding-right:15px;">
+      						<div role="tabpanel" class="tab-pane fade in active" id="customerinfo" aria-labelledby="home-tab">
+     							<div class="row">
+           		  					<div class="col-sm-12 col-lg-8">
+  										<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Heading<sup class="required">*</sup></label>
+    										<div class="col-sm-10">
+    											<input type="text" required class="form-control" id="Document" name="Document" onblur="generate_manual_code('chk_manual','Document','Code'); generate_metaTags();" onkeyup="generate_manual_code('chk_manual','Document','Code');generate_metaTags();"  value="<% if (typeof contentObj.Document !== 'undefined' && contentObj.Document !== null) { %><%= contentObj.Document %><% } %>">
+    										</div>
+  										</div>
+  
+  										<div class="form-group">
+    										<label for="firstname" class="col-sm-2  control-label">Sub heading </label>
+    										<div class="col-sm-10">
+      											<input type="text" class="form-control" id="Title" name="Title" onblur="generate_metaTags();" onkeyup="generate_metaTags();" value="<% if (typeof contentObj.Title !== 'undefined' && contentObj.Title !== null) { %><%= contentObj.Title %><% } %>">
+    										</div>
+  										</div>
+  										<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Body </label>
+    										<div class="col-sm-10">
+     											<TEXTAREA CLASS="form-control" STYLE="height:500px;" name="Body" id="Body"><% if (typeof contentObj.Body !== 'undefined' && contentObj.Body !== null) { %><%= contentObj.Body %><% } %></TEXTAREA>
+    										</div>
+										</div>
+										<div class="form-group">
+    										<label for="firstname" class="col-sm-2 control-label">Tags </label>
+    										<div class="col-sm-10">
+    											<input type="hidden" class="form-control" id="default_tags" value="<% if (typeof contentObj.tags !== 'undefined' && contentObj.tags !== null) { %><%= contentObj.tags %><% } %>">
+    											<textarea type="text" class="form-control" name="tags" id="tags" rows="1"></textarea>
+											</div>
+                  						</div>
+										
+  										<div class="form-group no-margn-bottom">
+              								<label for="dtp_input1" class="col-sm-2 control-label" >Published On  <span class="required">*</span></label>
+                  							<div class="col-lg-4 col-sm-10" >
+                  								<input type="hidden" class="form-control" id="Type" name="Type" value="blog">
+    											<input class="form-control col-md-5 col-xs-12" type="hidden" id="Published_timestamp" name="Published_timestamp" value="<% if (typeof contentObj.Published_timestamp !== 'undefined' && contentObj.Published_timestamp !== null) {  %><%= contentObj.Published_timestamp %><% } %>" readonly>
+                    							<div class='input-group date' id='datetime_picker'>
+                    								<input type='text' class="form-control" id="published_date" required value=""/>
+                    								<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                								</div>	
+                  							</div>
+            							</div>
+  										
+  										<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Status</label>
+    										<div class="col-sm-10" style="margin-top:6px;">
+    											<div STYLE="float:left; margin-right:10px; display:inline-block;">
+      		  										<label> <input type="radio" id="status" name="status" value="1" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && (contentObj.status == 1 || contentObj.status=="1")) { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  								</div>
+				  								<div sTYLE="float:left; display:inline-block;">
+      		  										<label> <input type="radio" id="status" name="status" value="0" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 0) { %>checked<% } %> > <strong style="font-weight:600">Inactive</strong></label>
+    			  								</div>
+											</div>
+										</div>
+  										
+   									</div>
+   									<% if (typeof contentObj._id !== "undefined" && contentObj._id !== null) { %>
+   									<div class=" col-sm-12 col-lg-4">
+   										<div class="well" style="overflow:hidden;"><div class="form-horizontal ">
+   										<h4 style="margin-top:0px;">Image</h4>
+   										<div class="form-group" id="displayImage" style="display:none;">
+    										<div class="col-sm-12 div_imagetranscrits ">
+    											
+    										</div>
+  										</div>
+  										<div class="form-group" >
+    										<label for="firstname" class="col-sm-2  control-label">Specify Path</label>
+    										<div class="col-sm-10">
+      											<input type="text" class="form-control" id="image_path" name="image_path" value="<% if (typeof contentObj.image_path !== 'undefined' && contentObj.image_path !== null) { %><%= contentObj.image_path %><% } %>">
+    										</div>
+  										</div>
+   										<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Upload</label>
+    										<div class="col-sm-10">
+    											<input type="file" id="file" class="form-control col-md-5 col-xs-12" value="">
+    										</div>
+  										</div>
+  										</div></div>
+  										<div class="well historyClass" style="overflow:hidden;display:none;"><div class="form-horizontal ">
+   											<h4 style="margin-top:0px;">History</h4>
+   											<div id="history_content">
+   											
+   											</div>
+  										</div></div>
+   									</div>
+   									<% } %>
+       							</div>
+      						</div>
+      						<div role="tabpanel" class="tab-pane fade" id="licenceno" aria-labelledby="profile-tab">
+       							<div class="row">
+                					<div class="col-sm-10  col-md-12 col-lg-9">
+                       					<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Code<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" required class="form-control" id="Code" name="Code" placeholder="" value="<% if (typeof contentObj.Code !== 'undefined' && contentObj.Code !== null) { %><%= contentObj.Code %><% } %>" <% if (typeof contentObj.chk_manual !== 'undefined' && contentObj.chk_manual !== null && contentObj.chk_manual == 1) {  }else { %>readonly<% } %>>
+							  					<span STYLE="font-size:12px; color:#737373;">URL (SEO friendly)</span>
+							  					<span class="help-block" STYLE="font-size:12px;">
+													<input name="chk_manual" id="chk_manual" value="1" type="checkbox" <% if (typeof contentObj.chk_manual !== 'undefined' && contentObj.chk_manual !== null && contentObj.chk_manual == 1) { %>checked<% } %> >
+													I want to manually enter code</span>
+                             				</div>
+                        				</div>
+                        				
+                        				<div class="form-group">
+                             				<label for="" class="col-sm-2 control-label">Window Title</label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="PageTitle" name="PageTitle" placeholder="" value="<% if (typeof contentObj.PageTitle !== 'undefined' && contentObj.PageTitle !== null) { %><%= contentObj.PageTitle %><% } %>" <% if (typeof contentObj.chk_manual_metatags !== 'undefined' && contentObj.chk_manual_metatags !== null && contentObj.chk_manual_metatags == 1) {  }else { %>readonly<% } %>>
+                            				</div>
+                        				</div>
+                        				<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Meta Data Keywords</label>
+                             				<div class="col-sm-9">
+                             					<TEXTAREA CLASS="form-control" STYLE="height:220px;" id="MetaTagKeywords" name="MetaTagKeywords" <% if (typeof contentObj.chk_manual_metatags !== 'undefined' && contentObj.chk_manual_metatags !== null && contentObj.chk_manual_metatags == 1) {  }else { %>readonly<% } %>><% if (typeof contentObj.MetaTagKeywords !== 'undefined' && contentObj.MetaTagKeywords !== null) { %><%= contentObj.MetaTagKeywords %><% } %></TEXTAREA>
+							 					<span STYLE="font-size:11px;">Search terms relevant to this page to find content of this page easily</span>
+                             				</div>
+                        				</div>
+                        				<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Meta Data Description</label>
+                             				<div class="col-sm-9">
+                             					<TEXTAREA CLASS="form-control" STYLE="height:220px;" id="MetaTagDescription" name="MetaTagDescription" <% if (typeof contentObj.chk_manual_metatags !== 'undefined' && contentObj.chk_manual_metatags !== null && contentObj.chk_manual_metatags == 1) {  }else { %>readonly<% } %>><% if (typeof contentObj.MetaTagDescription !== 'undefined' && contentObj.MetaTagDescription !== null) { %><%= contentObj.MetaTagDescription %><% } %></TEXTAREA>
+							 					<span STYLE="font-size:11px;">Overview which describes this page (About 300 words)</span>
+							 					<span class="help-block" STYLE="font-size:12px;">
+													<input name="chk_manual_metatags" id="chk_manual_metatags" value="1" type="checkbox" <% if (typeof contentObj.chk_manual_metatags !== 'undefined' && contentObj.chk_manual_metatags !== null && contentObj.chk_manual_metatags == 1) { %>checked<% } %>>
+													 I want to manually enter meta tags</span>
+							 				</div>
+                        				</div>
+                     				</div>
+                				</div>
+      						</div>
+      						<div role="tabpanel" class="tab-pane fade" id="tab4" aria-labelledby="profile-tab">
+      							<% if (typeof contentObj.BlogComments !== 'undefined' && contentObj.BlogComments !== null) {	%>
+      							<input type="hidden" name="BlogComments" id="BlogComments" value="" />
+      							<%
+      								var objectArr=contentObj.BlogComments;
+      								for(var i=0; i < objectArr.length; i++){
+      								%>
+      								<div class="row blogCommentsClass" style="background-color: aliceblue; padding: 20px; margin: 5px 5px 20px; border-radius: 5px;">
+                					<div class="col-sm-10  col-md-12 col-lg-7">
+                						<input type="hidden" class="span10" name="blog_id" id="blog_uuid" value="<%=  objectArr[i].uuid %>" />
+										
+										<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Name<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="blog_name_<%=  objectArr[i].uuid %>" value="<%=  objectArr[i].name %>">
+                             				</div>
+                        				</div>
+                       					<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Email<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="blog_email_<%=  objectArr[i].uuid %>" placeholder="" value="<%=  objectArr[i].email %>">
+							  				</div>
+                        				</div>
+                        				<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Website<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="blog_website_<%=  objectArr[i].uuid %>"  value="<%=  objectArr[i].website %>">
+							  				</div>
+                        				</div>                     				
+                        				<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Comment</label>
+                             				<div class="col-sm-9">
+                             					<TEXTAREA CLASS="form-control" STYLE="height:220px;" id="blog_comment_<%=  objectArr[i].uuid %>"><%=  objectArr[i].comment %></TEXTAREA>
+							 				</div>
+                        				</div>
+                        			</div>
+                     				<div class="col-lg-5">
+                     					<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Posted On<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="hidden" class="form-control" id="blog_created__<%=  objectArr[i].uuid %>" readonly value="<%=  objectArr[i].created %>">
+                              					<input type="text" class="form-control" readonly value="<%=  dateTimeFromUnix(objectArr[i].created) %>">
+                             				</div>
+                        				</div>
+                        				<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Status</label>
+    										<div class="col-sm-9" style="margin-top:6px;">
+    											<div  STYLE="float:left; margin-right:10px;display:inline-block;">
+      		  										<label> <input type="radio" id="blog_status__<%=  objectArr[i].uuid %>" value="1" <% if (objectArr[i].status == 1 || objectArr[i].status == "1") { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  								</div>
+				  								<div STYLE="float:left;display:inline-block;">
+      		  										<label> <input type="radio" id="blog_status__<%=  objectArr[i].uuid %>" value="0" <% if (objectArr[i].status == 0 || objectArr[i].status == "0") { %>checked<% } %>> <strong style="font-weight:600">Inactive</strong></label>
+    			  								</div>
+											</div>
+										</div>
+                     				</div>
+                     				
+                				</div>
+                				<% } 
+                				}else{	%>
+                					<div class="alert alert-danger">No blog comments posted!</div>
+                				<% } %>
+      						</div>
+      						<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null  && authenticatedUser.access_right == "11"  && authenticatedUser.access_right == 11) {
+      						if (typeof authenticatedUser.active_system_uuid !== 'undefined' && authenticatedUser.active_system_uuid !== null  && typeof contentObj.uuid_system !== 'undefined' && contentObj.uuid_system !== null && authenticatedUser.active_system_uuid==contentObj.uuid_system) {	%>
+            				<div role="tabpanel" class="tab-pane fade" id="tab5" aria-labelledby="profile-tab">
+       							<div class="row">
+                					<div class="col-sm-10  col-md-12 col-lg-9">
+                       					<div class="form-group">
+                             				<label for="" class="col-sm-2 control-label">Share with</label>
+                             				<div class="col-sm-9">
+                              					<input type="hidden" id="shared_systems" name="shared_systems" value="">
+                              					<select name="select_systems" id="select_systems" multiple="multiple" class="chosen-select form-control"></select>
+                            				</div>
+                        				</div>
+                     				</div>
+                				</div>
+      						</div>
+      						<% 	} 
+      						}	%>
+      					</div>
+  					</div>
+  					
+   					<div class="col-sm-12 margin-top-15 " ALIGN="CENTER" style="margin-top:20px;">	
+   						<button class="btn btn-primary btn-color margin-right-5 btn-sm"> Save Changes</button>
+                	</div>
+        		</form>
+      		</div>
+		</div>
+      			
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+
+
+<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+</div>
+<!-- modal box start -->
+<div class="modal fade" id="processingPrompt" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+        <div class="modal-content">
+        	<div class="modal-body" style="text-align:center" >
+                <h4>Uploading image, please wait and don't refresh the page while processing!</h4>.<br /> <img id="imgAjaxLoading" src="img/loading.gif" width="109" height="25" style="border-width: 0px;">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal box end -->
+
+<script src="js/jquery.validate.js"></script>
+<script SRC="plugins/tinymce/tinymce.min.js"></script>
+<script src="js/chosen.jquery.js" type="text/javascript"></script>
+
+ <script src="js/jquery.caret.min.js"></script>
+ <script src="js/jquery.tag-editor.min.js"></script>
+ <script src="js/moment.js"></script>
+<script src="js/bootstrap-datetimepicker.min.js"></script>
+<script>
+var defaultAssignedSystemVal='', selectedSharedSystemArr = new Array();
+<% if (typeof contentObj.uuid_system !== 'undefined' && contentObj.uuid_system !== null && contentObj.uuid_system !== "") { %>
+	defaultAssignedSystemVal="<%= contentObj.uuid_system %>";
+<% } %>
+<% if (typeof contentObj.shared_systems !== 'undefined' && contentObj.shared_systems !== null && contentObj.shared_systems !== "") { %>
+	var tempselectedSearchArr=<%- JSON.stringify(contentObj.shared_systems) %>;
+	if(typeof(tempselectedSearchArr)=="object" || typeof(tempselectedSearchArr)=="array"){
+		selectedSharedSystemArr = tempselectedSearchArr;
+	}	else	{
+		selectedSharedSystemArr = JSON.parse(tempselectedSearchArr);
+	}
+<% } %>
+$(document).ready(function(){
+	<% if (typeof contentObj.Type !== 'undefined' && contentObj.Type !== null) { %>
+		var typeStr='<%= contentObj.Type %>';
+		if(typeStr!="blog"){
+			window.location.href=backendDirectory+'/blog';
+		}
+	<% } %>
+});
+</script>
+<script src="scripts/document.js"></script>
+</body>
+</html>

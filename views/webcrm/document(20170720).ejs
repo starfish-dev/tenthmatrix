@@ -1,0 +1,762 @@
+<% include include/main-header %>
+<link rel="stylesheet" href="css/chosen.css">
+<!-- page specific css -->
+<link href="plugins/datetime-picker/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<style>
+#select_systems_chosen{
+width : 402px!important;
+}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Document <small><% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj.Document %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Document</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			
+		<div class="row" id="printMessageDivID">
+			<% if (typeof queryStr !== 'undefined' && queryStr !== null) {
+    				if(queryStr.error_msg) {	%>
+			<div class="col-sm-12"><div class="alert alert-danger alert-dismissable">
+             	<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                	<%= queryStr.error_msg %>
+            </div> </div>
+            <% }
+           		if(queryStr.success_msg) {	%>
+					<div class="col-sm-12"><div class="alert alert-success alert-dismissable">
+             		<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                		<%= queryStr.success_msg %>
+            		</div></div>
+            <%	}
+            }	%>
+      		<div class="panel-body no-padding-top bg-white"> 
+      			<form class="form-horizontal" action="<%= backendDirectory %>/save/document" method="POST" id="contentForm">
+      				<input type="hidden" class="form-control" id="table_name" name="table_name" value="documents">
+      				<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="Code">
+      				<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      				<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      				<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+     				<input type="hidden" class="form-control" id="data" name="data" value="">
+     				<div data-example-id="togglable-tabs">
+    					<ul id="new-customer-tab" class="nav nav-tabs" role="tablist">
+      						<li role="presentation" class="active"><a href="#customerinfo" id="home-tab" role="tab" data-toggle="tab" aria-controls="customer-info" aria-expanded="true">Page Editor</a></li>
+     						<li role="presentation"><a href="#licenceno" role="tab" id="profile-tab" data-toggle="tab" aria-controls="licenceno">Search Optimisation</a></li>  
+     						<li role="presentation"><a href="#tab3" role="tab" id="profile-tab" data-toggle="tab" aria-controls="tab3">Objects</a></li>  
+     						<li role="presentation" class="blogComments" <% if (typeof contentObj.Type !== 'undefined' && contentObj.Type !== null && contentObj.Type == "blog") {  }else{	%>style="display:none"<% } %>><a href="#tab4" role="tab" id="profile-tab" data-toggle="tab" aria-controls="tab4">Blog Comments</a></li>  
+     						<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null  && authenticatedUser.access_right == "11"  && authenticatedUser.access_right == 11) {
+     							if (typeof authenticatedUser.active_system_uuid !== 'undefined' && authenticatedUser.active_system_uuid !== null  && typeof contentObj.uuid_system !== 'undefined' && contentObj.uuid_system !== null && authenticatedUser.active_system_uuid==contentObj.uuid_system) {	%>
+            					<li role="presentation"><a href="#tab5" role="tab" id="sharing-tab" data-toggle="tab" aria-controls="tab5">Sharing</a></li>
+            				<% }
+            				} %>
+     					</ul>
+    					<div id="myTabContent" class="tab-content" style="padding-top:25px; border-left: 1px solid #ddd; border-right: 1px solid #ddd;  border-bottom: 1px solid #ddd; padding-bottom:25px; padding-left:15px; padding-right:15px;">
+      						<div role="tabpanel" class="tab-pane fade in active" id="customerinfo" aria-labelledby="home-tab">
+     							<div class="row">
+           		  					<div class=" col-sm-12 col-lg-9">
+  										<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Heading<sup class="required">*</sup></label>
+    										<div class="col-sm-9  ">
+    											<input type="text" required class="form-control" id="Document" name="Document" onblur="generate_manual_code('chk_manual','Document','Code'); generate_metaTags();" onkeyup="generate_manual_code('chk_manual','Document','Code');generate_metaTags();"  value="<% if (typeof contentObj.Document !== 'undefined' && contentObj.Document !== null) { %><%= contentObj.Document %><% } %>">
+    										</div>
+  										</div>
+  
+  										<div class="form-group">
+    										<label for="firstname" class="col-sm-2  control-label">Sub heading </label>
+    										<div class="col-sm-9">
+      											<input type="text" class="form-control" id="Title" name="Title" onblur="generate_metaTags();" onkeyup="generate_metaTags();" value="<% if (typeof contentObj.Title !== 'undefined' && contentObj.Title !== null) { %><%= contentObj.Title %><% } %>">
+    										</div>
+  										</div>
+  										<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Body </label>
+    										<div class="col-sm-9">
+     											<TEXTAREA CLASS="form-control" STYLE="height:500px;" name="Body" id="Body"><% if (typeof contentObj.Body !== 'undefined' && contentObj.Body !== null) { %><%= contentObj.Body %><% } %></TEXTAREA>
+    										</div>
+										</div>
+										<div class="form-group">
+    										<label for="firstname" class="col-sm-2  control-label">Type </label>
+    										<div class="col-sm-9">
+    											<select  required="required" class="form-control col-md-5 col-xs-12" name="Type" id="Type">
+                  									<option value="page" <% if (typeof contentObj.Type !== 'undefined' && contentObj.Type !== null && contentObj.Type == "page") { %>selected<% } %>>Page</option>
+                  									<option value="blog" <% if (typeof contentObj.Type !== 'undefined' && contentObj.Type !== null && contentObj.Type == "blog") { %>selected<% } %>>Blog</option>
+                  									<option value="news" <% if (typeof contentObj.Type !== 'undefined' && contentObj.Type !== null && contentObj.Type == "news") { %>selected<% } %>>News</option>
+                  									<option value="clients-testimonial" <% if (typeof contentObj.Type !== 'undefined' && contentObj.Type !== null && contentObj.Type == "clients-testimonial") { %>selected<% } %>>Clients testimonial</option>
+                    								<option value="resource-centre" <% if (typeof contentObj.Type !== 'undefined' && contentObj.Type !== null && contentObj.Type == "resource-centre") { %>selected<% } %>>Resource Centre</option>
+                    							</select>
+      										</div>
+  										</div>
+  										
+  										<div class="form-group no-margn-bottom">
+              								<label for="dtp_input1" class="col-md-2 control-label" >Published On  <span class="required">*</span></label>
+                  							<div class="col-md-6 col-lg-4" >
+                  								<input class="form-control col-md-5 col-xs-12" type="hidden" id="Published_timestamp" name="Published_timestamp" value="<% if (typeof contentObj.Published_timestamp !== 'undefined' && contentObj.Published_timestamp !== null) {  %><%= contentObj.Published_timestamp %><% } %>" readonly>
+                    								
+                								<div class="input-group date form_datetime " style="max-width:300px;" >
+                    								<input class="form-control col-md-5 col-xs-12" required type="text" id="published_date" value="" readonly>
+                    								<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                								</div>
+                  							</div>
+            							</div>
+  										
+  										<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Status</label>
+    										<div class="col-sm-9" style="margin-top:6px;">
+    											<div STYLE="float:left; margin-right:10px; display:inline-block;">
+      		  										<label> <input type="radio" id="status" name="status" value="1" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && (contentObj.status == 1 || contentObj.status=="1")) { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  								</div>
+				  								<div sTYLE="float:left; display:inline-block;">
+      		  										<label> <input type="radio" id="status" name="status" value="0" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 0) { %>checked<% } %> > <strong style="font-weight:600">Inactive</strong></label>
+    			  								</div>
+											</div>
+										</div>
+  										
+   									</div>
+   									<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
+   									<div class=" col-sm-12 col-lg-3">
+   										<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Image</label>
+    										<div class="col-sm-9 div_imagetranscrits ">
+    											
+    										</div>
+  										</div>
+  										<div class="form-group">
+    										<label for="firstname" class="col-sm-2  control-label">Image Path </label>
+    										<div class="col-sm-9">
+      											<input type="text" class="form-control" id="image_path" name="image_path" value="<% if (typeof contentObj.image_path !== 'undefined' && contentObj.image_path !== null) { %><%= contentObj.image_path %><% } %>">
+    										</div>
+  										</div>
+   										<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Upload image</label>
+    										<div class="col-sm-9  ">
+    											<input type="hidden" id="file_type" value="document_image">
+    											<input type="file" id="file" class="form-control col-md-5 col-xs-12" value="">
+    										</div>
+  										</div>
+  										<div class="form-group">
+  											<label for="" class="col-sm-2 control-label">&nbsp;</label>
+    										<button type="button" class="btn btn-danger sm-btn" onclick="upload_single_file(); return false;">Upload</button>
+  										</div>
+   									</div>
+   									<% } %>
+       							</div>
+      						</div>
+      						<div role="tabpanel" class="tab-pane fade" id="licenceno" aria-labelledby="profile-tab">
+       							<div class="row">
+                					<div class="col-sm-10  col-md-12 col-lg-9">
+                       					<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Code<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" required class="form-control" id="Code" name="Code" placeholder="" value="<% if (typeof contentObj.Code !== 'undefined' && contentObj.Code !== null) { %><%= contentObj.Code %><% } %>" <% if (typeof contentObj.chk_manual !== 'undefined' && contentObj.chk_manual !== null && contentObj.chk_manual == 1) {  }else { %>readonly<% } %>>
+							  					<span STYLE="font-size:12px; color:#737373;">URL (SEO friendly)</span>
+							  					<span class="help-block" STYLE="font-size:12px;">
+													<input name="chk_manual" id="chk_manual" value="1" type="checkbox" <% if (typeof contentObj.chk_manual !== 'undefined' && contentObj.chk_manual !== null && contentObj.chk_manual == 1) { %>checked<% } %> >
+													I want to manually enter code</span>
+                             				</div>
+                        				</div>
+                        				
+                        				<div class="form-group">
+                             				<label for="" class="col-sm-2 control-label">Window Title</label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="PageTitle" name="PageTitle" placeholder="" value="<% if (typeof contentObj.PageTitle !== 'undefined' && contentObj.PageTitle !== null) { %><%= contentObj.PageTitle %><% } %>" <% if (typeof contentObj.chk_manual_metatags !== 'undefined' && contentObj.chk_manual_metatags !== null && contentObj.chk_manual_metatags == 1) {  }else { %>readonly<% } %>>
+                            				</div>
+                        				</div>
+                        				<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Meta Data Keywords</label>
+                             				<div class="col-sm-9">
+                             					<TEXTAREA CLASS="form-control" STYLE="height:220px;" id="MetaTagKeywords" name="MetaTagKeywords" <% if (typeof contentObj.chk_manual_metatags !== 'undefined' && contentObj.chk_manual_metatags !== null && contentObj.chk_manual_metatags == 1) {  }else { %>readonly<% } %>><% if (typeof contentObj.MetaTagKeywords !== 'undefined' && contentObj.MetaTagKeywords !== null) { %><%= contentObj.MetaTagKeywords %><% } %></TEXTAREA>
+							 					<span STYLE="font-size:11px;">Search terms relevant to this page to find content of this page easily</span>
+                             				</div>
+                        				</div>
+                        				<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Meta Data Description</label>
+                             				<div class="col-sm-9">
+                             					<TEXTAREA CLASS="form-control" STYLE="height:220px;" id="MetaTagDescription" name="MetaTagDescription" <% if (typeof contentObj.chk_manual_metatags !== 'undefined' && contentObj.chk_manual_metatags !== null && contentObj.chk_manual_metatags == 1) {  }else { %>readonly<% } %>><% if (typeof contentObj.MetaTagDescription !== 'undefined' && contentObj.MetaTagDescription !== null) { %><%= contentObj.MetaTagDescription %><% } %></TEXTAREA>
+							 					<span STYLE="font-size:11px;">Overview which describes this page (About 300 words)</span>
+							 					<span class="help-block" STYLE="font-size:12px;">
+													<input name="chk_manual_metatags" id="chk_manual_metatags" value="1" type="checkbox" <% if (typeof contentObj.chk_manual_metatags !== 'undefined' && contentObj.chk_manual_metatags !== null && contentObj.chk_manual_metatags == 1) { %>checked<% } %>>
+													 I want to manually enter meta tags</span>
+							 				</div>
+                        				</div>
+                     				</div>
+                				</div>
+      						</div>
+      						<div role="tabpanel" class="tab-pane fade" id="tab3" aria-labelledby="profile-tab">
+      							<input type="hidden" name="Objects" id="Objects" value="" />
+      							<div align="right">	
+   									<button class="btn btn-danger btn-color margin-right-5 btn-sm" onClick="addNewObject();return false;">Add new Object</button>
+                				</div>
+                				<div id="tab3Content">	
+      							<% if (typeof contentObj.Objects !== 'undefined' && contentObj.Objects !== null) {
+      								var objectArr=contentObj.Objects;
+      								for(var i=0; i < objectArr.length; i++){
+      								%>
+      								<div class="row ObjectContentClass" style="background-color: aliceblue; padding: 20px; margin: 5px 5px 20px; border-radius: 5px;">
+                					<div class="col-sm-10  col-md-12 col-lg-7">
+                						<input type="hidden" class="span10" id="object_uuid" value="<%=  objectArr[i].uuid %>" />
+										
+										<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Object Heading<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="obj_heading_<%=  objectArr[i].uuid %>" onblur="generate_manual_code('obj_chk_manual_<%=  objectArr[i].uuid %>','obj_heading_<%=  objectArr[i].uuid %>','obj_code_<%=  objectArr[i].uuid %>')" onkeyup="generate_manual_code('obj_chk_manual_<%=  objectArr[i].uuid %>','obj_heading_<%=  objectArr[i].uuid %>','obj_code_<%=  objectArr[i].uuid %>')" value="<%=  objectArr[i].name %>">
+                             				</div>
+                        				</div>
+                       					<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Code<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="obj_code_<%=  objectArr[i].uuid %>" placeholder="" <% if (objectArr[i].chk_manual == 0) { %>readonly<% } %> value="<%=  objectArr[i].code %>">
+							  					<span class="help-block" STYLE="font-size:12px;">
+													<input id="obj_chk_manual_<%=  objectArr[i].uuid %>" value="0" onChange="generate_manual_code('obj_chk_manual_<%=  objectArr[i].uuid %>','obj_heading_<%=  objectArr[i].uuid %>','obj_code_<%=  objectArr[i].uuid %>')" type="checkbox" <% if (typeof objectArr[i].chk_manual !== 'undefined' && objectArr[i].chk_manual !== null && objectArr[i].chk_manual == 1) { %>checked<% } %>>
+													I want to manually enter code</span>
+                             				</div>
+                        				</div>
+                        				                      				
+                        				<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Object Content</label>
+                             				<div class="col-sm-9">
+                             					<TEXTAREA CLASS="form-control" STYLE="height:220px;" id="obj_content__<%=  objectArr[i].uuid %>"><%=  objectArr[i].content %></TEXTAREA>
+							 				</div>
+                        				</div>
+                        				
+                     				</div>
+                     				<div class="col-lg-5">
+                     					<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Order By<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="obj_order__<%=  objectArr[i].uuid %>" placeholder="" value="<%=  objectArr[i].order_by %>">
+                             				</div>
+                        				</div>
+                        				<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Status</label>
+    										<div class="col-sm-9"style="margin-top:6px;">
+    											<div STYLE="float:left; margin-right:10px;display:inline-block;">
+      		  										<label> <input type="radio" id="obj_status__<%=  objectArr[i].uuid %>" value="1" <% if (objectArr[i].status == 1 || objectArr[i].status == "1") { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  								</div>
+				  								<div class="radio" STYLE="float:left;display:inline-block;">
+      		  										<label> <input type="radio" id="obj_status_<%=  objectArr[i].uuid %>" value="0" <% if (objectArr[i].status == 0 || objectArr[i].status == "0") { %>checked<% } %>> <strong style="font-weight:600">Inactive</strong></label>
+    			  								</div>
+											</div>
+										</div>
+                     				</div>
+                     				
+                				</div>
+                				<% } 
+                				}	%>
+                				</div>
+                				
+      						</div>
+      						<div role="tabpanel" class="tab-pane fade blogComments" id="tab4" aria-labelledby="profile-tab" <% if (typeof contentObj.Type !== 'undefined' && contentObj.Type !== null && contentObj.Type == "blog") {  }else{	%>style="display:none"<% } %>>
+      							<% if (typeof contentObj.BlogComments !== 'undefined' && contentObj.BlogComments !== null) {	%>
+      							<input type="hidden" name="BlogComments" id="BlogComments" value="" />
+      							<%
+      								var objectArr=contentObj.BlogComments;
+      								for(var i=0; i < objectArr.length; i++){
+      								%>
+      								<div class="row blogCommentsClass" style="background-color: aliceblue; padding: 20px; margin: 5px 5px 20px; border-radius: 5px;">
+                					<div class="col-sm-10  col-md-12 col-lg-7">
+                						<input type="hidden" class="span10" name="blog_id" id="blog_uuid" value="<%=  objectArr[i].uuid %>" />
+										
+										<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Name<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="blog_name_<%=  objectArr[i].uuid %>" value="<%=  objectArr[i].name %>">
+                             				</div>
+                        				</div>
+                       					<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Email<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="blog_email_<%=  objectArr[i].uuid %>" placeholder="" value="<%=  objectArr[i].email %>">
+							  				</div>
+                        				</div>
+                        				<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Website<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="text" class="form-control" id="blog_website_<%=  objectArr[i].uuid %>"  value="<%=  objectArr[i].website %>">
+							  				</div>
+                        				</div>                     				
+                        				<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Comment</label>
+                             				<div class="col-sm-9">
+                             					<TEXTAREA CLASS="form-control" STYLE="height:220px;" id="blog_comment_<%=  objectArr[i].uuid %>"><%=  objectArr[i].comment %></TEXTAREA>
+							 				</div>
+                        				</div>
+                        			</div>
+                     				<div class="col-lg-5">
+                     					<div class="form-group">
+                              				<label for="" class="col-sm-2 control-label">Posted On<sup class="required">*</sup></label>
+                             				<div class="col-sm-9">
+                              					<input type="hidden" class="form-control" id="blog_created__<%=  objectArr[i].uuid %>" readonly value="<%=  objectArr[i].created %>">
+                              					<input type="text" class="form-control" readonly value="<%=  dateTimeFromUnix(objectArr[i].created) %>">
+                             				</div>
+                        				</div>
+                        				<div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Status</label>
+    										<div class="col-sm-9" style="margin-top:6px;">
+    											<div  STYLE="float:left; margin-right:10px;display:inline-block;">
+      		  										<label> <input type="radio" id="blog_status__<%=  objectArr[i].uuid %>" value="1" <% if (objectArr[i].status == 1 || objectArr[i].status == "1") { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  								</div>
+				  								<div STYLE="float:left;display:inline-block;">
+      		  										<label> <input type="radio" id="blog_status__<%=  objectArr[i].uuid %>" value="0" <% if (objectArr[i].status == 0 || objectArr[i].status == "0") { %>checked<% } %>> <strong style="font-weight:600">Inactive</strong></label>
+    			  								</div>
+											</div>
+										</div>
+                     				</div>
+                     				
+                				</div>
+                				<% } 
+                				}else{	%>
+                					<div class="alert alert-danger">No blog comments posted!</div>
+                				<% } %>
+      						</div>
+      						<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null  && authenticatedUser.access_right == "11"  && authenticatedUser.access_right == 11) {
+      						if (typeof authenticatedUser.active_system_uuid !== 'undefined' && authenticatedUser.active_system_uuid !== null  && typeof contentObj.uuid_system !== 'undefined' && contentObj.uuid_system !== null && authenticatedUser.active_system_uuid==contentObj.uuid_system) {	%>
+            				<div role="tabpanel" class="tab-pane fade" id="tab5" aria-labelledby="profile-tab">
+       							<div class="row">
+                					<div class="col-sm-10  col-md-12 col-lg-9">
+                       					<div class="form-group">
+                             				<label for="" class="col-sm-2 control-label">Share with</label>
+                             				<div class="col-sm-9">
+                              					<input type="hidden" id="shared_systems" name="shared_systems" value="">
+                              					<select name="select_systems" id="select_systems" multiple="multiple" class="chosen-select form-control"></select>
+                            				</div>
+                        				</div>
+                     				</div>
+                				</div>
+      						</div>
+      						<% 	} 
+      						}	%>
+      					</div>
+  					</div>
+  					
+   					<div class="col-sm-12 margin-top-15 " ALIGN="CENTER" style="margin-top:20px;">	
+   						<button class="btn btn-primary btn-color margin-right-5 btn-sm"> Save Changes</button>
+                	</div>
+        		</form>
+      		</div>
+		</div>
+      			
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+
+
+<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+</div>
+<script src="js/jquery.validate.js"></script>
+<script SRC="plugins/tinymce/tinymce.min.js"></script>
+<script src="js/chosen.jquery.js" type="text/javascript"></script>
+<script>
+var tiny_options=new Array();
+tiny_options['selector']= "textarea#Body";
+tiny_options['theme']= "modern";
+tiny_options['plugins']= "advlist autolink link image lists charmap print preview hr anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking save table contextmenu directionality emoticons template paste textcolor moxiemanager";
+tiny_options['theme_advanced_buttons1']= "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect";
+tiny_options['theme_advanced_buttons2']= "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor";
+tiny_options['theme_advanced_buttons3']= "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen";
+tiny_options['theme_advanced_buttons4']= "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak";
+tiny_options['theme_advanced_toolbar_location']= "top";
+tiny_options['theme_advanced_toolbar_align']= "left";
+tiny_options['theme_advanced_statusbar_location']= "bottom";
+tiny_options['theme_advanced_resizing']= true;
+tiny_options['setup'] = function(ed){
+            ed.on('blur', function() {
+                $("textarea#Body").html( tinyMCE.activeEditor.getContent() );
+            });
+        }
+tinymce.init(tiny_options);
+
+//init chosen
+var configDropDown = {
+	'.chosen-select'           : {},
+	'.chosen-select-deselect'  : {allow_single_deselect:true},
+	'.chosen-select-no-single' : {disable_search_threshold:10},
+	'.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+	'.chosen-select-width'     : {width:"95%"}
+}
+
+function addNewObject(){
+	var newUUIDStr=guid();
+	var htmlStr='<div class="row ObjectContentClass" style="background-color: aliceblue; padding: 20px; margin: 5px 5px 20px; border-radius: 5px;">';
+	htmlStr+='<div class="col-sm-10  col-md-12 col-lg-7">';
+    htmlStr+='<input type="hidden" class="span10" id="object_uuid" value="'+newUUIDStr+'" />';
+	htmlStr+='<div class="form-group">';
+    htmlStr+='<label for="" class="col-sm-2 control-label">Object Heading<sup class="required">*</sup></label>';
+    htmlStr+='<div class="col-sm-9">';
+    htmlStr+='<input type="text" class="form-control" id="obj_heading_'+newUUIDStr+'" value="" onblur="generate_manual_code(\'obj_chk_manual_'+newUUIDStr+'\',\'obj_heading_'+newUUIDStr+'\',\'obj_code_'+newUUIDStr+'\')" onkeyup="generate_manual_code(\'obj_chk_manual_'+newUUIDStr+'\',\'obj_heading_'+newUUIDStr+'\',\'obj_code_'+newUUIDStr+'\')">';
+    htmlStr+='</div>';
+    htmlStr+='</div>';
+    htmlStr+='<div class="form-group">';
+    htmlStr+='<label for="" class="col-sm-2 control-label">Code<sup class="required">*</sup></label>';
+    htmlStr+='<div class="col-sm-9">';
+    htmlStr+='<input type="text" class="form-control" id="obj_code_'+newUUIDStr+'" placeholder="" readonly value="">';
+	htmlStr+='<span class="help-block" STYLE="font-size:12px;">';
+	htmlStr+='<input id="obj_chk_manual_'+newUUIDStr+'" value="0" onChange="generate_manual_code(\'obj_chk_manual_'+newUUIDStr+'\',\'obj_heading_'+newUUIDStr+'\',\'obj_code_'+newUUIDStr+'\')" type="checkbox">';
+	htmlStr+='I want to manually enter code</span>';
+    htmlStr+='</div>';
+    htmlStr+='</div>';
+    htmlStr+='<div class="form-group"><label for="" class="col-sm-2 control-label">Object Content</label><div class="col-sm-9">';
+    htmlStr+='<TEXTAREA CLASS="form-control" STYLE="height:220px;" id="obj_content__'+newUUIDStr+'" ></TEXTAREA>';
+	htmlStr+='</div></div>';
+    htmlStr+='</div>';
+    htmlStr+='<div class="col-lg-5">';
+    htmlStr+='<div class="form-group"><label for="" class="col-sm-2 control-label">Order By<sup class="required">*</sup></label><div class="col-sm-9">';
+    htmlStr+='<input type="text" class="form-control" id="obj_order__'+newUUIDStr+'" placeholder="" value="0">';
+    htmlStr+='</div></div>';
+    htmlStr+='<div class="form-group"><label for="" class="col-sm-2 control-label">Status</label>';
+    htmlStr+='<div class="col-sm-9" style="margin-top:6px;">';
+	htmlStr+='<div STYLE="float:left; margin-right:10px;display:inline-block;">';
+    htmlStr+='<label> <input type="radio" id="obj_status__'+newUUIDStr+'" value="1" checked> <strong style="font-weight:600">Active</strong></label>';
+    htmlStr+='</div>';
+	htmlStr+='<div class="radio" STYLE="float:left;display:inline-block;">';
+    htmlStr+='<label> <input type="radio" id="obj_status_'+newUUIDStr+'" value="0"> <strong style="font-weight:600">Inactive</strong></label>';
+    htmlStr+='</div>';
+	htmlStr+='</div>';
+	htmlStr+='</div>';
+    htmlStr+='</div>';		
+	htmlStr+='</div>';
+	$("#tab3Content").prepend(htmlStr);
+}
+
+function generateObjectsJson(){
+	var createArr=new Array();
+	var i=0;
+	$('.ObjectContentClass').each(function(){
+		var uuid=$(this).find('#object_uuid').val();
+  		if($(this).find('#obj_code_'+uuid).val()!=""){
+  			var createObject={};
+  			createObject['uuid']=uuid;
+  			createObject['name']=$(this).find('#obj_heading_'+uuid).val();
+  			createObject['code']=$(this).find('#obj_code_'+uuid).val();
+  			createObject['content']=$(this).find('#obj_content__'+uuid).val();
+  			createObject['order_by']=$(this).find('#obj_order__'+uuid).val();
+  			var checkManualNum=$(this).find('#obj_chk_manual_'+uuid).val();
+  		
+  			if(checkManualNum=="" || checkManualNum==null || checkManualNum === 'undefined'){
+  				checkManualNum=0;
+  			}
+  			createObject['chk_manual']=checkManualNum;
+  		
+  			var statusNum=$(this).find('#obj_status__'+uuid).val();
+  		
+  			if(statusNum=="" || statusNum==null || statusNum === 'undefined'){
+  				statusNum=0;
+  			}
+  			createObject['status']=statusNum;
+  			createArr[i]=createObject;
+  			i++;
+  		}
+  	});
+  	$("#Objects").val(JSON.stringify(createArr));
+}
+
+function generateBlogJson(){
+	var createArr=new Array();
+	var i=0;
+	$('.blogCommentsClass').each(function(){
+		var createObject={};
+		var uuid=$(this).find('#blog_uuid').val();
+  		createObject['uuid']=uuid;
+  		createObject['name']=$(this).find('#blog_name_'+uuid).val();
+  		createObject['email']=$(this).find('#blog_email_'+uuid).val();
+  		createObject['comment']=$(this).find('#blog_comment_'+uuid).val();
+  		createObject['website']=$(this).find('#blog_website_'+uuid).val();
+  		var statusNum=$(this).find('#blog_status__'+uuid).val();
+  		
+  		if(statusNum=="" || statusNum==null || statusNum === 'undefined'){
+  			statusNum=0;
+  		}
+  		createObject['status']=statusNum;
+  		createArr[i]=createObject;
+  		i++;
+  	});
+  	$("#BlogComments").val(JSON.stringify(createArr));
+}
+
+function generate_manual_code(chkd,name,code){
+	var status=document.getElementById(chkd).checked;
+	if(status!=true){
+		generate_code(name,code);
+	}else{
+		document.getElementById(code).value="";
+		$('#'+code).prop("readonly",false);
+	}
+}
+function removeEmptyStrings(tempMetaTags){
+	var returnMetaTags= tempMetaTags != "";
+	return returnMetaTags;
+}
+
+function stopWords(tempMetaTags){
+	var FORGETABLE_WORDS = ',the,of,an,and,that,which,is,was,';
+	for(var i = 0, word; word = tempMetaTags[i++]; ) {
+		if (FORGETABLE_WORDS.indexOf(',' + word + ',') > -1 || word.length <= 3) {
+			tempMetaTags[i-1] = "";
+    	}
+	}
+	tempMetaTags = tempMetaTags.filter(removeEmptyStrings);
+	return tempMetaTags;
+}
+
+function generate_metaTags(){
+	var doc=$("#Document").val();
+	var Title=$("#Title").val();
+	var Body=$("#Body").val();
+	if($("#PageTitle").val()==""){
+		$("#PageTitle").val(Title);
+	}
+	Body=Body.replace(/<\/?[^>]+(>|$)/g, "");
+	if(Body.length>=250){
+		var metaDescription=Body.substr(0, 250);
+		$("#MetaTagDescription").val(metaDescription);
+	}	
+	
+	var tempMetaTags=doc+" "+Title+" "+Body;
+	tempMetaTags=tempMetaTags.split(" ");
+	tempMetaTags=stopWords(tempMetaTags);
+	
+	$.unique(tempMetaTags);
+	$("#MetaTagKeywords").val(tempMetaTags);
+}
+
+$(document).ready(function(){
+	load_team_logo();
+	
+	load_systems();
+	
+	$("#type").change(function(){
+		if($(this).val()=="blog"){
+			$(".blogComments").show();
+		}else{
+			$(".blogComments").hide();
+		}
+	});
+	
+	$("#chk_manual").click(function(){
+		if(document.getElementById('chk_manual').checked) {
+			$('#Code').prop("readonly",false);
+			$('#Code').val("");
+		}else{
+			$('#Code').prop("readonly",true);
+			$('#Code').val("");
+			generate_manual_code('chk_manual','Document','Code');
+		}
+	});
+	
+	$("#chk_manual_metatags").click(function(){
+		if(document.getElementById('chk_manual_metatags').checked) {
+			$('#PageTitle').prop("readonly",false);
+			$('#MetaTagDescription').prop("readonly",false);
+			$('#MetaTagKeywords').prop("readonly",false);
+			$('#PageTitle').val("");
+			$('#MetaTagDescription').val("");
+			$('#MetaTagKeywords').val("");
+		}else{
+			$('#PageTitle').prop("readonly",true);
+			$('#MetaTagDescription').prop("readonly",true);
+			$('#MetaTagKeywords').prop("readonly",true);
+			$('#PageTitle').val("");
+			$('#MetaTagDescription').val("");
+			$('#MetaTagKeywords').val("");
+			generate_metaTags();
+		}
+	});
+	
+	if($("#Published_timestamp").val()!=""){
+		var tempDisplayDate=datepickerFormat($("#Published_timestamp").val());
+		$("#published_date").val(tempDisplayDate)
+	}
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: '',
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				if (element.attr("id") == "published_date" ) {
+					$('.form_datetime').after(error);
+            	}else{
+					$(element).closest('div').append(error);
+				}
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				Document: { required: true },
+				Body: { required: true },
+				Code: { required: true },
+				published_date: { required: true }
+			},
+			submitHandler: function(form) {
+				var userSystemsStr= $('#select_systems').val();  
+				if(userSystemsStr!="" && userSystemsStr!=null && userSystemsStr!="undefined"){
+					var	userSystemsArr=userSystemsStr.toString().split(",");
+					var selectedSystemsStr= JSON.stringify(userSystemsArr);
+					
+					$('#shared_systems').val(selectedSystemsStr);
+					$('#select_systems').remove();
+				}
+				
+				if($("#type").val()=="blog"){
+					generateBlogJson();
+				}
+				generateObjectsJson();
+				var bodyContent=tinyMCE.get('Body').getContent();
+				$("#Body").val(bodyContent);
+				
+				var publishedDateNum=getTimestampFromDateTime($("#published_date").val());
+				$("#Published_timestamp").val(publishedDateNum);
+				
+				dataAsJson('contentForm', form);
+ 			}
+		});		
+});
+function load_systems(){
+	$("#select_systems").html("");
+	
+	var defaultAssignedVal='';
+	var jsonRow=backendDirectory+"/api_fetch_list?limit=all&collection=systems";
+	
+	$.getJSON(jsonRow,function(response){
+		if(response.aaData){
+		var contentHtml="";
+		if(response.aaData.length>0){
+			var selectedSearchArr = new Array();
+			<% if (typeof contentObj.uuid_system !== 'undefined' && contentObj.uuid_system !== null && contentObj.uuid_system !== "") { %>
+				defaultAssignedVal="<%= contentObj.uuid_system %>";
+			<% } %>
+			
+			<% if (typeof contentObj.shared_systems !== 'undefined' && contentObj.shared_systems !== null && contentObj.shared_systems !== "") { %>
+				var tempselectedSearchArr=<%- JSON.stringify(contentObj.shared_systems) %>;
+				if(typeof(tempselectedSearchArr)=="object" || typeof(tempselectedSearchArr)=="array"){
+					selectedSearchArr = tempselectedSearchArr;
+				}	else	{
+					selectedSearchArr = JSON.parse(tempselectedSearchArr);
+				}
+			<% } %>	
+			
+			$.each(response.aaData, function(i,row){
+				if(defaultAssignedVal!="" && defaultAssignedVal!=row._id){
+					var tempcontentHtml="<option value='"+row._id+"' ";
+					if(selectedSearchArr.length>0){
+						if($.inArray( row._id, selectedSearchArr)!==-1){
+							tempcontentHtml+="selected";
+						}
+					}
+					tempcontentHtml+=" >"+row.name+"</option>";
+					contentHtml+=tempcontentHtml;
+				}
+			});
+     	}
+     	$("#select_systems").html(contentHtml);
+     	
+     	for (var selector in configDropDown) {
+      		$(selector).chosen(configDropDown[selector]);
+   		}
+   		$("#select_systems").trigger("chosen:updated");
+   		}
+	});
+}
+function load_team_logo(){
+	var noImageStr= backendDirectory+'/images/no_image.png';
+	if($("#id").val()!="")	{
+		$('.div_imagetranscrits').html('<img src="'+backendDirectory+"/file/"+$("#id").val()+'?'+$.now()+'" class="img-responsive" style="border-radius: 0 0 3px 3px; border: 1px solid #ddd;" onerror="this.src=\''+noImageStr+'\'"/>')
+	} else{
+		$('.div_imagetranscrits').html('<img id="" src="'+$('#image_path').val()+'" class="img-responsive" style="border-radius: 0 0 3px 3px; border: 1px solid #ddd;" onerror="this.src=\''+noImageStr+'\'">');
+	}
+}
+function upload_single_file(){
+	$(".uploadFile").remove();
+	if($('#file').val().length>0)	{
+		var data = new FormData();
+		data.append('related_collection', $('#table_name').val());
+		data.append('collection_id', $('#id').val());
+		data.append('type', $('#file_type').val());
+		
+		var filesize=Number($('#file')[0].files[0].size)/(1024*1024);
+		
+		if(filesize>5){
+			$('#printMessageDivID').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>The file size larger than 5MB is not allowed</div>');
+			$('#file').focus();
+		}else{
+			var files= $('#file')[0].files;
+			$.each(files, function(key, value){
+				data.append('file', value);
+			});
+			
+			$.ajax({
+				url: backendDirectory+'/find_remove_file',
+				type: 'POST',
+				data: {'related_collection' : $('#table_name').val(), 'collection_id': $('#id').val()},
+				dataType: 'json',
+				success: function(response){
+					if(response.success){
+						$.ajax({
+							url: backendDirectory+'/upload',
+							type: 'POST',
+							data: data,
+							dataType: 'json',
+							contentType: false,
+							enctype: 'multipart/form-data',
+							cache: false,
+							processData: false, // Don't process the files
+							success: function(response){
+								if(response.success){
+									$("#image_path").val("");
+									load_team_logo();
+									__alertModalBox(response.success);
+								} else if(response.error) {
+									$('#printMessageDivID').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>'+response.error+'</div>');
+								}else {
+									$('#printMessageDivID').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Sorry, error in uploading file!</div>');
+								}
+							}
+						});
+					}else {
+						$('#printMessageDivID').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Sorry, error in uploading file!</div>');
+					}
+				}
+			});
+			
+		}
+	}	else {
+		$('#printMessageDivID').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Please select file to upload!</div>');
+	}
+}
+
+</script>
+<script type="text/javascript" src="plugins/datetime-picker/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript">
+	$('.form_datetime').datetimepicker({
+		weekStart: 1,
+        todayBtn:  1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 2,
+		forceParse: 0,
+		pickerPosition: "bottom-left",		
+        showMeridian: 1,
+		pickTime: 0
+	});
+</script>
+</body>
+</html>

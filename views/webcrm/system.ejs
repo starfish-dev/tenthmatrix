@@ -1,0 +1,105 @@
+<% include include/main-header %>
+<link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
+<style>
+.box-primary h4 {
+    border-bottom: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 20px;
+    margin: 7px 5px 0 0;
+    padding: 9px;
+}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1><% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } else{	%>Add new<% }%> <small>Business</small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Business</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/system" method="POST" id="contentForm">
+            						<% include system_form %>
+            					</form>
+              				</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/jquery.validate.js"></script>
+ <script src="js/moment.js"></script>
+<script src="js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript">
+$(function () {
+	<% if (typeof contentObj._id == 'undefined' && contentObj._id == null) { %>
+		$("input[name=status][value=1]").prop("checked",true);
+	<% } %>
+	if($("#established_timestamp").val()!=""){
+		var tempDisplayDate=return_datetimepicker_from_timestamp($("#established_timestamp").val());
+		$("#established_on").val(tempDisplayDate)
+	}
+	$('#datetime_picker').datetimepicker();
+	
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				if (element.attr("name") == "established_on" ) {
+                	$(element).closest('div').after(error);
+            	}else{
+					$(element).closest('div').append(error);
+				}
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name: { required: true },
+				address: { required: true },
+				telephone: { required: true },
+				email: { required: true, email : true },
+				organisation_type : { required: true },
+			},
+			submitHandler: function(form) {
+				if($("#established_on").val()!=""){
+					var publishedDateNum=return_timestamp_from_datetimepicker($("#established_on").val());
+					$("#established_timestamp").val(publishedDateNum);
+				}
+				//save data as json in data field, use dataAsJson function to populate that field
+ 				dataAsJson('contentForm', form);
+ 			}
+		});	
+});
+</script>
+</body>
+</html>

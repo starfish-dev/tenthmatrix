@@ -1,0 +1,337 @@
+<% include include/main-header %>
+<link rel="stylesheet" href="css/basictable.css">
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">	
+	<!-- Header Starts here-->
+  		<% include include/header %>
+  	<!-- Header Ends here-->
+  		
+  	<!-- Sidebar Starts Here-->
+  		<% include include/sidebar %>
+    <!-- Sidebar Ends Here-->
+    <div class="content-wrapper">
+    	<!-- Content Header (Page header) -->
+    	<section class="content-header">
+      		<h1>List <small><% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj.name %><% } else{	%>Add new<% }%></small></h1>
+      		<ol class="breadcrumb">
+        		<% include include/dashboard-breadcrumb %>
+        		<li class="active">List</li>
+      		</ol>
+    	</section>	
+    	<!-- Main content -->
+    	<section class="content">
+   			<div class="row">
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            		
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/system_list" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="system_lists">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="code">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						<div class="form-group">
+    									<label for="firstname" class="col-sm-1  control-label">Name </label>
+    									<div class="col-md-6 col-lg-4">
+                  							<input type="text" required="required" id="name" name="name" onblur="generate_code('name','code')" onkeyup="generate_code('name','code')" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } %>">
+                  						</div>
+                  					</div>
+  									<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Code<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" readonly required="required" id="code" name="code" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.code !== 'undefined' && contentObj.code !== null) { %><%= contentObj.code %><% } %>">
+                  						</div>
+                					</div>
+              						
+                					<div class="form-group">
+    									<label for="" class="col-sm-1 control-label">Status</label>
+    									<div class="col-sm-9" style="margin-top:6px;">
+    										<div STYLE="float:left; margin-right:10px; display:inline-block;">
+      		  									<label> <input type="radio" id="status" name="status" value="1" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 1) { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  							</div>
+				  							<div STYLE="float:left; display:inline-block;"">
+      		  									<label> <input type="radio" id="status" name="status" value="0" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 0) { %>checked<% } %> > <strong style="font-weight:600">Inactive</strong></label>
+    			  							</div>
+										</div>
+									</div>
+									<div CLASS="ROW ">
+									<div CLASS="col-md-12 itemsContent">
+										<span style="float:right; font-weight:bold;">
+											<button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal" style="margin-bottom: 10px;">+ Add new Item</button>
+										</span>
+									</div>
+									</div>
+									<div CLASS="row">
+									
+									<div class="itemsContent col-md-12" id="itemsTable">
+    									<label for="" class="col-lg-1 col-sm-12 control-label" STYLE="padding-left:0px;">List Items</label>
+    									<input type="hidden" id="list" name="list" value="">
+										<div CLASS="table-responsive">
+										   	<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint">
+												<thead>
+												  <tr class="item">
+												  	  <th>Label</th>
+												  	  <th>Value</th>
+													  <th>Sort Order</th>
+													  <th>Status</th>
+													  <th colspan="2" align="center">Actions</th>
+												  </tr>
+											  </thead>
+											  <tbody id="link_items">
+											  <% if (typeof contentObj.list !== 'undefined' && contentObj.list !== null  && contentObj.list != "") { 	
+											  			try{
+															var list_items = JSON.parse(contentObj.list); 
+        												}	catch (error){
+       														var list_items = contentObj.list; 
+    													} 
+    													
+											  		for(var i=0; i< list_items.length; i++){	%>
+											  			<tr class="itemClass item_<%= list_items[i].uuid %>">
+											  				<td><input type="hidden" value="<%= list_items[i].uuid %>" id="list_uuid"><input class="itemtr_<%= list_items[i].uuid %>" id="labelField" type="hidden" value="<%= list_items[i].label %>"><%= list_items[i].label %></td>
+											  				<td>
+											  					<% var listValueStr='';
+											  					if(list_items[i].value) {
+											  						listValueStr=list_items[i].value;
+											  					}
+											  					%>
+											  					<input id="labelValueField" type="hidden" value="<%= listValueStr %>"><%= listValueStr %></td>
+											  				<td><input id="sort_orderField" type="hidden" value="<%= list_items[i].item_sort_order %>"><%= list_items[i].item_sort_order %>
+											  			</td>
+															<td><input id="statusField" type="hidden" value="<%= list_items[i].status %>"><%= list_items[i].status %></td>
+															<td><a href="javascript:void(0)" title="Edit" onClick="edit_item('<%= list_items[i].uuid %>')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item('<%= list_items[i].uuid %>')" title="Remove"><i class="fa fa-trash"></i></a></td>
+														</tr>
+												<%	}
+											  }	%>
+											  </tbody>
+											</table>
+											<span style="float:right;font-size:12px;font-style:italic;color:#d9534f">Note: Please submit the form to save the changes!</span>
+										</div>
+											
+									</div>
+									</div>
+                					<div class="form-group">
+                						<label for="" class="col-sm-1 control-label"></label>
+                   						<div class="col-md-9 col-lg-6">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm" id="btn_submit">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/lists" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+              					</form>
+              				</div>
+            			</div>
+      		</section>
+    		<!--//body content--> 
+	</div>
+  	<!--//Main Content--> 
+  	
+  	<!-- Modal -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <button type="button" class="close" 
+                   data-dismiss="modal" onClick="resetItemForm()">
+                       <span aria-hidden="true">&times;</span>
+                       <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    Item
+                </h4>
+            </div>
+			
+			<style>
+			.form-group {
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+			
+			</style>
+            
+            <!-- Modal Body -->
+            <div class="modal-body">
+            	<div class="form-group" id="messageId">
+                    <label for="item_label"><strong>Label</strong><span class="f_req">*</span></label>
+                      <input class="form-control" id="item_label" placeholder="Enter Label"/>
+                      <input type="hidden" class="form-control" id="item_uuid"/>
+                  </div>
+                  <div class="form-group" style="margin-top:5px;">
+                 	<label><span for="item_type"><strong>Value</strong></span></label>
+                	<input type="text" class="form-control" id="item_value" placeholder="Value" value=""/>
+                  </div>
+                 <div class="form-group" style="margin-top:5px;">
+                 	<label><span for="item_type"><strong>Sort Order</strong></span></label>
+                	<input type="text" class="form-control" id="item_sort_order" placeholder="Sort Order" value="0"/>
+                  </div>
+                  <div class="form-group">
+						<LABEL> <span for="item_type"><strong>Status</strong></span></LABEL>
+                		<select name="item_active" id="item_active"  class="form-control">
+						<option value='1'>Active</option>
+						<option value='0'>Inactive</option>
+					</select>
+                  </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onClick="resetItemForm()">
+                	Close
+                </button>
+                <button type="button" class="btn btn-primary" onClick="savelinkitem()">
+                    Add
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+	<!-- Footer Starts Here-->
+	<% include include/footer %>
+	<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/basictable.js"></script>
+ <script src="plugins/combobox/autocomplete-ui.js"></script>
+ <script src="js/jquery.validate.js"></script>
+<script>
+function generateObjectJson(){
+	var createArr=new Array();
+	var i=0;
+	$('.itemClass').each(function(){
+		var createObject={};
+		var uuid=$(this).find('#list_uuid').val();
+  		createObject['uuid']=$(this).find('#list_uuid').val();
+  		createObject['label']=$(this).find('#labelField').val();
+  		createObject['value']=$(this).find('#labelValueField').val();
+  		
+  		var sortORderNum=$(this).find('#sort_orderField').val();
+  		
+  		if(sortORderNum=="" || sortORderNum==null || sortORderNum === 'undefined'){
+  			sortORderNum=0;
+  		}
+  		createObject['item_sort_order']=sortORderNum;
+  		createObject['status']=$(this).find('#statusField').val();
+  		createArr[i]=createObject;
+  		i++;
+  	});
+  	$("#list").val(JSON.stringify(createArr));
+}
+
+function remove_item(e){
+	if(e!=""){
+		$(".itemtr_"+e).parents('.itemClass').remove();
+	}
+}
+
+function edit_item(e){
+	if(e!=""){
+		var row= $(".itemtr_"+e).parents('.itemClass');	
+		$("#item_uuid").val(e);
+		$("#item_sort_order").val(row.find('#sort_orderField').val());
+		if(row.find('#statusField').val()=="Active"){
+			$("#item_active").val(1);
+		}else{
+			$("#item_active").val(0);
+		}
+		$("#item_label").val(row.find('#labelField').val());
+		$("#item_value").val(row.find('#labelValueField').val());
+		$('#myModal').modal('show'); 
+	}
+}
+
+function savelinkitem(){
+	$("#msgSpan").remove();
+	var item_uuid=$("#item_uuid").val();
+	var item_value = $("#item_value").val();
+	var item_label=$("#item_label").val();
+	var item_sort_order=$("#item_sort_order").val();
+	var item_active=$("#item_active").val();
+	
+	if(item_label!=""){
+		
+		var itemStatus="Inactive";
+		if(item_active==1){
+			itemStatus="Active";
+		}
+		
+		var newEntryFlag=false;
+			if(item_uuid==""){
+				item_uuid=guid();
+				newEntryFlag=true;
+			}
+			var subHTMLSTR='<td><input type="hidden" value="'+item_uuid+'" id="list_uuid"><input class="itemtr_'+item_uuid+'" id="labelField" type="hidden" value="'+item_label+'">'+item_label+'</td>';
+				subHTMLSTR+='<td><input id="labelValueField" type="hidden" value="'+item_value+'">'+item_value+'</td>';
+				subHTMLSTR+='<td><input id="sort_orderField" type="hidden" value="'+item_sort_order+'">'+item_sort_order+'</td>';
+				subHTMLSTR+='<td><input id="statusField" type="hidden" value="'+itemStatus+'">'+itemStatus+'</td>';
+				subHTMLSTR+='<td><a href="javascript:void(0)" title="Edit" onClick="edit_item(\''+item_uuid+'\')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item(\''+item_uuid+'\')" title="Remove"><i class="fa fa-trash"></i></a></td>';
+			
+			if(newEntryFlag){
+				var htmlStr='<tr class="itemClass item_'+item_uuid+'">'+subHTMLSTR+'</tr>';
+				$("#link_items").append(htmlStr);
+			}else{
+				var htmlStr=subHTMLSTR;
+				$(".item_"+item_uuid).html(htmlStr);
+			}
+			generateObjectJson();
+			$('#myModal').modal('hide');
+			$('#table-breakpoint').basictable('destroy');
+			$('#table-breakpoint').basictable({
+        		breakpoint: 751
+   			});
+			resetItemForm();			
+	}else{
+		$("#messageId").before('<span id="msgSpan" style="color:#CC0000;">Please add the required field!</span>');
+	}	
+}		
+	
+function resetItemForm(){
+	$("#msgSpan").remove();
+	$("#item_uuid").val("");
+	$("#item_value").val("");
+	$("#item_label").val('');
+	$("#item_sort_order").val(0);
+	$("#item_active").val(1);
+}
+$(document).ready(function(){
+	$('#table-breakpoint').basictable({
+        breakpoint: 751
+    });
+ 	  	
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name : { required: true },
+				code : { required: true }
+			},
+			submitHandler: function(form) {
+				generateObjectJson();
+ 				dataAsJson('contentForm', form);
+ 			}
+		});		
+});
+
+</script>
+</body>
+</html>

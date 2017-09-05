@@ -1,0 +1,14 @@
+<% if (typeof queryStr !== 'undefined' && queryStr !== null) {
+    				if(queryStr.error_msg) {	%>
+			<div class="row" ><div class="col-md-12 col-sm-12"><div class="alert alert-danger alert-dismissable">
+             	<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                	<%= queryStr.error_msg %>
+            </div> </div></div>
+            <% }
+           		if(queryStr.success_msg) {	%>
+					<div class="row"><div class="col-md-12 col-sm-12"><div class="alert alert-success alert-dismissable">
+             		<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                		<%= queryStr.success_msg %>
+            		</div></div></div>
+            <%	}
+            }	%>

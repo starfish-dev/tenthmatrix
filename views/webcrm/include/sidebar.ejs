@@ -1,0 +1,52 @@
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      <!-- Sidebar user panel -->
+      <div class="user-panel">
+        <div class="pull-left image">
+          <img src="<% if (typeof authenticatedUser.uploaded_file_uuid !== 'undefined' && authenticatedUser.uploaded_file_uuid !== null && authenticatedUser.uploaded_file_uuid !=="") {	%><%= backendDirectory %>/file/<%= authenticatedUser.uploaded_file_uuid %><% }else{ %>img/no-avatar.jpg<% } %>" class="img-circle" alt="User Image">
+        </div>
+        <% 	
+if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {	
+	var loggedInUserNameStr="";
+	if (typeof authenticatedUser.firstname !== 'undefined' && authenticatedUser.firstname !== null) {	
+		loggedInUserNameStr+=authenticatedUser.firstname;
+	}
+	if (typeof authenticatedUser.lastname !== 'undefined' && authenticatedUser.firlastnamestname !== null) {	
+		loggedInUserNameStr+="&nbsp;"+authenticatedUser.lastname;
+	}
+	%>
+	<div class="pull-left info">
+          <p><%- loggedInUserNameStr %></p>
+          <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+        </div>
+      
+<% } %>
+      </div>  
+      <!-- search form -->
+      <form action="#" method="get" class="sidebar-form" onSubmit="load_navigation_data()">
+        <div class="input-group">
+          <input type="text" id="menuSearchBox" class="form-control" placeholder="Search...">
+              <span class="input-group-btn">
+                <button id="search-btn" class="btn btn-flat" STYLE="border-left:none;line-height: 12px;" onClick="load_navigation_data(); return false;"><i class="fa fa-search"></i></button>
+              </span>
+        </div>
+      </form>
+      <!-- /.search form -->
+      <!-- sidebar menu: : style can be found in sidebar.less -->
+      <ul class="sidebar-menu" id="dashboard-menu">
+      
+        
+      </ul>
+      
+		<ul class="sidebar-menu" STYLE="margin-top:20px; border-top:1px solid #ddd;display:none;" id="lastClickedListID">
+     		<li class=" treeview  active" >
+          		<a href="#"><i class=" fa fa-history"></i> <span>Recently Viewed</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+		 		<ul class="treeview-menu lastClickedLinkCss" style="display:none;">
+		 		
+          		</ul>
+        	</li>
+		</ul>
+	</section>
+    <!-- /.sidebar -->
+</aside>

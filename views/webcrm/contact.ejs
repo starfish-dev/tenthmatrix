@@ -1,0 +1,383 @@
+<% include include/main-header %>
+<link rel="stylesheet" href="plugins/combobox/autocomplete-ui.css"/>
+<style>
+.custom-combobox {
+		position: relative;
+		display: inline-block;
+	}
+	.custom-combobox-toggle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin-left: -1px;
+		padding: 0;
+	}
+	.custom-combobox-input {
+		margin: 0;
+		padding: 5px 10px;
+	}
+	.ui-widget-overlay {
+		position: fixed;
+	}
+	.box-primary h4 {
+    border-bottom: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 20px;
+    margin: 7px 5px 0 0;
+    padding: 9px;
+}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1> <% if (typeof contentObj.first_name !== 'undefined' && contentObj.first_name !== null) { %><%= contentObj.first_name %><% } else{	%>Add new<% }%><small>Contact</small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Contact</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+				<div class="row">
+					<div class="panel-body no-padding-top bg-white"> 
+		<% include include/display_returned_msg %>
+		<form class="form-horizontal" action="<%= backendDirectory %>/save/contact" method="POST" id="EntryForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="contacts">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="email_address">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						
+								
+			<div class="chart">
+				<div class="col-md-6 col-xs-12">
+          				<div class="box box-primary">
+		   					 <h4 style="padding-left: 10px;margin-top: 10px;font-size: 24px;margin-bottom: 8px;padding-bottom: 14px;">Basic Details</h4>
+            				<!-- /.box-header -->
+            					<div class="box-body">
+			
+									<div class="row">
+           		 						 <div class=" col-sm-12 col-lg-12">						
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Client <span style="color:#6E829B">*</span></label>
+								<div class="col-sm-9">
+									<select id="customer_mongo_id" name="customer_mongo_id" class="form-control" style="display: none;">
+									</select>
+								</div>
+							</div>    
+							 <div class="form-group">
+								<label class="col-sm-3 control-label">First name <span style="color:#6E829B">*</span></label>
+								<div class="col-sm-9"><input name="first_name" class="form-control" value="<% if (typeof contentObj.first_name !== 'undefined' && contentObj.first_name !== null) { %><%= contentObj.first_name %><% } %>" id="first_name" type="text"></div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Surname </label>
+							<div class="col-sm-9">	<input name="last_name" class="form-control" value="<% if (typeof contentObj.last_name !== 'undefined' && contentObj.last_name !== null) { %><%= contentObj.last_name %><% } %>" id="last_name" type="text">    </div>                             
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Title</label>
+								<div class="col-sm-9"><input name="title" class="form-control" value="<% if (typeof contentObj.title !== 'undefined' && contentObj.title !== null) { %><%= contentObj.title %><% } %>" id="title" type="text"></div>
+							</div>						   
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Salutation</label>
+								<div class="col-sm-9"><input name="salutation" class="form-control" value="<% if (typeof contentObj.salutation !== 'undefined' && contentObj.salutation !== null) { %><%= contentObj.salutation %><% } %>" id="salutation" type="text">		</div>				
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Comments</label>
+								<div class="col-sm-9"><textarea name="comments" class="form-control" rows="4" id="comments"><% if (typeof contentObj.comments !== 'undefined' && contentObj.comments !== null) { %><%= contentObj.comments %><% } %></textarea>
+							</div></div>
+							
+                            <div class="form-group">
+								<label class="col-sm-3 control-label"></label>
+								<div class="col-sm-9">	<input name="newsletter_subscriber" value="true" id="newsletter_subscriber" type="checkbox" <% if (typeof contentObj.newsletter_subscriber !== 'undefined' && contentObj.newsletter_subscriber !== null && contentObj.newsletter_subscriber == true) { %>checked<% } %> > Newsletter Subscriber</div>                                                        
+                            </div>
+							
+							
+							</div>
+							</div></div></div>
+						
+						</div>
+				<div class="col-md-6 col-xs-12">
+          				<div class="box box-primary">
+		   					 <h4 style="padding-left: 10px;margin-top: 10px;font-size: 24px;margin-bottom: 8px;padding-bottom: 14px;">Contact Details</h4>
+            				<!-- /.box-header -->
+            					<div class="box-body">
+			
+									<div class="row">
+           		 						 <div class=" col-sm-12 col-lg-12">						
+							
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Email <span style="color:#6E829B">*</span></label>
+								<div class="col-sm-9"><input name="email_address" class="form-control" value="<% if (typeof contentObj.email_address !== 'undefined' && contentObj.email_address !== null) { %><%= contentObj.email_address %><% } %>" id="email_address" type="text"></div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Direct Phone</label>
+								<div class="col-sm-9"><input class="form-control phone" value="<% if (typeof contentObj.direct_phone !== 'undefined' && contentObj.direct_phone !== null) { %><%= contentObj.direct_phone %><% } %>" name="direct_phone" id="direct_phone" type="text"></div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Mobile </label>
+								<div class="col-sm-9"> <input name="mobile" class="form-control phone" value="<% if (typeof contentObj.mobile !== 'undefined' && contentObj.mobile !== null) { %><%= contentObj.mobile %><% } %>" id="mobile" type="text"></div>
+							</div>			
+							
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Direct fax</label>
+								<div class="col-sm-9">	<input name="direct_fax" class="form-control" value="<% if (typeof contentObj.direct_fax !== 'undefined' && contentObj.direct_fax !== null) { %><%= contentObj.direct_fax %><% } %>" id="direct_fax" type="text"></div>
+							</div>
+							
+							</div>
+							</div></div></div>
+						
+						</div>
+					<div class="col-xs-12" style="text-align:center;">
+						<input class="btn btn-primary btn-sm" value="Submit" type="submit">
+						<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               				<a href="<%= backendDirectory %>/list/contacts" class="btn btn-danger btn-sm">Cancel</a>
+               			<%	}else{	%>
+               				<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               			<% } %>
+					</div>
+					</div>
+				</form>
+						</div>
+				</div>
+		
+		</section>
+      			
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+
+<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+</div>
+<script src="plugins/combobox/autocomplete-ui.js"></script>
+<script src="js/jquery.validate.js"></script>
+
+<script language="javascript">
+	$(function () {
+		var selected_customer_id="";
+		<% if (typeof queryStr !== 'undefined' && queryStr !== null && typeof queryStr.customer_id !== 'undefined' && queryStr.customer_id !== null && queryStr.customer_id !=="") { %>
+			selected_customer_id="<%= queryStr.customer_id %>";
+		<% }else if(typeof contentObj.customer_mongo_id !== 'undefined' && contentObj.customer_mongo_id !== null)	{ %>
+			selected_customer_id="<%= contentObj.customer_mongo_id %>";
+		<% } %>
+		
+		fetch_collection_autocomplete_list('customers', 'customer_mongo_id', selected_customer_id);
+
+		// validate form on keyup and submit
+		$("#EntryForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				customer_mongo_id: { required: true },
+				first_name: { required: true },
+				email_address: { required: true, email :true },
+			},
+			submitHandler: function(form) {
+				dataAsJson('EntryForm', form);
+ 			}
+		});			
+	});
+
+//autocomplete
+	var xhr;
+  (function( $ ) {
+    $.widget( "custom.combobox", {
+      _create: function() {
+        this.wrapper = $( "<span>" )
+          .addClass( "custom-combobox" )
+          .insertAfter( this.element );
+ 
+        this.element.hide();
+        this._createAutocomplete();
+        this._createShowAllButton();
+      },
+ 
+      _createAutocomplete: function() {
+        var selected = this.element.children( ":selected" ),
+          value = selected.val() ? selected.text() : "";
+ 
+        this.input = $( "<input>" )
+          .appendTo( this.wrapper )
+          .val( value )
+          .attr( "title", "" )
+          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+          .autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: $.proxy( this, "_source" )
+          })
+          .tooltip({
+            tooltipClass: "ui-state-highlight"
+          });
+ 
+        this._on( this.input, {
+          autocompleteselect: function( event, ui ) {
+		  	//alert("show all");
+            ui.item.option.selected = true;
+			
+            this._trigger( "select", event, {
+              item: ui.item.option
+            });
+          },
+ 
+          autocompletechange: "_removeIfInvalid"
+        });
+      },
+ 
+      _createShowAllButton: function() {
+        var input = this.input,
+          wasOpen = false;
+ 
+        $( "<a>" )
+          .attr( "tabIndex", -1 )
+          .attr( "title", "Show All Items" )
+          .tooltip()
+          .appendTo( this.wrapper )
+          .button({
+            icons: {
+              primary: "ui-icon-triangle-1-s"
+            },
+            text: false
+          })
+          .removeClass( "ui-corner-all" )
+          .addClass( "custom-combobox-toggle ui-corner-right" )
+          .mousedown(function() {
+            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+          })
+          .click(function() {
+            input.focus();
+ 
+            // Close if already visible
+            if ( wasOpen ) {
+              return;
+            }
+ 
+            // Pass last search string as value to search for, displaying last results
+            input.autocomplete( "search", 'SHOWALL' );
+          });
+      },
+ 
+      _source: function( request, response ) {
+        //var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+		var ele_select= this.element;
+		if(request.term=='SHOWALL'){
+			response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+		
+		}
+		else
+		{
+		var jsonRow = backendDirectory+"/api_fetch_list?start=0&limit=20&collection=customers?s="+request.term;
+
+		//alert(jsonRowURLStr);
+		if(xhr) xhr.abort();
+		xhr=$.getJSON(jsonRow,function(result){
+			
+			if(result.aaData.length>0){
+				var html='<option value=""></option>';
+
+				$.each(result.aaData, function(i,item)
+				{
+					html += '<option value="'+item._id+'">'+item.name+'</option>';
+				});
+				ele_select.html(html);
+				
+				
+				response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+				
+				
+			}
+		});
+       
+	  } 
+		
+      },
+ 
+      _removeIfInvalid: function( event, ui ) {
+ 
+        // Selected an item, nothing to do
+        if ( ui.item ) {
+
+          return;
+        }
+ 
+        // Search for a match (case-insensitive)
+        var value = this.input.val(),
+          valueLowerCase = value.toLowerCase(),
+          valid = false;
+        this.element.children( "option" ).each(function() {
+          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+            this.selected = valid = true;	
+			
+            return false;
+          }
+        });
+ 
+        // Found a match, nothing to do
+        if ( valid ) {
+          return;
+        }
+ 
+        // Remove invalid value
+        this.input
+          .val( "" )
+          .attr( "title", value + " didn't match any item" )
+          .tooltip( "open" );
+        this.element.val( "" );
+        this._delay(function() {
+          this.input.tooltip( "close" ).attr( "title", "" );
+        }, 2500 );
+        this.input.data( "ui-autocomplete" ).term = "";
+      },
+ 
+      _destroy: function() {
+        this.wrapper.remove();
+        this.element.show();
+      }
+    });
+  })( jQuery ); 
+	</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<% 	var loggedInUserNameStr="";
+if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {	
+	if (typeof authenticatedUser.firstname !== 'undefined' && authenticatedUser.firstname !== null) {	
+		loggedInUserNameStr+=authenticatedUser.firstname;
+	}
+	if (typeof authenticatedUser.lastname !== 'undefined' && authenticatedUser.lastname !== null) {	
+		loggedInUserNameStr+="&nbsp;"+authenticatedUser.lastname;
+	}
+} %>
+<header class="main-header">
+    <!-- Logo -->
+    <a href="<%= backendDirectory %>/index" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      
+      <span class="logo-mini"><img src="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.thumbnail_logo_uuid !== 'undefined' && system_preferences.thumbnail_logo_uuid !== null && system_preferences.thumbnail_logo_uuid !== "") { %><%= backendDirectory %>/file/<%= system_preferences.thumbnail_logo_uuid %>?<%= Math.random(); %><% }else{ %>images/jobshout-small.gif<% } %>"  STYLE="padding-left:15px;"></span>
+      <!-- logo for regular state and mobile devices -->
+      <span class="logo-lg"><IMG src="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.main_logo_uuid !== 'undefined' && system_preferences.main_logo_uuid !== null && system_preferences.main_logo_uuid !== "") { %><%= backendDirectory %>/file/<%= system_preferences.main_logo_uuid %>?<%= Math.random(); %><% }else{ %>images/webcrm-logo.png<% } %>" ALT=""/></span>
+    </a>
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+          <!-- Notifications: style can be found in dropdown.less -->
+          <li class="dropdown notifications-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-bell-o"></i>
+              <span class="label label-warning notificationCount">0</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li class="header">You have <span class="notificationCount">0</span> new notifications</li>
+              <li>
+                <!-- inner menu: contains the actual data -->
+                <ul class="menu" id="notificationsUl">
+                 
+                </ul>
+              </li>
+              <li class="footer"><a href="<%= backendDirectory %>/notifications">View all</a></li>
+            </ul>
+          </li>
+          <!-- Tasks: style can be found in dropdown.less -->
+          <li class="dropdown tasks-menu" id="loggedInUserSystems" style="display:none;">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-laptop"></i>
+              <span class="label label-danger totalLoggedInUserSystems">1</span>
+            </a>
+            <ul class="dropdown-menu">
+				<li class="header">Switch System to</li>
+			  	<!--<li style="padding:15px;">
+                	<input class="form-control" style="height:34px; border-radius:4px; border: 1px solid #ddd;" type="text">
+                 </li>-->
+              	<li>
+                	<!-- inner menu: contains the actual data -->
+                	<ul id="swtich_sites" class="menu"></ul>
+              	</li>
+            </ul>
+          </li>
+          <li class="dropdown tasks-menu" id="activeSystemNameID" style="display:none;">
+           
+          </li>
+          <!-- User Account: style can be found in dropdown.less -->
+          <% 	if (typeof loggedInUserNameStr !== 'undefined' && loggedInUserNameStr !== null && loggedInUserNameStr !== "") {	%>
+          <li class="dropdown user user-menu">
+          	<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              	<img src="<% if (typeof authenticatedUser.uploaded_file_uuid !== 'undefined' && authenticatedUser.uploaded_file_uuid !== null && authenticatedUser.uploaded_file_uuid !=="") {	%><%= backendDirectory %>/file/<%= authenticatedUser.uploaded_file_uuid %><% }else{ %>img/no-avatar.jpg<% } %>" class="user-image" alt="User Image">
+              	<span class="hidden-xs"><%- loggedInUserNameStr %></span>
+            </a>
+            
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="user-header">
+                <img src="<% if (typeof authenticatedUser.uploaded_file_uuid !== 'undefined' && authenticatedUser.uploaded_file_uuid !== null && authenticatedUser.uploaded_file_uuid !=="") {	%><%= backendDirectory %>/file/<%= authenticatedUser.uploaded_file_uuid %><% }else{ %>img/no-avatar.jpg<% } %>" class="img-circle" alt="User Image">
+
+                <p>
+                  <%- loggedInUserNameStr %> - Web Developer
+                  <% if (typeof authenticatedUser.club_name !== 'undefined' && authenticatedUser.club_name !== null && authenticatedUser.club_name !=="") {	%>
+                  	<small>Club : <%- authenticatedUser.club_name %></small>
+                  <% } else if (typeof authenticatedUser.email !== 'undefined' && authenticatedUser.email !== null && authenticatedUser.email !== "") {	%>
+                  	<small>Email : <a style="color:#fff;" href="<%= backendDirectory %>/user?_id=<%= authenticatedUser._id %>"><%- authenticatedUser.email %></a></small>
+                  <% } %>
+                </p>
+              </li>
+              <!-- Menu Body -->
+              <!--
+              <li class="user-body">
+                <div class="row">
+                  <div class="col-xs-4 text-center">
+                    <a href="#">Followers</a>
+                  </div>
+                  <div class="col-xs-4 text-center">
+                    <a href="#">Sales</a>
+                  </div>
+                  <div class="col-xs-4 text-center">
+                    <a href="#">Friends</a>
+                  </div>
+                </div>
+               </li>
+              -->
+              <!-- Menu Footer-->
+              <li class="user-footer">
+                <div class="pull-left">
+                	<% if (typeof authenticatedUser._id !== 'undefined' && authenticatedUser._id !== null && authenticatedUser._id !=="") {	%>
+                  		<a href="<%= backendDirectory %>/user?_id=<%= authenticatedUser._id %>" class="btn btn-default btn-flat">Profile</a>
+                  	<% } %>
+                </div>
+                <div class="pull-right">
+                  <a href="<%= backendDirectory %>/logout" class="btn btn-default btn-flat">Sign out</a>
+                </div>
+              </li>
+            </ul>
+            
+          </li>
+          <% } %>
+          <li>
+            <a href="<%= backendDirectory %>/system_preference" title="System Preferences"><i class="fa fa-gears"></i></a>
+          </li>
+          <!-- Control Sidebar Toggle Button -->
+                </ul>
+      </div>
+    </nav>
+  </header>

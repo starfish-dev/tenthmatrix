@@ -1,0 +1,60 @@
+					<% if (typeof total_count !== 'undefined' && total_count !== null && typeof itemsPerPage !== 'undefined' && itemsPerPage !== null && typeof currentPageNum !== 'undefined' && currentPageNum !== null && document_details.length>0) {	%>
+						<div class="row">
+							<div class="col-sm-7 right">
+								<div class="dataTables_paginate paging_simple_numbers right" id="example_paginate">
+									<ul class="pagination">
+										<%	var tpages = Math.round(total_count/itemsPerPage);	
+											if(tpages<=0){
+												tpages=1;
+											}
+											var adjacents = 2;
+											var currentLink= currentUrl+"?keyword="+keywordStr;
+											var paginationHtml="";
+																						
+											if (currentPageNum == 1) {
+												paginationHtml+= '<li class="paginate_button disabled" id="example_previous" ><a href="javascript:void(0)" aria-controls="example" data-dt-idx="0" tabindex="0">Previous</a></li>';
+   											} else if (currentPageNum == 2) {
+   											 	paginationHtml+= '<li class="paginate_button" id="example_previous"><a href="'+currentLink+'" aria-controls="example" data-dt-idx="0" tabindex="0">Previous</a></li>';
+        									} else {
+        										var prePage= currentPageNum-1;
+        										paginationHtml+= '<li class="paginate_button" id="example_previous"><a href="'+currentLink+'&page='+prePage+'" aria-controls="example" data-dt-idx="0" tabindex="0">Previous</a></li>';
+    										}
+   											
+   											var pmin=1;
+   											if(currentPageNum>adjacents){
+   												pmin=parseInt(currentPageNum) - parseInt(adjacents);
+   											}
+   											
+    										var pmax=tpages;
+    										if(currentPageNum < (tpages - adjacents)){
+    											pmax = parseInt(currentPageNum) + parseInt(adjacents);
+    										}
+    									
+    										for (var i=pmin; i <= pmax; i++) {
+    											if (i == currentPageNum) {
+        											paginationHtml+= '<li class="paginate_button active"><a href="javascript:void(0)" aria-controls="example" data-dt-idx="'+i+'" tabindex="0">'+i+'</a></li>';
+            									} else if (i == 1) {
+        											paginationHtml+= '<li class="paginate_button"><a href="'+currentLink+'" aria-controls="example" data-dt-idx="'+i+'" tabindex="0">'+i+'</a></li>';
+            									} else {
+       												paginationHtml+= '<li class="paginate_button"><a href="'+currentLink+'&page='+i+'" aria-controls="example" data-dt-idx="'+i+'" tabindex="0">'+i+'</a></li>';
+            									}
+   											}
+   											
+   											if (currentPageNum<(tpages - adjacents)) {
+    											paginationHtml+= '<li class="paginate_button"><a href="'+currentLink+'&page='+tpages+'" aria-controls="example" data-dt-idx="0" tabindex="0">'+tpages+'</a></li>';
+    										}
+    
+    										// next
+    										if (currentPageNum < tpages) {
+    											var nxtPage= parseInt(currentPageNum)+1;
+    											paginationHtml+= '<li class="paginate_button next" id="example_next"><a href="'+currentLink+'&page='+nxtPage+'" aria-controls="example" data-dt-idx="4" tabindex="0">Next</a></li>';
+        									} else {
+    											paginationHtml+= '<li class="paginate_button next disabled" id="example_next"><a href="#" aria-controls="example" data-dt-idx="4" tabindex="0">Next</a></li>';
+        									}
+											%>
+											<%- paginationHtml	%>
+									</ul>
+								</div>
+							</div>
+						</div>
+					<%	} 	%>

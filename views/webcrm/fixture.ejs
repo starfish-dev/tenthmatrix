@@ -1,0 +1,266 @@
+<% include include/main-header %>
+
+<link rel="stylesheet" href="css/basictable.css">
+<link href="css/bootstrap-toggle.min.css" rel="stylesheet">
+<link href="plugins/datetime-picker/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<link rel="stylesheet" href="plugins/combobox/autocomplete-ui.css"/>
+<link rel="stylesheet" href="css/bootstrap.datepicker.css">
+<style>
+	.custom-combobox {
+		position: relative;
+		display: inline-block;
+		width: 272px;	
+	}
+	.custom-combobox-toggle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin-left: -1px;
+		padding: 0;
+	}
+	.custom-combobox-input {
+		margin: 0;
+		padding: 5px 10px;
+	}
+	.ui-widget-overlay {
+		position: fixed;
+	}
+	.newRowClass {
+		background-color: #f2dede !important;
+	}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Fixture <small><% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Fixture</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+					
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/fixture" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="fixtures">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="name">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						
+            						<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Name<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" required="required" id="name" name="name" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Fixture type</label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" id="fixture_type" name="fixture_type" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.fixture_type !== 'undefined' && contentObj.fixture_type !== null) { %><%= contentObj.fixture_type %><% } %>">
+                  						</div>
+                					</div>
+                					
+                					<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Add link to fixture</label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" id="fixture_link" name="fixture_link" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.fixture_link !== 'undefined' && contentObj.fixture_link !== null) { %><%= contentObj.fixture_link %><% } %>">
+                  						</div>
+                					</div>
+                					
+                					<div class="form-group">
+    									<label for="" class="col-sm-1 control-label">Status</label>
+    									<div class="col-sm-9" style="margin-top:6px;">
+    										<div STYLE="margin-right:10px;display:inline-block;">
+      		  									<label> <input type="radio" id="status" name="status" value="1" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 1) { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  							</div>
+				  							<div STYLE="display:inline-block;">
+      		  									<label> <input type="radio" id="status" name="status" value="0" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 0) { %>checked<% } %> > <strong style="font-weight:600">Inactive</strong></label>
+    			  							</div>
+										</div>
+									</div>
+									
+									<div class="form-group FilterUIClass">
+										
+                  						<label class="control-label col-md-1" for="first-name">Filter by</label>
+                  						<div class="col-md-2 ">
+                  							<input type="text" id="start_date" class="form-control col-md-5 col-xs-12 datepicker" value="" data-date-format="dd/mm/yyyy" placeholder="Start date" readonly>
+                  						</div>
+                  						<div class="col-md-2">
+                  							<input type="text" id="end_date" class="form-control col-md-5 col-xs-12 datepicker" value="" data-date-format="dd/mm/yyyy" placeholder="End date" readonly>
+                  						</div>
+                  						<div class="col-md-1">
+                  							<a href="javascript:void(0)" onClick="refreshDatePicker();" class="btn btn-danger btn-sm" title="Reset dates"><i class="fa fa-refresh"></i></a>
+                  						</div>
+                  						<label class="control-label col-md-1" for="first-name">Filter by team</label>
+                  						<div class="col-md-2 ui-widget">
+                  							<select id="search_by_team" class="form-control combobox" style="display: none;"></select>
+                  						</div>
+                  						
+                  						<div class="col-md-2" style="float:right;">
+                  							<a href="javascript:void(0)" onClick="addNewFixture();" class="btn btn-danger btn-sm hidden-xs">+ Add new match</a>
+                  						</div>
+                  					</div>
+                  					<div class="form-group FilterUIClass">
+    									<label for="" class="col-sm-1 control-label"></label>
+    									<div class="col-sm-11" style="margin-top:6px;">
+    										<div class="col-md-2" style="padding-left:0px;">
+                  								<a href="javascript:void(0)" onClick="addNewFixture();" class="btn btn-danger btn-sm hidden-xs">+ Add new match</a>
+                  							</div>
+                  							<div align="right" style="font-style:italic; font-size:12px; padding-top:10px;"><b>Note:</b>
+               									<span class="newRowClass">Highlighted rows are not saved. Please click 'Save' icon for each match after any modification to save the changes!</span>
+               								</div>
+										</div>
+									</div>
+              						<div class="form-group FilterUIClass">
+                  						<label class="control-label col-md-1" for="first-name">Matches</label>
+                  						<div class="col-md-11">
+                  							<div class="table-responsive table-full-width">
+		 										<div class="table-responsive" style="border:none;" >
+                                					<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint"  style="background-color: rgb(255, 255, 255); border-radius: 4px;" >
+                                						<thead>
+                                       						<th>Date</th>
+                                       						<th>Home Team</th>
+                                       						<th>Away Team</th>
+                                       						<th>Venue</th>
+                                       						<th>Publish</th>
+                                       						<th>Action</th>
+                                    					</thead>
+                                   						<tbody id="documents_data">
+                                    				
+                                    					</tbody>
+                                					</table>
+                                				</div>
+											</div>
+                  						</div>
+                  					</div>
+                  					<div style="text-align:center; display:none;" id="img_loading_div">
+										Loading...<br /> <img id="imgAjaxLoading" src="img/loading.gif" width="109" height="25" style="border-width: 0px;">
+									</div>
+									<div style="text-align:center">
+										<a style="width: 60%; margin-bottom: 10px; display:none;" class="btn palette-carrot btn-warning" id="display_more_btn" title="Load more" onclick="load_more()" href="javascript:void(0);">
+											Load more
+										</a>
+        							</div>
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-6" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/fixtures" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+               							
+                						
+                					</div>
+              					</form>
+              				</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/bootstrap-toggle.min.js"></script>
+<script src="js/basictable.js"></script>
+<script src="js/jquery.validate.js"></script>
+<script src="js/bootstrap.datepicker.js"></script>
+<script type="text/javascript" src="plugins/datetime-picker/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script src="plugins/combobox/autocomplete-ui.js"></script>
+
+<script src="scripts/matches.js"></script>
+<script type="text/javascript">
+var eventDetailForm=false;
+$(document).ready(function(){	
+
+		// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name: { required: true }
+			},
+			submitHandler: function(form) {
+ 				dataAsJson('contentForm', form);
+ 			}
+		});	
+	
+	<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
+		$(".FilterUIClass").show();
+		var defaultCurrentDate = new Date();
+		
+		$("#start_date").datepicker().datepicker("setDate", defaultCurrentDate);
+		setdefaultsettingsdatepicker('start_date', 'end_date','setStartDate');
+	
+		var nextMonthDate = defaultCurrentDate.getMonth() == 11 ? new Date(defaultCurrentDate.getFullYear()+1, 0 , 1) : new Date(defaultCurrentDate.getFullYear(), defaultCurrentDate.getMonth() + 1, 1);
+		$("#end_date").datepicker().datepicker("setDate", nextMonthDate);
+		setdefaultsettingsdatepicker('end_date', 'start_date','setEndDate');
+	
+		$('#start_date').datepicker({"autoclose": true}).on('changeDate', function (ev) {
+			setdefaultsettingsdatepicker('start_date', 'end_date','setStartDate');
+			start=initialSize, end=pageSize
+			$('#documents_data').html('');
+			$('#table-breakpoint').basictable('destroy');		
+			loadFixtureEvents();
+		});
+	
+		$('#end_date').datepicker({"autoclose": true}).on('changeDate', function (ev) {
+			setdefaultsettingsdatepicker('end_date', 'start_date','setEndDate');
+			start=initialSize, end=pageSize
+			$('#documents_data').html('');
+			$('#table-breakpoint').basictable('destroy');		
+			loadFixtureEvents();
+		});
+	
+		$('#start_date').datepicker().on('changeDate', function (ev) {
+			$(this).datepicker('hide');
+		});
+		$('#end_date').datepicker().on('changeDate', function (ev) {
+			$(this).datepicker('hide');
+		});
+	
+		load_teams();
+	
+		load_venue();
+	
+		loadFixtureEvents();
+	<%	} else{ %>
+		$(".FilterUIClass").hide();
+	<%	}	%>
+});
+</script>
+</body>
+</html>

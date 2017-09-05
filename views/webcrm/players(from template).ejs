@@ -1,0 +1,393 @@
+<% include include/main-header %>
+<% 
+var currentTemplateStr= "players";
+if (typeof currentTemplate !== 'undefined' && currentTemplate !== null) {
+	currentTemplateStr=currentTemplate;
+}
+currentTemplateStr= "players";
+var keywordStr="";
+if (typeof searched_keyword !== 'undefined' && searched_keyword !== null) {
+	keywordStr=searched_keyword;
+}
+
+%>
+
+<!-- page specific css -->
+<link rel="stylesheet" href="css/basictable.css">
+<link href="css/bootstrap-toggle.min.css" rel="stylesheet">
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+
+  		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  		<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1 id="pageMainHeading">
+        Players
+        <small>LIST VIEW</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="<%= backendDirectory %>/index"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active" id="breadcrumbTitle">Players</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+				<div CLASS="row">
+					<div CLASS="col-md-12">
+	
+						<div class="clearfix hidden-xs">
+      						<div class="form-group no-margin">
+     							<div class="pull-right margin-bottom-10 ">
+									<div class="form-inline" style="">                 	          
+                 						<div class="btn-inline display-inline-block">
+											<input class="form-control searchFieldClass" style="min-width:225px; height:36px;" required id="searchField" placeholder="Search here..." value="<%= keywordStr %>">
+											<button class="btn btn-left-align btn-link no-shadow bg-transparent no-padding-top padding-right-10 right-auto left" type="button" id="searchBtn"><i class="glyphicon glyphicon-search"></i></button>
+										</div>
+                                        <a href="/user" class="btn btn-danger btn-color padingmix  btn-icon-left btn-sm editorLink"> <i class="fa fa-plus"></i>Enter new player</a>
+                  						<button class="btn btn-primary btn-circle" type="button" onclick="refresh_data()">  <i class="fa fa-refresh"></i></button>
+                  					</div>
+         						</div>
+      						</div>
+     					</div>
+						
+						<div class="visible-xs ">
+							<div class="row">
+								<div class="col-lg-6 col-sm-12 col-xs-12">
+									<div>
+										<form class="form-inline" method="get" action=""> 
+											<input class="form-control xs-margin-btm10 searchFieldClass" required id="smallSearchField" name="keyword" placeholder="Search..." type="text" value="<%= keywordStr %>">
+                     						<a href="/user" class="btn btn-danger btn-color padingmix btn-icon-left btn-sm editorLink" STYLE="width:100%; margin:10px 0px;"> <i class="fa fa-plus"></i>Enter new player</a>
+                  						</form>
+									</div>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+   
+      		<div class="row">
+	  			<div class="content table-responsive table-full-width">
+		 			<div class="table-responsive" style="border:none;" >
+                                <table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint"  style="background-color: rgb(255, 255, 255); border-radius: 4px;" >
+                                	<% if(currentTemplateStr!=""){	%>
+                                    <thead class="headFootClass">
+                                       
+                                    </thead>
+                                     <tfoot class="headFootClass">
+                                       
+                                    </tfoot>
+                                    <%	}	else	{	%>
+                                    <thead>
+                                       	<th>Name</th>
+                                       	<th>Name</th>
+                                       	<th>Name</th>
+                                       	<th>Name</th>
+                                       	<th>Name</th>
+                                       	<th>Name</th>
+                                       	<th>Action</th>
+                                    </thead>
+                                     <tfoot>
+                                       
+                                    </tfoot>
+                                    <%	}	%>
+                                    <tbody id="documents_data">
+                                    	
+                                    </tbody>
+                                </table>
+                    </div>
+				</div>
+			<!-- right col -->
+      	</div>
+      <!-- /.row (main row) -->
+
+    </section>
+</div>
+ 
+ <!--//Main Content--> 
+	<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+<script src="js/bootstrap-toggle.min.js"></script>
+<script src="js/basictable.js"></script>
+<script type="text/javascript">
+var templateStr="<%= currentTemplateStr %>", searchStr="<%= keywordStr %>", collectionStr="users";
+
+<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
+var	access_right="<%= authenticatedUser.access_right %>";
+<% }	else{	 %>
+var access_right=0;
+<% } %>
+
+var xhrStatus;
+
+var pageSize=15, totalNum=0, checkAllFlag= false;
+var start=0, end=pageSize;
+var accessRightCode=parseInt(access_right);
+
+function generateHeading(e, upperCase){
+	if(typeof upperCase == 'undefined' && upperCase==''){ 
+		var upperCase=false;
+	} 
+	var patt=/[^A-Za-z0-9]/g;
+	var result=e.replace(patt,' ');
+	result=result.replace(/\s+/g, ' ');
+	if(upperCase==true){
+		result=result.toUpperCase();
+	}else{
+		result=result.substr(0, 1).toUpperCase() + result.substr(1);
+	}
+	return result;
+}
+
+	function searchKeyword(e){
+		var searchField= $("#"+e).val();
+		if(searchField!=""){
+			$("#documents_data").html('');
+			$("#"+e).removeClass("errorPlaceHolder");
+			$('#display_more_btn').hide();
+			$('#img_loading_div').show();
+			searchStr=searchField;
+			start=0;
+			end=start+pageSize;
+			load_data();
+		}else{
+			$("#"+e).addClass("errorPlaceHolder");
+			$("#"+e).attr("placeholder" , "Please enter search term here");
+			$("#"+e).focus();
+		}
+	}
+	
+$(document).ready(function() {
+    	$('#table').basictable();
+    	
+    	$('#display_more_btn').hide();
+		$('#img_loading_div').show();
+		load_data();
+		
+		$("#searchBtn").click(function()	{
+			searchKeyword('searchField');
+		});
+		
+		$('#searchField').keypress(function (e) {
+  			if (e.which == 13) {
+    			searchKeyword('searchField');
+  			}
+		});
+		$("#searchBtn").click(function()	{
+			searchKeyword('searchField');
+		});
+	// toggle all checkboxes from a table when header checkbox is clicked
+  	$(".chk_all").click(function () {
+  		alert();
+  		if ($(this).is(":checked")) {
+			checkAllFlag=true;
+			$('.chk_all').prop("checked", true);
+  			$('.check').prop("checked", true);
+  		} else {
+			checkAllFlag=false;
+			$('.chk_all').prop("checked", false);
+  			$('.check').prop("checked", false);
+  		}  		
+  	});
+  	
+});
+
+function timeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp * 1000);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  var hour = a.getHours();
+  var min = a.getMinutes();
+  var sec = a.getSeconds();
+  var time = month + ' ' + date + ' ' + year + ', ' + hour + ':' + min ;
+  return time;
+}
+
+function refresh_data(){
+	$('#table').basictable();
+	searchStr="";
+	$(".searchFieldClass").val("");
+	$("#documents_data").html('');
+	$('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	start=0;
+	end=start+pageSize;
+	load_data();
+}
+function load_more(){
+	$('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	start=end;
+	end=start+pageSize;
+	load_data();
+}
+	
+function allowWebAccess(e){
+	var allow_web_access=0;
+	if ($("#web_access_"+e).is(":checked")) {
+		allow_web_access=1;
+	}
+	var jsonRow=backendDirectory+"/update_user_status?id="+e+"&allow_web_access="+allow_web_access;
+	$.getJSON(jsonRow,function(response){
+		console.log(response);
+	});
+}
+
+	function load_data(){
+		$(".alert").remove();
+		var jsonRow=backendDirectory+"/api_fetch_list?start="+start+"&limit="+pageSize+"&s="+searchStr;
+		if(templateStr!=""){
+			jsonRow+="&templateStr="+templateStr;
+		}else{
+			jsonRow+="&collection="+collectionStr;
+		}
+		if(xhrStatus) xhrStatus.abort();
+		xhrStatus=$.getJSON(jsonRow,function(html){
+			if(html.error){
+				$(".topOptionsClass").hide();
+				$("#table-breakpoint").before('<div class="alert alert-danger">'+html.error+'</div>');
+			}else{
+				var editorPage="javascript:void(0)";
+				if(html.total){
+					totalNum=parseInt(html.total);
+				}
+				if (typeof html.display_columns !== 'undefined' && html.display_columns !== null && html.display_columns!="" && start==0){
+					var headFootStr="";
+					$.each(html.display_columns, function(i,row){
+						if(row=="id" || row=="_id"){
+							headFootStr+='<th><input type="checkbox" class="chk_all"></th>';
+						}else{
+							headFootStr+="<th>"+generateHeading(row)+"</th>";
+						}
+					});
+					$(".headFootClass").html("<tr>"+headFootStr+"</tr>");
+					
+				}
+				if (typeof html.enable_search !== 'undefined' && html.enable_search !== null && (html.enable_search==true ||  html.enable_search=="true") && start==0){
+					$(".form-inline").show();
+				}
+				if (typeof html.editor !== 'undefined' && html.editor !== null && html.editor!=""){
+					editorPage=backendDirectory+"/"+html.editor;
+					
+					$(".editorLink").attr("href", editorPage);
+					$(".editorLink").show();
+				}
+				var contentHtml="";
+				
+				if(html.aaData.length>0){
+					$.each(html.aaData, function(i,row){
+						var uniqueIDStr='';
+									
+						contentHtml+="<tr>";
+						var uniqueFieldVal="";
+						if (typeof html.uniqueField !== 'undefined' && html.uniqueField !== null && row.hasOwnProperty(html.uniqueField) ==true){
+							uniqueFieldVal=row[html.uniqueField];
+						}
+						if (typeof html.display_columns !== 'undefined' && html.display_columns !== null && html.display_columns!=""){
+							$.each(html.display_columns, function(k,col){
+								if(col!="Action"){
+									if(row.hasOwnProperty(col)==true && (col=="_id")){
+										uniqueIDStr=row[col];
+										
+										if(checkAllFlag){
+											contentHtml+='<td><input type="checkbox" class="check" checked id="'+uniqueIDStr+'"></td>';
+										}else{
+											contentHtml+='<td><input type="checkbox" class="check" id="'+uniqueIDStr+'"></td>';
+										}
+									}else if(row.hasOwnProperty(col)==true && (col=="Modified" || col=="modified_timestamp" || col=="modified" || col=="Created" || col=="created_timestamp" || col=="created")){
+										contentHtml+="<td>"+timeConverter(row[col])+"</td>";
+									}else if(row.hasOwnProperty(col)==true && (col=="Status" || col=="status" || col=="active" )){
+										if(row[col]==1 || row[col]=="1"){
+											contentHtml+='<td><span class="label label-success">Active</span></td>';
+										}else{
+											contentHtml+='<td><span class="label label-danger">Inactive</span></td>';
+										}
+									}else if(row.hasOwnProperty(col)==true && (col=="allow_web_access")){
+										var checkedStr="";
+										if(row[col]==1 || row[col]=="1"){
+											checkedStr="checked";
+										}
+										contentHtml+='<td><input id="web_access_'+uniqueIDStr+'" type="checkbox" '+checkedStr+' class="toggleCheckbox" onChange="allowWebAccess(\''+uniqueIDStr+'\')"></td>';
+										
+									}else if(row.hasOwnProperty(col)==true && (col=="access_right")){
+										if(row[col]==0 || row[col]=="0"){
+											contentHtml+='<td><span class="label label-danger">ReadOnly</span></td>';
+										}else{
+											contentHtml+='<td><span class="label label-success">ReadWrite</span></td>';
+										}
+									}else if(row.hasOwnProperty(col)==true && (col=="gender")){
+										if(row[col]=="m"){
+											contentHtml+='<td>Male</td>';
+										}else{
+											contentHtml+='<td>Female</td>';
+										}
+									}else if(row.hasOwnProperty(col)==true && (col=="player_qualities")){
+										contentHtml+="<td>"+row[col]+"</td>";
+									}else if(row.hasOwnProperty(col)){
+										contentHtml+="<td>"+row[col]+"</td>";
+									}else{
+										contentHtml+="<td></td>";
+									}
+								}
+							});
+						}else{
+							$.each(row, function(j,rowDetails){
+								if (typeof html.uniqueField !== 'undefined' && html.uniqueField !== null && html.uniqueField == j){
+									uniqueFieldVal=rowDetails;
+								}
+								contentHtml+="<td>"+rowDetails+"</td>";
+							});
+						}
+						if (typeof html.uniqueField !== 'undefined' && html.uniqueField !== null && uniqueFieldVal!=""){
+							if(accessRightCode==0){
+								contentHtml+='<td class="actions-list"><a href="javascript:void(0)" onClick="alert(\'Sorry you do not have access to this option!\');"><i class="fa fa-pencil"></i></a></td>';
+							}else{
+								contentHtml+='<td class="actions-list"><a href="'+editorPage+'?'+html.uniqueField+'='+uniqueFieldVal+'" title="Edit"><i class="fa fa-pencil"></i></a></td>';
+							}
+						}
+						contentHtml+="</tr>";
+					});
+					$("#documents_data").append(contentHtml);
+					
+					//initialize table
+					$('#table').basictable();
+	  				$('#table-breakpoint').basictable({
+        				breakpoint: 751
+     				});
+     				
+     				//
+     				$('.toggleCheckbox').bootstrapToggle({
+      					on: 'Yes',
+      					off: 'No'
+    				});
+     			}else{
+     				$("#documents_data").html("");
+					$(".headFootClass").html("");
+					$("#table-breakpoint").before('<div class="alert alert-danger">No more records found!</div>');
+     			}
+			}
+			
+			if(end< totalNum){
+				$('#display_more_btn').show();
+			}
+			$('#img_loading_div').hide();
+			
+		});
+	}
+</script>
+
+</body>
+</html>

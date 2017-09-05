@@ -1,0 +1,607 @@
+<% include include/main-header %>
+<link rel="stylesheet" href="plugins/combobox/autocomplete-ui.css"/>
+<link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
+<link rel="stylesheet" href="css/basictable.css">
+<style>
+.custom-combobox {
+		position: relative;
+		display: inline-block;
+	}
+	.custom-combobox-toggle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin-left: -1px;
+		padding: 0;
+	}
+	.custom-combobox-input {
+		margin: 0;
+		padding: 5px 10px;
+	}
+	.ui-widget-overlay {
+		position: fixed;
+	}
+	.box-primary h4 {
+    border-bottom: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 20px;
+    margin: 7px 5px 0 0;
+    padding: 9px;
+}
+</style>
+
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Task <small><% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Task</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+      				
+      				<div class="panel-body no-padding-top bg-white"> 
+      				<% include include/display_returned_msg %>
+      					<div class="nav-tabs-custom">
+            				<!-- Tabs within a box -->
+           					<ul class="nav nav-tabs pull-left">
+            					<li class="active"><a href="#first" data-toggle="tab">Details</a></li>
+            					<% if (typeof contentObj._id !== "undefined" && contentObj._id !== null) { %>
+           						<li><a href="#second" data-toggle="tab">Related Timeslips</a></li>
+           						<li><a href="#third" data-toggle="tab">Notes</a></li>
+           						<% } %>
+							</ul>
+            				<div class="tab-content ">
+            					<div class="chart tab-pane active" id="first" >	
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/task" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="tasks">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="name">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						
+            						<div class="row" STYLE="margin-top:10px;">
+            						<div class="col-md-6 col-xs-12"><div class="box box-primary">
+            						<h4>Main Details</h4>
+            						<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-12">
+            						<div class="form-group">
+                  						<label class="control-label col-md-3" for="first-name">Name<span class="required">*</span></label>
+                  						<div class="col-md-9 col-lg-9">
+                    						<input type="text" required="required" id="name" name="name" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } %>">
+                  						</div>
+                					</div>
+              						<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Reported by<span class="required">*</span></label>
+                  						<div class="col-md-9 col-lg-9">
+                   							<input type="hidden" class="form-control col-md-5 col-xs-12" id="reported_by" name="reported_by" value="<% if (typeof contentObj.reported_by !== 'undefined' && contentObj.reported_by !== null) { %><%= contentObj.reported_by %><% } %>">
+                   							<select required="required" class="form-control col-md-5 col-xs-12" name="reported_by_user_id" id="reported_by_user_id"></select>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Project<span class="required">*</span></label>
+                  						<div class="col-md-9 col-lg-9">
+                  							<select required="required" class="form-control col-md-5 col-xs-12" name="project_mongo_id" id="project_mongo_id"></select>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Assigned to<span class="required">*</span></label>
+                  						<div class="col-md-9 col-lg-9">
+                   							<input type="hidden" class="form-control col-md-5 col-xs-12" id="assigned_to" name="assigned_to" value="<% if (typeof contentObj.assigned_to !== 'undefined' && contentObj.assigned_to !== null) { %><%= contentObj.assigned_to %><% } %>">
+                  							<select required="required" class="form-control col-md-5 col-xs-12" name="assigned_to_user_id" id="assigned_to_user_id"></select>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Description<span class="required">*</span></label>
+                  						<div class="col-md-9 col-lg-9">
+                   							<textarea class="form-control col-md-5 col-xs-12" rows="5" required id="description" name="description"><% if (typeof contentObj.description !== 'undefined' && contentObj.description !== null) { %><%= contentObj.description %><% } %></textarea>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Status<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<select class="form-control" id="status" name="status" required></select>
+                  						</div>
+                  						<div class="col-sm-3">
+											<label><input id="active" name="active" value="1" type="checkbox" <% if (typeof contentObj.active !== 'undefined' && contentObj.active !== null && contentObj.active == 1) { %>checked<% } %>> Active</label>
+    			  						</div>
+                					</div>
+									                                                  
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Rate </label>
+										<div class="col-md-9 col-lg-9">
+											<input name="task_rate" class="form-control num" type="text" value="<% if (typeof contentObj.task_rate !== 'undefined' && contentObj.task_rate !== null) { %><%= contentObj.task_rate %><% } %>" id="task_rate">
+										</div>
+									</div>
+                					
+                            		</div></div>
+                            		</div></div></div>
+							        <div class="col-md-6 col-xs-12"><div class="box box-primary">
+							        <h4>Important Dates</h4>
+            						<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-12">
+							        
+                					<div class="form-group">
+    									<label for="" class="col-sm-3 control-label">Start  <sup class="required">*</sup></label>
+    									<div class="col-sm-9">
+    										<input type="hidden" class="form-control" id="start_timestamp" name="start_timestamp" value="<% if (typeof contentObj.start_timestamp !== 'undefined' && contentObj.start_timestamp !== null) { %><%= contentObj.start_timestamp %><% } %>">
+    										<div class='input-group date' id='start_datetime_picker'>
+                    							<input type='text' class="form-control" id="start_date" value=""/>
+                    							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                							</div>	
+    									</div>
+  									</div>
+															
+  									<div class="form-group">
+ 										<label for="" class="col-sm-3 control-label">Expected Close</label>
+ 										<div class="col-sm-9">
+											<input type="hidden" class="form-control" id="end_timestamp" name="end_timestamp" value="<% if (typeof contentObj.end_timestamp !== 'undefined' && contentObj.end_timestamp !== null) { %><%= contentObj.end_timestamp %><% } %>">
+    										<div class='input-group date' id='end_datetime_picker'>
+                    							<input type='text' class="form-control" id="end_date" value=""/>
+                    							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                							</div>	
+										</div>
+									</div>
+                            		<div class="form-group" >
+										<label class="col-sm-3 control-label">Estimated Hour </label>
+										<div class="col-md-9 col-lg-7">
+											<input name="task_estimated_hours" class="form-control num" type="text" value="<% if (typeof contentObj.task_estimated_hours !== 'undefined' && contentObj.task_estimated_hours !== null) { %><%= contentObj.task_estimated_hours %><% } %>" id="task_estimated_hours">
+										</div>
+									</div>      
+									</div></div>
+                					</div></div></div>
+                					<div class="col-xs-12">
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-12" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/tasks" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+                					</div>
+                					</div>
+              					</form>
+              					</div>
+              					<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
+              					<div class="chart tab-pane" id="second" >
+              						
+              						<div CLASS="row" style="padding:15px;">
+			<div class="clearfix hidden-xs">
+				<div class="col-md-6" style="">
+					<span class="display_records_count" style="font-weight:bold;"></span>
+					
+				</div>
+				<div class="col-md-6 text-right">
+      				<div class="form-group no-margin">
+     					<div class="pull-right margin-bottom-10 ">
+							<div class="form-inline" style="">                 	          
+                 				<div class="btn-inline display-inline-block">
+									<input class="form-control searchFieldClass" style="min-width:225px; height:36px;" required id="searchField" placeholder="Search here..." value="">
+									<button class="btn btn-left-align btn-link no-shadow bg-transparent no-padding-top padding-right-10 right-auto left" type="button" id="searchBtn" title="Search"><i class="glyphicon glyphicon-search"></i></button>
+								</div>
+                				<a title="Add new timeslip" href="<%= backendDirectory %>/timeslip?task_id=<%= contentObj._id %>" target="_blank" class="btn btn-danger">Add new timeslip</a>
+                			</div>
+         				</div>
+      				</div>
+				</div>
+			</div>
+				<div class="visible-xs" >
+					<div class="col-md-12 display_records_count" style="font-weight:bold;"></div>
+					<div class="col-lg-6 col-sm-12 col-xs-12" style="margin-bottom:10px;">
+						<form class="form-inline" method="get" action=""> 
+							<input class="form-control xs-margin-btm10 searchFieldClass" required id="smallSearchField" name="keyword" placeholder="Search..." type="text" value="">
+                     	</form>
+                     		<a title="Add new timeslip" href="<%= backendDirectory %>/timeslip?task_id=<%= contentObj._id %>" target="_blank" class="btn btn-danger">Add new timeslip</a>
+                	</div>
+				</div>
+			</div>
+              						<div class="content table-responsive table-full-width" >
+		 								<div class="table-responsive" style="border:none;">
+                        					<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="related_timeslips" style="background-color: rgb(255, 255, 255); border-radius: 4px;" >
+												<thead>
+													<tr>
+		      											<th>Task Name</th>
+		      											<th>Reported By</th>
+		      											<th>Description</th>
+		      											<th>Start</th>
+		      											<th>End</th>
+		      											<th>Est. Hours</th>
+		      											<th>Details</th>			  
+		  											</tr>
+												</thead>
+		  										<tbody id="related_timeslips_data">
+		  											
+		  										</tbody>
+		  									</table>
+										</div>
+									</div>
+									<div style="text-align:center; display:none;" id="display_more_btn">
+										<a style="width: 60%; margin-bottom: 10px;" class="btn palette-carrot btn-danger" title="Load more" onclick="load_more()" href="javascript:void(0);">Load more</a>
+        							</div>
+        							<div style="text-align:center" id="img_loading_div">
+										Loading...<br /> <img id="imgAjaxLoading" src="img/loading.gif" width="109" height="25" style="border-width: 0px;">
+									</div>
+              					
+              					</div>
+              					<div class="chart tab-pane" id="third" >
+              						<div class="col-sm-12" style="margin-top:20px;">
+              							<a title="Add new note" onClick="$('#addNote').modal('show');" href="javascript:void(0)" class="btn btn-danger">Add new note</a>
+              						</div>
+              						<div class="content table-responsive table-full-width">
+		 								<div class="table-responsive" style="border:none;" >
+                        					<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint" style="background-color: rgb(255, 255, 255); border-radius: 4px;" >
+												<thead>
+													<tr>
+		      											<th>Added by</th>
+		      											<th>Last Modified</th>	      
+			 											<th>Note</th>
+			 											<th class="hidden-xs">Action</th>			  
+		  											</tr>
+												</thead>
+		  										<tbody id="notesTable">
+		  											
+		  										</tbody>
+		  									</table>
+										</div>
+									</div>
+              					</div>
+              					<%	}	%>
+              				</div>
+              			</div>
+              		</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+<!-- add_note_modal Starts Here-->
+<% include include/add_note_modal %>
+<!-- add_note_modal Ends Here-->	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/jquery.validate.js"></script>
+<script src="js/moment.js"></script>
+<script src="js/bootstrap-datetimepicker.min.js"></script>
+<script src="plugins/combobox/autocomplete-ui.js"></script>
+<script src="js/basictable.js"></script>
+<script type="text/javascript">
+var table_row_id="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>";
+var auth_user_id="<% if (typeof authenticatedUser._id !== 'undefined' && authenticatedUser._id !== null) { %><%= authenticatedUser._id %><% } %>";
+var auth_user_name="<% if (typeof authenticatedUser.firstname !== 'undefined' && authenticatedUser.firstname !== null) { %><%= authenticatedUser.firstname %><% } %>";
+	auth_user_name+="<% if (typeof authenticatedUser.lastname !== 'undefined' && authenticatedUser.lastname !== null) { %>&nbsp;<%= authenticatedUser.lastname %><% } %>";
+<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
+var	access_right="<%= authenticatedUser.access_right %>";
+<% }	else{	 %>
+var access_right=0;
+<% } %>
+var relatedCollectionStr='timeslips', tableDisplayID='related_timeslips', relatedFieldName='task_mongo_id', relatedFieldValue=table_row_id;
+function draw_content_html (aaData) {
+	var contentHtml="";
+	$.each(aaData, function(i,row){
+		contentHtml+='<tr><td>'+row.task_name+'</td><td>'+row.reported_by+'</td><td>'+row.description+'</td><td>'+return_datetimepicker_from_timestamp(row.start_timestamp)+'</td><td>'+return_datetimepicker_from_timestamp(row.end_timestamp)+'</td><td>'+row.slip_hours+'</td><td><a href="'+backendDirectory+'/timeslip?_id='+row._id+'" target="_blank"><i class="fa fa-pencil"></i></a></td></tr>';
+	});
+	return contentHtml;
+}
+
+$(function () {	
+	var assign_to='', reported_by='', project_id='';
+	<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+		<% if (typeof contentObj.assigned_to_user_id !== 'undefined' && contentObj.assigned_to_user_id !== null && contentObj.assigned_to_user_id!=="") { %>
+			assign_to= '<%= contentObj.assigned_to_user_id %>';
+		<% } %>
+		<% if (typeof contentObj.reported_by_user_id !== 'undefined' && contentObj.reported_by_user_id !== null && contentObj.reported_by_user_id!=="") { %>
+			reported_by='<%= contentObj.reported_by_user_id %>';
+		<% } %>
+    <%	}else{	%>
+    	<% if (typeof authenticatedUser._id !== 'undefined' && authenticatedUser._id !== null && authenticatedUser._id!=="") { %>
+			reported_by='<%= authenticatedUser._id %>';
+		<% } %>
+    <% } %>
+		
+	fetch_collection_autocomplete_list('users', 'assigned_to_user_id', assign_to, 'status', '1');
+	fetch_collection_autocomplete_list('users', 'reported_by_user_id', reported_by, 'status', '1');
+	
+	fetch_default_list("tasks-status", "<% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null) { %><%= contentObj.status %><% } %>","status");
+	
+	<% if (typeof queryStr !== 'undefined' && queryStr !== null && typeof queryStr.project_id !== 'undefined' && queryStr.project_id !== null && queryStr.project_id !=="") { %>
+		project_id="<%= queryStr.project_id %>";
+	<% }else if(typeof contentObj.project_mongo_id !== 'undefined' && contentObj.project_mongo_id !== null)	{ %>
+		project_id="<%= contentObj.project_mongo_id %>";
+	<% } %>
+	fetch_collection_autocomplete_list('projects', 'project_mongo_id', project_id);
+	
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name: { required: true },
+				assigned_to_user_id: { required: true },
+				project: { required: true },
+				reported_by_user_id: { required: true },
+				description : { required: true },
+				start_date : { required: true },
+				status: { required: true }
+			},
+			submitHandler: function(form) {
+				$('#reported_by').val($('#reported_by_user_id option:selected').text());
+				$('#assigned_to').val($('#assigned_to_user_id option:selected').text());
+				
+				var startTimestampNum=return_timestamp_from_datetimepicker($('#start_date').val(), false);
+				$('#start_timestamp').val(startTimestampNum);
+				
+				var endTimestampNum=return_timestamp_from_datetimepicker($('#end_date').val(), false);
+				$('#end_timestamp').val(endTimestampNum);
+				
+				//save data as json in data field, use dataAsJson function to populate that field
+ 				dataAsJson('contentForm', form);
+ 			}
+		});	
+			/* datepicker plugin */
+			if($("#start_timestamp").val()!=""){
+				var tempDisplayDate=return_datetimepicker_from_timestamp($("#start_timestamp").val());
+				$("#start_date").val(tempDisplayDate)
+			}
+            $('#start_datetime_picker').datetimepicker({
+				format: 'L',
+				defaultDate:new Date()
+			}).on("dp.show", function (e) {
+				if($('#end_date').val()!=="")	{
+					$('#start_datetime_picker').data("DateTimePicker").maxDate($('#end_date').val());
+				}
+        	}).on("dp.change", function (e) {
+        		$('#end_datetime_picker').data("DateTimePicker").minDate(e.date);
+        	});
+			
+			if($("#end_timestamp").val()!=""){
+				var tempDisplayDate=return_datetimepicker_from_timestamp($("#end_timestamp").val());
+				$("#end_date").val(tempDisplayDate)
+			}
+            $('#end_datetime_picker').datetimepicker({
+				format: 'L'
+			}).on("dp.show", function (e) {
+				if($('#start_date').val()!==""){
+					$('#end_datetime_picker').data("DateTimePicker").minDate($('#start_date').val());
+				}
+        	}).on("dp.change", function (e) {
+        		$('#start_datetime_picker').data("DateTimePicker").maxDate(e.date);
+            });
+});
+
+//autocomplete
+	var xhr;
+  (function( $ ) {
+    $.widget( "custom.combobox", {
+      _create: function() {
+        this.wrapper = $( "<span>" )
+          .addClass( "custom-combobox" )
+          .insertAfter( this.element );
+ 
+        this.element.hide();
+        this._createAutocomplete();
+        this._createShowAllButton();
+      },
+ 
+      _createAutocomplete: function() {
+      	var ele_select= this.element;
+        var selected = this.element.children( ":selected" ),
+          value = selected.val() ? selected.text() : "";
+ 
+        this.input = $( "<input>" )
+          .appendTo( this.wrapper )
+          .val( value )
+          .attr( "title", "" )
+          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+          .autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: $.proxy( this, "_source" )
+          })
+          .tooltip({
+            tooltipClass: "ui-state-highlight"
+          });
+ 
+        this._on( this.input, {
+          autocompleteselect: function( event, ui ) {
+		  	//alert("show all");
+            ui.item.option.selected = true;
+			
+            this._trigger( "select", event, {
+              item: ui.item.option
+            });
+            if(ele_select.attr('id')=='assigned_to_user_id' || ele_select.attr('id')=='reported_by_user_id'){
+				$('#reported_by').val($('#reported_by_user_id option:selected').text());
+				$('#assigned_to').val($('#assigned_to_user_id option:selected').text());
+			}
+          },
+ 
+          autocompletechange: "_removeIfInvalid"
+        });
+      },
+ 
+      _createShowAllButton: function() {
+        var input = this.input,
+          wasOpen = false;
+ 
+        $( "<a>" )
+          .attr( "tabIndex", -1 )
+          .attr( "title", "Show All Items" )
+          .tooltip()
+          .appendTo( this.wrapper )
+          .button({
+            icons: {
+              primary: "ui-icon-triangle-1-s"
+            },
+            text: false
+          })
+          .removeClass( "ui-corner-all" )
+          .addClass( "custom-combobox-toggle ui-corner-right" )
+          .mousedown(function() {
+            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+          })
+          .click(function() {
+            input.focus();
+ 
+            // Close if already visible
+            if ( wasOpen ) {
+              return;
+            }
+ 
+            // Pass last search string as value to search for, displaying last results
+            input.autocomplete( "search", 'SHOWALL' );
+          });
+      },
+ 
+      _source: function( request, response ) {
+        //var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+		var ele_select= this.element;
+		if(request.term=='SHOWALL'){
+			response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+		
+		}
+		else
+		{
+		
+		if(ele_select.attr('id')=='project_mongo_id'){
+			var jsonRow = backendDirectory+"/api_fetch_list?start=0&limit=20&collection=projects&s="+request.term;
+		}else if(ele_select.attr('id')=='assigned_to_user_id' || ele_select.attr('id')=='reported_by_user_id'){
+			var jsonRow = backendDirectory+"/api_fetch_list?start=0&limit=20&collection=users&findFieldName=status&findFieldValue=1&s="+request.term;
+		}
+		//alert(jsonRowURLStr);
+		if(xhr) xhr.abort();
+		xhr=$.getJSON(jsonRow,function(result){
+			
+			if(result.aaData.length>0){
+				var html='<option value=""></option>';
+
+				$.each(result.aaData, function(i,item)
+				{
+					if(ele_select.attr('id')=='project_mongo_id'){
+						html += '<option value="'+item._id+'">'+item.name+'</option>';
+					}else if(ele_select.attr('id')=='assigned_to_user_id' || ele_select.attr('id')=='reported_by_user_id'){
+						var nameStr='';
+						if(item.firstname){
+							nameStr+=item.firstname;
+						}
+						if(item.lastname){
+							nameStr+=" "+item.lastname;
+						}
+						html += '<option value="'+item._id+'">'+nameStr+'</option>';
+					}
+				});
+				ele_select.html(html);
+				
+				
+				response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+				
+				
+			}
+		});
+       
+	  } 
+		
+      },
+ 
+      _removeIfInvalid: function( event, ui ) {
+ 
+        // Selected an item, nothing to do
+        if ( ui.item ) {
+
+          return;
+        }
+ 
+        // Search for a match (case-insensitive)
+        var value = this.input.val(),
+          valueLowerCase = value.toLowerCase(),
+          valid = false;
+        this.element.children( "option" ).each(function() {
+          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+            this.selected = valid = true;	
+			if(ele_select.attr('id')=='assigned_to_user_id' || ele_select.attr('id')=='reported_by_user_id'){
+				$('#reported_by').val($('#reported_by_user_id option:selected').text());
+				$('#assigned_to').val($('#assigned_to_user_id option:selected').text());
+			}
+            return false;
+          }
+        });
+ 
+        // Found a match, nothing to do
+        if ( valid ) {
+          return;
+        }
+ 
+        // Remove invalid value
+        this.input
+          .val( "" )
+          .attr( "title", value + " didn't match any item" )
+          .tooltip( "open" );
+        this.element.val( "" );
+        this._delay(function() {
+          this.input.tooltip( "close" ).attr( "title", "" );
+        }, 2500 );
+        this.input.data( "ui-autocomplete" ).term = "";
+      },
+ 
+      _destroy: function() {
+        this.wrapper.remove();
+        this.element.show();
+      }
+    });
+  })( jQuery ); 
+</script>
+<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
+	<script src="scripts/manage_notes.js"></script>
+	<script src="scripts/list_by_collection.js"></script>
+<%	}	%>
+</body>
+</html>

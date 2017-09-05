@@ -1,0 +1,220 @@
+<% include include/main-header %>
+
+<link rel="stylesheet" href="css/jquery.tag-editor.css" />
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		
+  			<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    		<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Image <small><% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>Update<% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Image</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+    	
+           				<div class="row">
+           					<div class="panel-body no-padding-top bg-white"> 
+            				<% include include/display_returned_msg %>
+            					
+            					<form class="form-horizontal" action="" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="uuid" name="uuid" value="<% if (typeof contentObj.metadata !== 'undefined' && contentObj.metadata !== null && typeof contentObj.metadata.uuid !== 'undefined' && contentObj.metadata.uuid !== null) { %><%= contentObj.metadata.uuid %><% } %>">
+                         			<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
+                         			<div class="form-group">
+                  						<label class="control-label col-md-2" for="first-name">File Name</label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" id="filename" readonly class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.metadata !== 'undefined' && contentObj.metadata !== null && typeof contentObj.metadata.originalname !== 'undefined' && contentObj.metadata.originalname !== "") { %><%= contentObj.metadata.originalname %><% } else if (typeof contentObj.filename !== 'undefined' && contentObj.filename !== null) { %><%= contentObj.filename %><% } %>">
+                  						</div>
+                					
+                  						<label class="control-label col-md-1" for="first-name">Content Type</label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" readonly class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.contentType !== 'undefined' && contentObj.contentType !== null) { %><%= contentObj.contentType %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-2" for="first-name">File Size</label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" readonly class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.length !== 'undefined' && contentObj.length !== null) { %><%= contentObj.length %><% } %> bytes">
+                  						</div>
+                					
+                  						<label class="control-label col-md-1" for="first-name">Upload Date</label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" readonly class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.uploadDate !== 'undefined' && contentObj.uploadDate !== null) { %><%= contentObj.uploadDate %><% } %>">
+                  						</div>
+                					</div>
+                					<% }%>
+                					<div class="form-group" id="displayImage" style="display:none;">
+    										<label for="" class="col-sm-2 control-label">Image</label>
+    										<div class="col-sm-9 div_imagetranscrits ">
+    											
+    										</div>
+  									</div>
+                					<div class="form-group">
+    									<label for="" class="col-sm-2 control-label">Upload image <sup class="required">*</sup></label>
+    									<div class="col-sm-9  ">
+    										<input type="file" id="file" class="form-control col-md-5 col-xs-12" value="">
+    									</div>
+  									</div>
+  									<div class="form-group">
+    										<label for="firstname" class="col-sm-2 control-label">Tags </label>
+    										<div class="col-sm-10">
+    											<input type="hidden" class="form-control" id="default_tags" value="<% if (typeof contentObj.metadata !== 'undefined' && contentObj.metadata !== null && typeof contentObj.metadata.tags !== 'undefined' && contentObj.metadata.tags !== null) { %><%= contentObj.metadata.tags %><% } %>">
+    											<textarea type="text" class="form-control" name="tags" id="tags" rows="1"></textarea>
+											</div>
+                  						</div>
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-6" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/image_gallery" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+              					</form>
+              				</div>
+            			</div>
+    		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+
+<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+</div>
+
+<script src="plugins/jquery-ui.min.js"></script>
+<script src="js/jquery.validate.js"></script>
+
+ <script src="js/jquery.caret.min.js"></script>
+ <script src="js/jquery.tag-editor.min.js"></script>
+<script>
+function upload_single_file(){
+	var guidStr=$("#uuid").val();
+	if(guidStr==""){
+		guidStr= guid();
+	}
+	$(".uploadFile").remove();
+	if($('#file').val().length>0)	{
+		var data = new FormData();
+		data.append('related_collection', "");
+		data.append('uuid', guidStr);
+		data.append('collection_id', "");
+		data.append('type', 'image');
+		data.append('tags', $("#tags").val());
+		
+		var filesize=Number($('#file')[0].files[0].size)/(1024*1024);
+		
+		if(filesize>5){
+			$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>The file size larger than 5MB is not allowed</div>');
+			$('#file').focus();
+		}else{
+			var files= $('#file')[0].files;
+			var fileTypeStr=files[0]['type'];
+			
+			var ValidImageTypes = ["image/gif", "image/jpeg", "image/png", "image/gif"];
+			if ($.inArray(fileTypeStr, ValidImageTypes) < 0) {
+				$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Only image upload is allowed!</div>');
+				$('#file').focus();
+			}else{
+				$.each(files, function(key, value){
+					data.append('file', value);
+				});
+			
+				$.ajax({
+					url: backendDirectory+'/find_remove_file',
+					type: 'POST',
+					data: {'uuid' : guidStr},
+					dataType: 'json',
+					success: function(response){
+						if(response.success){
+							$.ajax({
+								url: backendDirectory+'/upload',
+								type: 'POST',
+								data: data,
+								dataType: 'json',
+								contentType: false,
+								enctype: 'multipart/form-data',
+								cache: false,
+								processData: false, // Don't process the files
+								success: function(response){
+									if(response.success && response._id && response._id!=""){
+										window.location.href = backendDirectory+"/image?_id="+response._id;
+									} else if(response.error) {
+										$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>'+response.error+'</div>');
+									}else {
+										$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Sorry, error in uploading file!</div>');
+									}
+								}
+							});
+						}else {
+							$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Sorry, error in uploading file!</div>');
+						}
+					}
+				});
+			}
+		}
+	}	else {
+		$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Please select file to upload!</div>');
+	}
+}
+
+function load_team_logo(){
+	var noImageStr= backendDirectory+'/images/no_image.png';
+	if($("#uuid").val()!="")	{
+		$('.div_imagetranscrits').html('<img src="'+backendDirectory+"/file/"+$("#uuid").val()+'?'+$.now()+'" class="img-responsive" style="border-radius: 0 0 3px 3px; border: 1px solid #ddd;" onerror="this.src=\''+noImageStr+'\'"/>')
+		$('#displayImage').show();
+	}
+}
+
+$(document).ready(function(){
+	drawTagsUi();	// call this method to initialise tags
+	
+	load_team_logo();
+	
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				sender_name: { required: true },
+				sender_email: { required: true },
+				recipient: { required: true },
+				subject: { required: true },
+				body: { required: true },
+				status: { required: true },
+			},
+			submitHandler: function(form) {
+				upload_single_file();
+ 			}
+		});		
+});
+</script>
+</body>
+</html>

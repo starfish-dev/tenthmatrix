@@ -1,0 +1,209 @@
+<% include include/main-header %>
+<style>
+.box-primary h4 {
+    border-bottom: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 20px;
+    margin: 7px 5px 0 0;
+    padding: 9px;
+}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1><% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } else{	%>Add new<% }%> <small>Club</small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Club</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+      				
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/club" method="POST" id="contentForm">
+            						
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="clubs">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="name">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						
+            						<input type="hidden" class="form-control" id="system_version" name="system_version" value="1">
+            						<input type="hidden" class="form-control" id="uuid_created_by" name="uuid_created_by" value="<% if (typeof authenticatedUser._id !== 'undefined' && authenticatedUser._id !== null) {	%><%= authenticatedUser._id %><%	}	%>">
+            						<div class="row">
+            						<div class="col-sm-6 col-xs-12"><div class="box box-primary">
+            						<h4>Basic Details</h4>
+            						<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-11">
+            						<div class="form-group">
+                  						<label class="control-label col-md-3" for="first-name">Name<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-7">
+                    						<input type="text" required="required" id="name" name="name" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group" style="margin-top:10px;">
+										<label class="col-sm-3 control-label">Club Administrator </label>
+										<div class="col-md-6 col-lg-7">
+                    						<input type="text" id="administrator" name="administrator" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.administrator !== 'undefined' && contentObj.administrator !== null) { %><%= contentObj.administrator %><% } %>">
+                  						</div>
+                            		</div>
+                					
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Description</label>
+                  						<div class="col-md-6 col-lg-7">
+                   							<textarea class="form-control col-md-5 col-xs-12" row="10" id="description" name="description"><% if (typeof contentObj.description !== 'undefined' && contentObj.description !== null) { %><%= contentObj.description %><% } %></textarea>
+                  						</div>
+                					</div>
+                					<div class="form-group" style="margin-top:10px;">
+										<label class="col-sm-3 control-label">Link </label>
+										<div class="col-md-6 col-lg-7">
+                    						<input type="text" id="target_link" name="target_link" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.target_link !== 'undefined' && contentObj.target_link !== null) { %><%= contentObj.target_link %><% } %>">
+                  						</div>
+                            		</div>
+                            		<div class="form-group" class="linkTargetDivID">
+    									<label for="" class="col-sm-3 control-label">Target</label>
+    									<div class="col-sm-9" style="margin-top:6px;">
+    										<div STYLE="float:left; margin-right:10px;display:inline-block;">
+      		  									<label> <input type="radio" id="source" name="source" value="1" <% if (typeof contentObj.source !== 'undefined' && contentObj.source !== null && contentObj.source == 1) { %>checked<% } %> checked>  <strong style="font-weight:600">Open in same window</strong></label>
+    			  							</div>
+				  							<div STYLE="float:left;display:inline-block;"">
+      		  									<label> <input type="radio" id="source" name="source" value="0" <% if (typeof contentObj.source !== 'undefined' && contentObj.source !== null && contentObj.source == 0) { %>checked<% } %> > <strong style="font-weight:600">Open in new window </strong></label>
+    			  							</div>
+										</div>
+									</div>
+                					<div class="form-group">
+    									<label for="" class="col-sm-3 control-label">Status</label>
+    									<div class="col-sm-7" style="margin-top:6px;">
+    										<div STYLE="margin-right:10px;display:inline-block;">
+      		  									<label> <input type="radio" id="status" name="status" value="1" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 1) { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  							</div>
+				  							<div STYLE="display:inline-block;">
+      		  									<label> <input type="radio" id="status" name="status" value="0" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 0) { %>checked<% } %> > <strong style="font-weight:600">Inactive</strong></label>
+    			  							</div>
+										</div>
+									</div>
+									
+                            		</div></div>
+                            		</div></div></div>
+							        <div class="col-sm-6 col-xs-12"><div class="box box-primary">
+							        <h4>Contact Details</h4>
+            						<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-11">
+            						<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Website Url<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-7">
+                   							<input type="text" required="required" class="form-control col-md-5 col-xs-12" id="website_url" name="website_url" value="<% if (typeof contentObj.website_url !== 'undefined' && contentObj.website_url !== null) { %><%= contentObj.website_url %><% } %>">
+                  						</div>
+                					</div>
+							       		<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Address<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-9">
+                   							<textarea required="required" class="form-control col-md-5 col-xs-12" row="4" id="address" name="address" ><% if (typeof contentObj.address !== 'undefined' && contentObj.address !== null) { %><%= contentObj.address %><% } %></textarea>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Town<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-7">
+                  							<input type="text" required="required" class="form-control col-md-5 col-xs-12" id="town" name="town" value="<% if (typeof contentObj.town !== 'undefined' && contentObj.town !== null) { %><%= contentObj.town %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Telephone </label>
+                  						<div class="col-md-6 col-lg-7">
+                  							<input type="text" class="form-control col-md-5 col-xs-12" id="telephone" name="telephone" value="<% if (typeof contentObj.telephone !== 'undefined' && contentObj.telephone !== null) { %><%= contentObj.telephone %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">E-mail</label>
+                  						<div class="col-md-6 col-lg-7">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" id="email" name="email" value="<% if (typeof contentObj.email !== 'undefined' && contentObj.email !== null) { %><%= contentObj.email %><% } %>">
+                  						</div>
+                					</div>
+                					
+									</div></div>
+                					</div></div></div>
+                					</div>
+                					
+                					<div class="row">
+                					<div class="col-sm-6 col-xs-12">
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-12" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/clubs" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+                					</div>
+                					</div>
+            					</form>
+              				</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/jquery.validate.js"></script>
+<script type="text/javascript">
+$(function () {
+	<% if (typeof contentObj._id == 'undefined' && contentObj._id == null) { %>
+		$("input[name=status][value=1]").prop("checked",true);
+	<% } %>
+	
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				if (element.attr("name") == "established_on" ) {
+                	$(element).closest('div').after(error);
+            	}else{
+					$(element).closest('div').append(error);
+				}
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name: { required: true },
+				address: { required: true },
+				email: { email : true },
+				website_url : { required: true }
+			},
+			submitHandler: function(form) {
+				//save data as json in data field, use dataAsJson function to populate that field
+ 				dataAsJson('contentForm', form);
+ 			}
+		});	
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<% include include/main-header %>
+<link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
+<link rel="stylesheet" href="plugins/combobox/autocomplete-ui.css"/>
+<style>
+.custom-combobox {
+		position: relative;
+		display: inline-block;
+	}
+	.custom-combobox-toggle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin-left: -1px;
+		padding: 0;
+	}
+	.custom-combobox-input {
+		margin: 0;
+		padding: 5px 10px;
+	}
+	.ui-widget-overlay {
+		position: fixed;
+	}
+	.box-primary h4 {
+    border-bottom: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 20px;
+    margin: 7px 5px 0 0;
+    padding: 9px;
+}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1> <% if (typeof contentObj.firstname !== 'undefined' && contentObj.firstname !== null) { %><%= contentObj.firstname %><% } else{	%>Add new<% }%><small>Employee</small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Employee</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+				<div class="row">
+					<div class="panel-body no-padding-top bg-white"> 
+		<% include include/display_returned_msg %>
+		<form class="form-horizontal" action="<%= backendDirectory %>/save/employee" method="POST" id="EntryForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="employees">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="email_address">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						
+								
+			<div class="chart">
+				<div class="col-md-6 col-xs-12">
+          				<div class="box box-primary">
+		   					 <h4 style="padding-left: 10px;margin-top: 10px;font-size: 24px;margin-bottom: 8px;padding-bottom: 14px;">Basic Details</h4>
+            				<!-- /.box-header -->
+            					<div class="box-body">
+			
+									<div class="row">
+           		 						 <div class=" col-sm-12 col-lg-12">						
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Position <span style="color:#6E829B">*</span></label>
+								<div class="col-sm-9"><input name="position" class="form-control required" value="<% if (typeof contentObj.position !== 'undefined' && contentObj.position !== null) { %><%= contentObj.position %><% } %>" id="position" type="text"></div>
+							</div>	 
+							<div class="form-group">
+								<label class="col-sm-3 control-label">First Name <span style="color:#6E829B">*</span></label>
+								<div class="col-sm-3"><input name="firstname" class="form-control required" value="<% if (typeof contentObj.firstname !== 'undefined' && contentObj.firstname !== null) { %><%= contentObj.firstname %><% } %>" id="firstname" type="text"></div>
+							
+								<label class="col-sm-2 control-label">Last Name <span style="color:#6E829B">*</span></label>
+							<div class="col-sm-4">	<input name="lastname" class="form-control required" value="<% if (typeof contentObj.lastname !== 'undefined' && contentObj.lastname !== null) { %><%= contentObj.lastname %><% } %>" id="lastname" type="text">    </div>                             
+							</div>
+									<div class="form-group">
+                  						<label class="control-label col-md-3" for="">DOB <span style="color:#6E829B">*</span></label>
+                  						<div class="col-md-3 col-lg-4">
+                   							<input type="hidden" id="dob" name="dob" readonly value="<% if (typeof contentObj.dob !== 'undefined' && contentObj.dob !== null) { %><%= contentObj.dob %><% } %>">
+                   							<div class='input-group date' id='datetime_picker'>
+                    							<input type='text' class="form-control" id="date_of_birth" value="" required/>
+                    							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                							</div>	
+                  						</div>
+                  						<label class="control-label col-md-2 ageClass" style="display:none;">Age</label>
+                  						<div class="col-md-3 col-lg-2 ageClass"  style="display:none;">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" readonly id="age" value="">
+                  						</div>
+                					</div>				   
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Type</label>
+								<div class="col-sm-9">
+									<select id="type" name="type" class="form-control col-md-5 col-xs-12">
+                   								
+                    				</select>
+								</div>				
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Manager</label>
+								<div class="col-sm-9">
+									<input type="hidden" class="form-control" id="manager_name" name="manager_name" value="">
+									<select id="manager_mongo_id" name="manager_mongo_id" class="form-control col-md-5 col-xs-12">
+                   								
+                    				</select>
+								</div>				
+							</div>
+									<div class="form-group">
+    									<label for="" class="col-sm-3 control-label">Status</label>
+    									<div class="col-sm-9" style="margin-top:6px;">
+    										<div STYLE="margin-right:10px;display:inline-block;">
+      		  									<label> <input type="radio" id="status" name="status" value="1" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 1) { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  							</div>
+				  							<div STYLE="display:inline-block;">
+      		  									<label> <input type="radio" id="status" name="status" value="0" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 0) { %>checked<% } %> > <strong style="font-weight:600">Inactive</strong></label>
+    			  							</div>
+										</div>
+									</div>
+							</div>
+							</div></div></div>
+						
+						</div>
+				<div class="col-md-6 col-xs-12">
+          				<div class="box box-primary">
+		   					 <h4 style="padding-left: 10px;margin-top: 10px;font-size: 24px;margin-bottom: 8px;padding-bottom: 14px;">Contact Details</h4>
+            				<!-- /.box-header -->
+            					<div class="box-body">
+			
+									<div class="row">
+           		 						 <div class=" col-sm-12 col-lg-12">						
+							
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Email <span style="color:#6E829B">*</span></label>
+								<div class="col-sm-9"><input name="email_address" class="form-control required" value="<% if (typeof contentObj.email_address !== 'undefined' && contentObj.email_address !== null) { %><%= contentObj.email_address %><% } %>" id="email_address" type="text"></div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Contact Number</label>
+								<div class="col-sm-9"><input class="form-control phone" value="<% if (typeof contentObj.contact_number !== 'undefined' && contentObj.contact_number !== null) { %><%= contentObj.contact_number %><% } %>" name="contact_number" id="contact_number" type="text"></div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Address </label>
+								<div class="col-sm-9"> <textarea name="address" class="form-control" id="address"><% if (typeof contentObj.address !== 'undefined' && contentObj.address !== null) { %><%= contentObj.address %><% } %></textarea></div>
+							</div>			
+							
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Emergency Contact Name</label>
+								<div class="col-sm-9">	<input name="emergency_contact_name" class="form-control" value="<% if (typeof contentObj.emergency_contact_name !== 'undefined' && contentObj.emergency_contact_name !== null) { %><%= contentObj.emergency_contact_name %><% } %>" id="emergency_contact_name" type="text"></div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Emergency Contact Number</label>
+								<div class="col-sm-9">	<input name="emergency_contact_number" class="form-control" value="<% if (typeof contentObj.emergency_contact_number !== 'undefined' && contentObj.emergency_contact_number !== null) { %><%= contentObj.emergency_contact_number %><% } %>" id="emergency_contact_number" type="text"></div>
+							</div>
+							</div>
+							</div></div></div>
+						
+						</div>
+				<div class="col-md-6 col-xs-12">
+          				<div class="box box-primary">
+		   					 <h4 style="padding-left: 10px;margin-top: 10px;font-size: 24px;margin-bottom: 8px;padding-bottom: 14px;">Employment Details</h4>
+            				<!-- /.box-header -->
+            					<div class="box-body">
+			
+									<div class="row">
+           		 						 <div class=" col-sm-12 col-lg-12">						
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Start Date <span style="color:#6E829B">*</span></label>
+								<div class="col-sm-9">
+									<input type="hidden" id="employment_start_timestamp" name="employment_start_timestamp" value="<% if (typeof contentObj.employment_start_timestamp !== 'undefined' && contentObj.employment_start_timestamp !== null) { %><%= contentObj.employment_start_timestamp %><% } %>">
+                   					<div class='input-group date' id='employment_datetime_picker'>
+                    					<input type='text' class="form-control" id="employment_start_date" value=""/>
+                    					<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                					</div>
+                				</div>
+							</div>	 
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Number of years in Employment</label>
+								<div class="col-sm-3"><input name="number_of_years_in_employment" class="form-control" value="<% if (typeof contentObj.number_of_years_in_employment !== 'undefined' && contentObj.number_of_years_in_employment !== null) { %><%= contentObj.number_of_years_in_employment %><% } %>" id="number_of_years_in_employment" type="text"></div>
+							
+								<label class="col-sm-3 control-label">Current Holidays Entitlement</label>
+								<div class="col-sm-3">	<input name="current_holiday_entitlement" readonly class="form-control" value="<% if (typeof contentObj.current_holiday_entitlement !== 'undefined' && contentObj.current_holiday_entitlement !== null) { %><%= contentObj.current_holiday_entitlement %><% } %>" id="current_holiday_entitlement" type="text">    </div>                             
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Pan Card Number</label>
+								<div class="col-sm-9">	<input name="pan_card_number" class="form-control" value="<% if (typeof contentObj.pan_card_number !== 'undefined' && contentObj.pan_card_number !== null) { %><%= contentObj.pan_card_number %><% } %>" id="pan_card_number" type="text">    </div>                             
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">NI Number</label>
+								<div class="col-sm-9">	<input name="ni_number" class="form-control" value="<% if (typeof contentObj.ni_number !== 'undefined' && contentObj.ni_number !== null) { %><%= contentObj.ni_number %><% } %>" id="ni_number" type="text">    </div>                             
+							</div>
+							</div>
+							</div></div></div>
+						
+						</div>
+				<div class="col-md-6 col-xs-12">
+          				<div class="box box-primary">
+		   					 <h4 style="padding-left: 10px;margin-top: 10px;font-size: 24px;margin-bottom: 8px;padding-bottom: 14px;">Medical Details</h4>
+            				<!-- /.box-header -->
+            					<div class="box-body">
+			
+									<div class="row">
+           		 						 <div class=" col-sm-12 col-lg-12">						
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Doctor Name</label>
+								<div class="col-sm-9">	<input name="doctor_name" class="form-control" value="<% if (typeof contentObj.doctor_name !== 'undefined' && contentObj.doctor_name !== null) { %><%= contentObj.doctor_name %><% } %>" id="doctor_name" type="text"></div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Surgery Address </label>
+								<div class="col-sm-9"> <textarea name="surgery_address" class="form-control" id="surgery_address"><% if (typeof contentObj.surgery_address !== 'undefined' && contentObj.surgery_address !== null) { %><%= contentObj.surgery_address %><% } %></textarea></div>
+							</div>	
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Medical Conditions </label>
+								<div class="col-sm-9"> <textarea name="medical_conditions" class="form-control" id="medical_conditions"><% if (typeof contentObj.medical_conditions !== 'undefined' && contentObj.medical_conditions !== null) { %><%= contentObj.medical_conditions %><% } %></textarea></div>
+							</div>
+							</div>
+							</div></div></div>
+						
+						</div>		
+						
+					<div class="col-xs-12" style="text-align:center;">
+						<input class="btn btn-primary btn-sm" value="Submit" type="submit">
+						<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               				<a href="<%= backendDirectory %>/list/contacts" class="btn btn-danger btn-sm">Cancel</a>
+               			<%	}else{	%>
+               				<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               			<% } %>
+					</div>
+					</div>
+				</form>
+						</div>
+				</div>
+		
+		</section>
+      			
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+
+<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+</div>
+<script src="js/moment.js"></script>
+<script src="js/bootstrap-datetimepicker.min.js"></script>
+<script src="js/jquery.validate.js"></script>
+<script src="plugins/combobox/autocomplete-ui.js"></script>
+<script language="javascript">
+
+function set_no_of_employement_holidays(){
+	var annual_holidays=20;
+	var ONE_DAY = 1000 * 60 * 60 * 24
+
+	var start_date= $('#employment_start_date').val();
+	var dateParts = $('#employment_start_date').val().split('/'),	date;
+		start_date = new Date(dateParts[2], parseInt(dateParts[0])-1, dateParts[1]);
+		
+	var now = new Date();
+	
+	// Convert both dates to milliseconds
+    var date1_ms = start_date.getTime();
+    var date2_ms = now.getTime()
+
+    // Calculate the difference in milliseconds
+    var difference_ms = Math.abs(date1_ms - date2_ms)
+	
+	// Convert back to days and return
+    var days = Math.round(difference_ms/ONE_DAY)
+	
+	var s_year=start_date.getFullYear();
+	var thisyear = now.getFullYear();
+	var number_of_long_years = 0;
+	for(var y=s_year; y <= thisyear; y++){ 
+		if(days>=365){
+			days = days-366;
+			number_of_long_years++; 
+		} else {
+			days=days-365;
+		}
+	}
+	$('#number_of_years_in_employment').val(number_of_long_years);
+	var current_holiday_entitlement=annual_holidays+number_of_long_years;
+	$('#current_holiday_entitlement').val(current_holiday_entitlement);
+}
+	$(function () {
+		var s_manager_mongo_id="";
+		<% if(typeof contentObj.manager_mongo_id !== 'undefined' && contentObj.manager_mongo_id !== null)	{ %>
+			s_manager_mongo_id="<%= contentObj.manager_mongo_id %>";
+		<% } %>
+		
+		fetch_collection_autocomplete_list('employees', 'manager_mongo_id', s_manager_mongo_id, 'type', 'Manager');
+		
+		fetch_default_list("employee-types", "<% if (typeof contentObj.type !== 'undefined' && contentObj.type !== null) { %><%= contentObj.type %><% } %>","type");
+	
+	 // datetimepicker plugin
+		if($("#dob").val()!=""){
+			$("#age").val(getAge($("#dob").val()));
+			$('.ageClass').show();
+			var tempDisplayDate=return_datetimepicker_from_timestamp($("#dob").val());
+			$("#date_of_birth").val(tempDisplayDate);
+		}
+		$('#datetime_picker').datetimepicker({
+			format: 'L'
+		});
+		$("#datetime_picker").on("dp.change", function (e) {
+        	var timestampnum= return_timestamp_from_datetimepicker($("#date_of_birth").val(),false);
+        	$("#dob").val(timestampnum);
+			$("#age").val(getAge(timestampnum));
+			$('.ageClass').show();
+        });
+		
+		if($("#employment_start_timestamp").val()!=""){
+			var tempDisplayDate=return_datetimepicker_from_timestamp($("#employment_start_timestamp").val());
+			$("#employment_start_date").val(tempDisplayDate);
+		}
+		$('#employment_datetime_picker').datetimepicker({
+			format: 'L'
+		});
+		$("#employment_datetime_picker").on("dp.change", function (e) {
+        	var timestampnum= return_timestamp_from_datetimepicker($("#employment_start_date").val(),false);
+        	$("#employment_start_timestamp").val(timestampnum);
+        	set_no_of_employement_holidays();
+        });
+		// validate form on keyup and submit
+		$("#EntryForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				if (element.attr("id") == "date_of_birth" ) {
+					$('#datetime_picker').after(error);
+            	}else{
+					$(element).closest('div').append(error);
+				}
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				customer_mongo_id: { required: true },
+				first_name: { required: true },
+				email_address: { required: true, email :true },
+			},
+			submitHandler: function(form) {
+				var dobtimestampnum= return_timestamp_from_datetimepicker($("#date_of_birth").val(),false);
+        		$("#dob").val(dobtimestampnum);
+        	
+				var timestampnum= return_timestamp_from_datetimepicker($("#employment_start_date").val(),false);
+        		$("#employment_start_timestamp").val(timestampnum);
+				dataAsJson('EntryForm', form);
+ 			}
+		});			
+	});
+
+//autocomplete
+	var xhr;
+  (function( $ ) {
+    $.widget( "custom.combobox", {
+      _create: function() {
+        this.wrapper = $( "<span>" )
+          .addClass( "custom-combobox" )
+          .insertAfter( this.element );
+ 
+        this.element.hide();
+        this._createAutocomplete();
+        this._createShowAllButton();
+      },
+ 
+      _createAutocomplete: function() {
+      	var ele_select= this.element;
+       
+        var selected = this.element.children( ":selected" ),
+          value = selected.val() ? selected.text() : "";
+ 
+        this.input = $( "<input>" )
+          .appendTo( this.wrapper )
+          .val( value )
+          .attr( "title", "" )
+          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+          .autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: $.proxy( this, "_source" )
+          })
+          .tooltip({
+            tooltipClass: "ui-state-highlight"
+          });
+ 
+        this._on( this.input, {
+          autocompleteselect: function( event, ui ) {
+		  	//alert("show all");
+            ui.item.option.selected = true;
+			if(ele_select.attr('id')=='manager_mongo_id'){
+				$('#manager_name').val($('#manager_mongo_id option:selected').text());
+			}
+            this._trigger( "select", event, {
+              item: ui.item.option
+            });
+          },
+ 
+          autocompletechange: "_removeIfInvalid"
+        });
+      },
+ 
+      _createShowAllButton: function() {
+        var input = this.input,
+          wasOpen = false;
+ 
+        $( "<a>" )
+          .attr( "tabIndex", -1 )
+          .attr( "title", "Show All Items" )
+          .tooltip()
+          .appendTo( this.wrapper )
+          .button({
+            icons: {
+              primary: "ui-icon-triangle-1-s"
+            },
+            text: false
+          })
+          .removeClass( "ui-corner-all" )
+          .addClass( "custom-combobox-toggle ui-corner-right" )
+          .mousedown(function() {
+            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+          })
+          .click(function() {
+            input.focus();
+ 
+            // Close if already visible
+            if ( wasOpen ) {
+              return;
+            }
+ 
+            // Pass last search string as value to search for, displaying last results
+            input.autocomplete( "search", 'SHOWALL' );
+          });
+      },
+ 
+      _source: function( request, response ) {
+        //var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+		var ele_select= this.element;
+		if(request.term=='SHOWALL'){
+			response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+		
+		}
+		else
+		{
+		var jsonRow = backendDirectory+"/api_fetch_list?start=0&limit=20&collection=employees?s="+request.term+"&findFieldName=type&findFieldValue=Manager";
+
+		//alert(jsonRowURLStr);
+		if(xhr) xhr.abort();
+		xhr=$.getJSON(jsonRow,function(result){
+			
+			if(result.aaData.length>0){
+				var html='<option value=""></option>';
+
+				$.each(result.aaData, function(i,item)
+				{
+					html += '<option value="'+item._id+'">'+item.firstname+' '+item.lastname+'</option>';
+				});
+				ele_select.html(html);
+				
+				
+				response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+				
+				
+			}
+		});
+       
+	  } 
+		
+      },
+ 
+      _removeIfInvalid: function( event, ui ) {
+ 
+        // Selected an item, nothing to do
+        if ( ui.item ) {
+
+          return;
+        }
+ 
+        // Search for a match (case-insensitive)
+        var value = this.input.val(),
+          valueLowerCase = value.toLowerCase(),
+          valid = false;
+        this.element.children( "option" ).each(function() {
+          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+            this.selected = valid = true;	
+			if(ele_select.attr('id')=='manager_mongo_id'){
+				$('#manager_name').val($('#manager_mongo_id option:selected').text());
+			}
+            return false;
+          }
+        });
+ 
+        // Found a match, nothing to do
+        if ( valid ) {
+          return;
+        }
+ 
+        // Remove invalid value
+        this.input
+          .val( "" )
+          .attr( "title", value + " didn't match any item" )
+          .tooltip( "open" );
+        this.element.val( "" );
+        this._delay(function() {
+          this.input.tooltip( "close" ).attr( "title", "" );
+        }, 2500 );
+        this.input.data( "ui-autocomplete" ).term = "";
+      },
+ 
+      _destroy: function() {
+        this.wrapper.remove();
+        this.element.show();
+      }
+    });
+  })( jQuery ); 
+</script>
+</body>
+</html>

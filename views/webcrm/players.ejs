@@ -1,0 +1,753 @@
+<% include include/main-header %>
+<% 
+var keywordStr="";
+if (typeof searched_keyword !== 'undefined' && searched_keyword !== null) {
+	keywordStr=searched_keyword;
+}
+
+%>
+
+<!-- page specific css -->
+<link rel="stylesheet" href="css/basictable.css">
+<link href="css/bootstrap-toggle.min.css" rel="stylesheet">
+<link rel="stylesheet" href="css/bootstrap.datepicker.css">
+<style>
+	.injured {
+		background-color:#FFB2B2 !important;
+	}
+	.available {
+		background-color: #dff0d8 !important;
+	}
+	.unsure {
+		background-color: #fcf8e3 !important;
+	}
+	.home_only {
+		background-color: #d9edf7 !important;
+	}
+	.unavailable {
+		background-color: #f2dede !important;
+	}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+
+  		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  		<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1 id="pageMainHeading">
+        Players
+        <small>LIST VIEW</small>
+      </h1>
+      <ol class="breadcrumb">
+        <% include include/dashboard-breadcrumb %>
+        <li class="active" id="breadcrumbTitle">Players</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+				<div CLASS="row">
+					<div CLASS="col-md-12">
+						<div class="clearfix hidden-xs">
+      						<div class="form-group no-margin">
+      							<div class="pull-left margin-bottom-10 ">
+									<div class="form-inline" style="">                 	          
+                 						<div class="btn-inline display-inline-block">
+                 							<label>Select date</label>
+											<input readonly class="form-control datepicker" id="start_date" placeholder="Select date" value="" data-date-format="dd/mm/yyyy">
+											<span style="font-style:italic; font-size:11px;">(to check players availability)</span>
+										</div>
+									</div>
+         						</div>
+     							<div class="pull-right margin-bottom-10 ">
+									<div class="form-inline" style=""> 
+										<div class="btn-inline display-inline-block">
+                 							<label>Filter</label>
+											<select id="player_type_uuid" name="player_type_uuid" class="form-control">
+											
+											</select>
+											<input class="form-control searchFieldClass" style="min-width:225px; height:36px;" required id="searchField" placeholder="Search here..." value="<%= keywordStr %>">
+											<button class="btn btn-left-align btn-link no-shadow bg-transparent no-padding-top padding-right-10 right-auto left" type="button" id="searchBtn" title="Search><i class="glyphicon glyphicon-search"></i></button>
+										</div>
+                                        <button class="btn btn-primary btn-circle" type="button" onclick="refresh_data()" title="Clear search term">  <i class="fa fa-refresh"></i></button>
+                  					</div>
+         						</div>
+      						</div>
+     					</div>
+						
+						<div class="visible-xs ">
+							<div class="row">
+								<div class="col-md-12 display_records_count" style="font-weight:bold;"></div>
+								<div class="col-lg-6 col-sm-12 col-xs-12">
+										<form class="form-inline" method="get" action=""> 
+											<input class="form-control xs-margin-btm10 searchFieldClass" required id="smallSearchField" name="keyword" placeholder="Search..." type="text" value="<%= keywordStr %>">
+                     						<a href="<%= backendDirectory %>/user" class="btn btn-danger btn-color padingmix btn-icon-left btn-sm editorLink" STYLE="width:100%; margin:10px 0px;" title="Enter new player"> <i class="fa fa-plus"></i>Enter new player</a>
+                  						</form>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+			<div CLASS="row" style="margin-top:10px;">
+					<div CLASS="col-md-12">
+						<div class="clearfix hidden-xs">
+      						<div class="form-group no-margin">
+      							<div class="pull-left margin-bottom-10 ">
+									<div class="form-inline" style="">                 	          
+                 						<a href="javascript:void(0)" onClick="$('#load_teams').val('');fetch_team_players();" class="btn btn-danger btn-color padingmix  btn-icon-left btn-sm editorLink"> <i class="fa fa-refresh"></i>Display all players</a>
+										<a href="#loadTeamPopup" data-toggle="modal" class="btn btn-danger btn-color padingmix  btn-icon-left btn-sm editorLink"> <i class="fa fa-list"></i>Load team</a>
+										<a href="javascript:void(0)" onClick="__showAddPopup(); return false;" data-toggle="modal" onclick="#" class="btn btn-danger btn-color padingmix  btn-icon-left btn-sm editorLink"> <i class="fa fa-group"></i>Select & Add player(s) to team</a>
+										
+                                    </div>
+         						</div>
+     							<div class="pull-right margin-bottom-10 ">
+									<div class="form-inline" style=""> 
+										<span class="display_records_count" style="font-weight:bold;"></span>
+										<a href="javascript:void(0);" class="btn btn-danger btn-color padingmix btn-icon-left btn-sm" style="display:none;" id="send_notificationBtn" onClick="notificationPopup();return false;" title="Send notifications to selected players"> <i class="fa fa-send"></i>Send notification</a>
+                                        <a href="<%= backendDirectory %>/user" class="btn btn-danger btn-color padingmix  btn-icon-left btn-sm editorLink" title="Enter new player"> <i class="fa fa-plus"></i>Enter new player</a>
+                  					</div>
+         						</div>
+      						</div>
+     					</div>
+				</div>
+			</div>
+<input id="selectedRows" type="hidden" value="">
+											
+<div id="addTeam" class="modal fade" role="dialog" style="display: none;" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+    	<div class="modal-content">
+     		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal" onClick="$('#add_new_team').val(''); clearPopup();">×</button>
+        		<h3 class="modal-title">Add player(s) to team</h3>
+      		</div>
+      		<div class="modal-body">
+       			<h4>Add to existing team</h4>
+       			<p><span class="label-default" id="ex_msg_suc" style="color:#006600"></span><span class="label-default" id="ex_msg_err" style="color:#FF0000"></span></p>
+        		<select name="teams_list" id="teams_list" class="form-control" size="10" style="width:100%">
+					
+				</select>
+				<div class="col-md-12" style="padding-top:10px;">
+					<button type="button" class="btn btn-info sm-btn" onclick="clearPopup(); add_to_existing_team();" style="float:right;">Add to existing team(s)</button>
+				</div>
+						
+        		<h4>Add to new team</h4>
+        			<div class="row">
+        				<div class="col-md-12" id="n_msg_err" style="color:#FF0000;"></div>
+        				<div class="col-md-12" id="n_msg_suc" style="color:#006600;"></div>
+        			</div>
+					<div class="row">
+						<div class="col-md-8">
+							<input class="form-control" name="add_new_team" id="add_new_team" value="" type="text">
+						</div>
+						<div class="col-md-4">
+							<button type="button" class="btn btn-info sm-btn" onclick="clearPopup(); add_new_team();">Add new</button>
+						</div>
+					</div>
+      		</div>
+      		<div class="modal-footer">
+      			<button type="button" class="btn btn-default" data-dismiss="modal" onClick="$('#add_new_team').val(''); clearPopup(); ">Close</button>
+      		</div>
+    	</div>
+	</div>
+</div>
+
+<div id="loadTeamPopup" class="modal fade" role="dialog" style="display: none;" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+    	<div class="modal-content">
+     		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal">×</button>
+        		<h3 class="modal-title">Load players of team</h3>
+      		</div>
+      		<div class="modal-body">
+       			<select name="load_teams" id="load_teams" class="form-control"style="width:100%">
+					
+				</select>
+			</div>
+      		<div class="modal-footer">
+      			<button type="button" class="btn btn-default" data-dismiss="modal" onClick="fetch_team_players();">Load</button>
+      			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      		</div>
+    	</div>
+	</div>
+</div>
+      		<div class="row">
+	  			<div class="content table-responsive table-full-width">
+		 			<div class="table-responsive" style="border:none;" >
+                                <table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint"  style="background-color: rgb(255, 255, 255); border-radius: 4px;" >
+                                	<thead>
+                                       <th class="hidden-xs"><input type="checkbox" class="chk_all"</th>
+                                       <th>Username</th>
+                                       <th>Email</th>
+                                       <th>Type</th>
+                                       <th>Qualities</th>
+                                       <% if (typeof authenticatedUser.club_mongo_id !== 'undefined' && authenticatedUser.club_mongo_id !== null && authenticatedUser.club_mongo_id!=='') {	%>
+                                       <% } else { %>
+                                       <th>Club</th>
+                                       <% } %>
+                                       <th>Web Access</th>
+                                       <th class="availabilityTHClass" style="display:none;">Availability</th>
+                                       <th>Action</th>
+                                    </thead>
+                                    <tfoot>
+                                    	<th class="hidden-xs"><input type="checkbox" class="chk_all"</th>
+                                        <th>Username</th>
+                                       	<th>Email</th>
+                                       	<th>Type</th>
+                                       	<th>Qualities</th>
+                                       	<%	if (typeof authenticatedUser.club_mongo_id !== 'undefined' && authenticatedUser.club_mongo_id !== null && authenticatedUser.club_mongo_id!=='') {	%>
+                                       	
+                                       	<% } else { %>
+                                       	<th>Club</th>
+                                       	<% } %>
+                                       	<th>Web Access</th>
+                                       	<th class="availabilityTHClass" style="display:none;">Availability</th>
+                                       	<th>Action</th>
+                                    </tfoot>
+                                    
+                                    <tbody id="documents_data">
+                                    	
+                                    </tbody>
+                                </table>
+                    </div>
+				</div>
+				<div style="text-align:center">
+					<a style="width: 60%; margin-bottom: 10px;" class="btn palette-carrot btn-warning" id="display_more_btn" title="Load more" onclick="load_more()" href="javascript:void(0);">
+						Load more
+					</a>
+        		</div>
+        		<div style="text-align:center" id="img_loading_div">
+					Loading...<br /> <img id="imgAjaxLoading" src="img/loading.gif" width="109" height="25" style="border-width: 0px;">
+				</div>
+			<!-- right col -->
+      	</div>
+      <!-- /.row (main row) -->
+
+    </section>
+</div>
+<div id="notify_team" class="modal fade" role="dialog" style="display: none;" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+    	<div class="modal-content">
+     		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal" onClick="$('#notification_subject').val('');$('#notification_users').val('');$('#notification_text').val(''); $('#notify_msg_err').html(''); $('#notify_msg_suc').html('');">×</button>
+        		<h3 class="modal-title">Send notification</h3>
+      		</div>
+      		<div class="modal-body">
+       				<div class="row">
+        				<div class="col-md-12" id="notify_msg_err" style="color:#FF0000;"></div>
+        				<div class="col-md-12" id="notify_msg_suc" style="color:#006600;"></div>
+        			</div>
+					<div class="row">
+						<div class="col-md-12 ui-widget">
+							<input class="form-control" id="notification_users" type="hidden" value="">
+							<label>Subject</label><input class="form-control" id="notification_subject" value="">
+                   			<label>Message</label><textarea class="form-control" id="notification_text" ></textarea>
+                   			
+                   			<span style="font-size:11px;font-style:italic;">Note : This will send notification to all the selected players.</span>
+						</div>
+						
+					</div>
+      		</div>
+      		<div class="modal-footer">
+      			<button type="button" class="btn btn-info sm-btn" onclick="$('#notify_msg_err').html(''); $('#notify_msg_suc').html(''); push_notification();">Push notification</button>
+      			<button type="button" class="btn btn-default" data-dismiss="modal" onClick="$('#notification_subject').val('');$('#notification_users').val('');$('#notification_text').val(''); $('#notify_msg_err').html(''); $('#notify_msg_suc').html('');">Close</button>
+      		</div>
+    	</div>
+	</div>
+</div>
+
+ <!--//Main Content--> 
+	<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+<script src="js/bootstrap-toggle.min.js"></script>
+<script src="js/basictable.js"></script>
+<script src="js/bootstrap.datepicker.js"></script>
+<script type="text/javascript">
+var searchStr="<%= keywordStr %>";
+
+<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
+var	access_right="<%= authenticatedUser.access_right %>";
+<% }	else{	 %>
+var access_right=0;
+<% } %>
+
+var xhrStatus;
+
+var pageSize=15, totalNum=0, totalDisplayedNum=0, checkAllFlag= false;
+var start=0, end=pageSize;
+var accessRightCode=parseInt(access_right);
+var complete=false, completeScroll=false;
+
+function clearPopup(){
+	$('#ex_msg_suc').html(''); $('#ex_msg_err').html(''); $('#n_msg_err').html(''); $('#n_msg_suc').html(''); 
+}
+
+	function searchKeyword(e){
+		$('#table-breakpoint').basictable('destroy');
+		
+		var searchField= $("#"+e).val();
+		if(searchField!=""){
+			$("#"+e).removeClass("errorPlaceHolder");
+			searchStr=searchField;
+		}else{
+			$("#"+e).addClass("errorPlaceHolder");
+			$("#"+e).attr("placeholder" , "Please enter search term here");
+			$("#"+e).focus();
+			searchStr='';
+		}
+		
+			$("#documents_data").html('');
+			$('#display_more_btn').hide();
+			$('#img_loading_div').show();
+			start=0;
+			end=start+pageSize;
+			load_data();
+	}
+	
+	function load_member_types(){
+		
+		var jsonRow=backendDirectory+"/api_fetch_list?start=0&limit=100&collection=member_types",
+		xhrStatus=$.getJSON(jsonRow,function(html){
+			if(html.error){
+				
+			}else{
+				var contentHtml="<option value=''>All</option>";
+				$.each(html.aaData, function(i,row){
+					contentHtml+='<option value="'+row._id+'" >'+row.name+'</option>';
+				});
+				$("#player_type_uuid").html(contentHtml);
+			}
+		});
+	}	
+	
+	function load_teams(){
+		var jsonRow=backendDirectory+"/api_fetch_list?start=0&limit=100&collection=teams",
+		xhrStatus=$.getJSON(jsonRow,function(html){
+			if(html.error){
+				
+			}else{
+				var contentHtml="";
+				$.each(html.aaData, function(i,row){
+					<% if (typeof authenticatedUser.club_mongo_id !== 'undefined' && authenticatedUser.club_mongo_id !== null) {	%>
+						var	club_id_str="<%= authenticatedUser.club_mongo_id %>";
+						if(row.club_mongo_id==club_id_str){
+							contentHtml+='<option value="'+row._id+'" >'+row.name+'</option>';
+						}
+					<% }	else{	 %>
+						contentHtml+='<option value="'+row._id+'" >'+row.name;
+						if(row.club_name && row.club_name!="")	{
+							contentHtml+='('+row.club_name+')';
+						}
+						contentHtml+='</option>';
+					<% } %>
+				});
+				var loadTeamsStr="<option value=''>--Select--</option>"+contentHtml;
+				
+				$("#load_teams").html(loadTeamsStr);
+				$("#teams_list").html(contentHtml);
+			}
+		});
+	}	
+$(document).ready(function() {
+	$('#start_date').datepicker({ 
+        minDate: 0 
+    }).on('changeDate', function (ev) {
+    	$('#table-breakpoint').basictable('destroy');
+		$('#table').basictable();
+		$("#documents_data").html('');
+		$('#display_more_btn').hide();
+		$('#img_loading_div').show();
+		start=0;
+		end=start+pageSize;
+		load_data();
+	});
+	
+	load_member_types();
+	load_teams();
+	
+    $('#table').basictable();
+    	
+    $('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	load_data();
+		
+	$("#searchBtn").click(function()	{
+		searchKeyword('searchField');
+	});
+		
+	$('#searchField').keypress(function (e) {
+  		if (e.which == 13) {
+    		searchKeyword('searchField');
+  		}
+	});
+	$("#searchBtn").click(function()	{
+		searchKeyword('searchField');
+	});
+		
+	$("#player_type_uuid").change(function()	{
+		$('#table-breakpoint').basictable('destroy');
+		$("#documents_data").html('');
+		$('#display_more_btn').hide();
+		$('#img_loading_div').show();
+		start=0;
+		end=start+pageSize;
+		load_data();
+	});
+		
+	// toggle all checkboxes from a table when header checkbox is clicked
+  	$(".chk_all").click(function () {
+  		if ($(this).is(":checked")) {
+			checkAllFlag=true;
+			$('.chk_all').prop("checked", true);
+  			$('.check').prop("checked", true);
+  			$('#send_notificationBtn').show();
+  		} else {
+			checkAllFlag=false;
+			$('.chk_all').prop("checked", false);
+  			$('.check').prop("checked", false);
+  			$('#send_notificationBtn').hide();
+  		}  		
+  	});
+  	
+  	$(window).scroll(function(){
+		if ($(window).scrollTop() == $(document).height() - $(window).height()){
+			if(complete==false && completeScroll==false) {
+				load_more();
+			}
+		}
+	});	
+});
+
+function checkSelection () {
+	var checkedVals = [];
+	$('input.check:checkbox:checked').each(function () {
+   	 	checkedVals.push($(this).val());
+	});
+	
+	if(checkedVals.length>0){
+		$('#send_notificationBtn').show();
+	} else{
+		$('#send_notificationBtn').hide();
+	}
+}
+
+function refresh_data(){
+	$('#table-breakpoint').basictable('destroy');
+	searchStr="";
+	$(".searchFieldClass").val("");
+	$("#documents_data").html('');
+	$('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	start=0;
+	end=start+pageSize;
+	load_data();
+}
+
+function fetch_team_players(){
+	$('#table-breakpoint').basictable('destroy');
+	$("#documents_data").html('');
+	$('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	start=0;
+	end=start+pageSize;
+	load_data();
+}
+
+function load_more(){
+	$('#table-breakpoint').basictable('destroy');
+	$('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	if(start==0)	{
+		start=end+1;
+	} else{
+		start=end;
+	}
+	end=start+pageSize;
+	load_data();
+}
+	
+function allowWebAccess(e){
+	var allow_web_access=0;
+	if ($("#web_access_"+e).is(":checked")) {
+		allow_web_access=1;
+	}
+	var jsonRow=backendDirectory+"/update_user_status?id="+e+"&allow_web_access="+allow_web_access;
+	$.getJSON(jsonRow,function(response){
+		//console.log(response);
+	});
+}
+
+	function load_data(){
+		completeScroll=true;
+		
+		$(".alert").remove();
+		var jsonRow=backendDirectory+"/api_fetch_players?start="+start+"&limit="+pageSize+"&s="+searchStr;
+		if($("#player_type_uuid").val()!=="" && $("#player_type_uuid").val()!==null && $("#player_type_uuid").val()!=="null"){
+			jsonRow+="&player_type_uuid="+$("#player_type_uuid").val();
+		}
+		if($("#load_teams").val()!=="" && $("#load_teams").val()!==null && $("#load_teams").val()!=="null"){
+			jsonRow+="&team="+$("#load_teams").val();
+		}
+		if($("#start_date").val()!=="" && $("#start_date").val()!==null && $("#start_date").val()!=="null"){
+			jsonRow+="&timestamp="+getTimestampFromDate($("#start_date").val());
+			$('.availabilityTHClass').show();
+		}
+		if(xhrStatus) xhrStatus.abort();
+		xhrStatus=$.getJSON(jsonRow,function(html){
+			if(html.error){
+				complete=true;
+				$(".topOptionsClass").hide();
+				$("#table-breakpoint").before('<div class="alert alert-danger">'+html.error+'</div>');
+			}else{
+				
+				var contentHtml="";
+				totalNum=html.total;
+				if(html.iTotalRecordsReturned){
+					totalDisplayedNum=totalDisplayedNum+parseInt(html.iTotalRecordsReturned);
+				}
+				if(totalDisplayedNum>0 && totalNum>0){
+					$(".display_records_count").html("Showing "+totalDisplayedNum+" out of "+totalNum);
+				}
+				if(html.aaData.length>0){
+					$.each(html.aaData, function(i,row){
+						var uniqueIDStr=row._id;
+						contentHtml+="<tr id='tr_"+uniqueIDStr+"'>";
+						if(checkAllFlag){
+							contentHtml+='<td class="hidden-xs"><input type="checkbox" class="check" checked value="'+uniqueIDStr+'" onClick="checkSelection();"></td>';
+						}else{
+							contentHtml+='<td class="hidden-xs"><input type="checkbox" class="check" value="'+uniqueIDStr+'" onClick="checkSelection();"></td>';
+						}
+						
+						contentHtml+='<td>'+row.firstname+' '+row.lastname+'</td>';
+						contentHtml+='<td>'+row.email+'</td>';
+						contentHtml+='<td>'+row.player_type+'</td>';
+						if(row.player_qualities){
+							contentHtml+='<td>'+row.player_qualities+'</td>';
+						}else{
+							contentHtml+='<td></td>';
+						}
+						<% if (typeof authenticatedUser.club_mongo_id !== 'undefined' && authenticatedUser.club_mongo_id !== null  && authenticatedUser.club_mongo_id !== "") {	%>
+							//not to display
+						<% } else {	%>
+						if(row.club_name){
+							contentHtml+='<td>'+row.club_name+'</td>';
+						}else{
+							contentHtml+='<td></td>';
+						}
+						<%	}	%>
+						var checkedStr="";
+						if(row.allow_web_access==1 || row.allow_web_access=="1"){
+							checkedStr="checked";
+						}
+						contentHtml+='<td><input id="web_access_'+uniqueIDStr+'" type="checkbox" '+checkedStr+' class="toggleCheckbox" onChange="allowWebAccess(\''+uniqueIDStr+'\')"></td>';
+						if($("#start_date").val()!=="" && $("#start_date").val()!==null && $("#start_date").val()!=="null"){
+							contentHtml+='<td class="availabilityTHClass" id="available_'+uniqueIDStr+'">No response</td>';
+						}
+						contentHtml+='<td class="actions-list"><a href="user?_id='+uniqueIDStr+'" title="Edit"><i class="fa fa-pencil"></i></a></td>';
+						contentHtml+="</tr>";
+					});
+					$("#documents_data").append(contentHtml);
+					
+     				//
+     				$('.toggleCheckbox').bootstrapToggle({
+      					on: 'Yes',
+      					off: 'No'
+    				});
+    				
+    				if(html.playersAvailability && html.playersAvailability.length>0){
+    					$.each(html.playersAvailability, function(i,row){
+							$("#available_"+row.user_mongo_id).html(row.available);
+							
+							if(row.available=="Unavailable"){
+								$("#tr_"+row.user_mongo_id).addClass('unavailable');
+							} else if(row.available=="Available"){
+								$("#tr_"+row.user_mongo_id).addClass('available');
+							} else {
+								$("#tr_"+row.user_mongo_id).addClass(row.available.toLowerCase());
+							}
+						});
+    				}
+    				complete=false;
+     			}else{
+     				complete=true;
+     				//$("#documents_data").html("");
+					//$(".headFootClass").html("");
+					$("#table-breakpoint").before('<div class="alert alert-danger alert-dismissable"><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>No more players found!</div>');
+     			}
+			}
+			
+					//initialize table
+					$('#table-breakpoint').basictable({
+        				breakpoint: 751
+     				});
+     		
+			if(end< totalNum){
+				$('#display_more_btn').show();
+			}
+			$('#img_loading_div').hide();
+			completeScroll=false;
+		});
+	}
+	
+	function __showAddPopup(){
+		var selected='';
+		$('.check').each(function(){
+			if($(this).is(":checked")){
+				if(selected==''){
+					selected=$(this).val();
+				}
+				else{
+					selected+=","+$(this).val();
+				}
+			}
+		});
+		
+		if(selected!=''){
+			$("#selectedRows").val(selected);
+			$("#addTeam").modal('show');
+			
+		}else{
+			$("#addTeam").modal('hide');
+			__alertModalBox('Please select player(s) to add to team');
+			$('#add_sets').val('');
+		}
+	}
+
+function add_new_team(){
+	var teamNameStr= $("#add_new_team").val();
+	
+	if(teamNameStr!=""){
+		var selectedRowsStr= $("#selectedRows").val();
+		if(selectedRowsStr!=""){
+			var	selectedPlayersArr=selectedRowsStr.toString().split(",");
+			var playersSortOrder=new Array();
+			for(var i=0; i<selectedPlayersArr.length; i++){
+				var subObject={};
+				subObject['batting_order']=i;
+				subObject['user_mongo_id']=selectedPlayersArr[i];
+				subObject['uuid']=guid();
+				playersSortOrder[i]=subObject;
+			}
+			var selectedPlayersStr= JSON.stringify(playersSortOrder);
+			
+			var postContentURL=backendDirectory+"/api_crud_get";
+    		var uuidSystemStr=	"<% if (typeof authenticatedUser.active_system_uuid !== 'undefined' && authenticatedUser.active_system_uuid !== null && authenticatedUser.active_system_uuid !== "") {	 %><%= authenticatedUser.active_system_uuid %><% } %>";
+			$.ajax({
+				type: "GET",
+				dataType: "json",
+				url: postContentURL,
+				data: {"collection" : "teams", "action" : "create", "fieldName" : "name", "fieldValue" : teamNameStr, "name" : teamNameStr, "players" : selectedPlayersStr, "status" : 0, "uuid_system" : uuidSystemStr},
+				success: function(response){
+					if(response.success){
+						$('#add_new_team').val('');
+						$('#n_msg_suc').html(response.success);
+						load_teams();
+					}else if(response.error){
+						$('#n_msg_err').html(response.error);
+					}
+				}
+			});
+		}else{
+			$('#n_msg_err').html('Please select player(s) to add to team');
+		}
+	}else{
+		$('#n_msg_err').html('Please enter new team name!');
+	}
+}
+
+function add_to_existing_team(){
+	var selectedTeamStr= $("#teams_list").val();
+	
+	if(selectedTeamStr!="" && selectedTeamStr!=null && selectedTeamStr!="undefined"){
+		var selectedRowsStr= $("#selectedRows").val();
+		if(selectedRowsStr!=""){
+			var	selectedPlayersArr=selectedRowsStr.toString().split(",");
+			var playersSortOrder=new Array();
+			for(var i=0; i<selectedPlayersArr.length; i++){
+				var subObject={};
+				subObject['batting_order']=i+1;
+				subObject['user_mongo_id']=selectedPlayersArr[i];
+				subObject['uuid']=guid();
+				playersSortOrder[i]=subObject;
+			}
+			var selectedPlayersStr= JSON.stringify(playersSortOrder);
+			
+			var postContentURL=backendDirectory+"/saveplayers";
+    		$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: postContentURL,
+				data: {"action" : "create", "subObjectName" : "players", "id" : selectedTeamStr, "aaData" : selectedPlayersStr},
+				success: function(response){
+					if(response.success){
+						$('#add_new_team').val('');
+						$('#ex_msg_suc').html(response.success);
+						load_teams();
+					}else if(response.error){
+						$('#ex_msg_err').html(response.error);
+					}
+				}
+			});
+		}else{
+			$('#ex_msg_err').html('Please select player(s) to add to team');
+		}
+	}else{
+		$('#ex_msg_err').html('Please select team!');
+	}
+}
+
+function notificationPopup(){
+	var playersIdArr= new Array();
+	$('input.check:checkbox:checked').each(function () {
+   	 	playersIdArr.push($(this).val());
+	})
+	
+	$("#notification_users").val(JSON.stringify(playersIdArr));
+	$('#notify_team').modal('show');
+}
+
+function push_notification(){
+	if($("#notification_text").val()!="" && $("#notification_subject").val()!="")	{
+		if($("#notification_users").val()!=""){
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: backendDirectory+"/batch_notification",
+				data: {"notify_to" : $("#notification_users").val(), "message" : $("#notification_text").val().trim(), "subject" : $("#notification_subject").val() },
+				success: function(response){
+					if(response.success){
+						$("#notification_subject").val('');
+						$("#notification_text").val('');
+						$("#notify_msg_suc").html(response.success);
+						$("#notification_users").val("");
+					}
+					if(response.error){
+						$("#notify_msg_err").html(response.error);
+					}
+				}
+			});
+		}else{
+			$('#notify_msg_err').html("No player selected to send notification!");
+		}
+	}	else{
+		$('#notify_msg_err').html("Please enter both subject and message!");
+	}
+}
+
+</script>
+
+</body>
+</html>

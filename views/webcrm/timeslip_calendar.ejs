@@ -1,0 +1,591 @@
+<% include include/main-header %>
+<link href='css/fullcalendar/fullcalendar.min.css' rel='stylesheet' />
+<link href='css/fullcalendar/fullcalendar.print.css' rel='stylesheet' media='print' />
+<link href='css/fullcalendar/scheduler.min.css' rel='stylesheet' />
+<link rel="stylesheet" href="plugins/combobox/autocomplete-ui.css"/>
+<link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
+<style>
+.custom-combobox {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+.custom-combobox-toggle {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	margin-left: -1px;
+	padding: 0;
+}
+.custom-combobox-input {
+	margin: 0;
+	padding: 5px 10px;
+	width: 94%;
+}
+.ui-widget-overlay {
+	position: fixed;
+}
+.ui-widget-content {
+	z-index: 10000!important;
+}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">	
+	<!-- Header Starts here-->
+  		<% include include/header %>
+  	<!-- Header Ends here-->
+  		
+  	<!-- Sidebar Starts Here-->
+  		<% include include/sidebar %>
+    <!-- Sidebar Ends Here-->
+    <div class="content-wrapper">
+    	<!-- Content Header (Page header) -->
+    	<section class="content-header">
+      		<h1>Calendar</h1>
+      		<ol class="breadcrumb">
+        		<% include include/dashboard-breadcrumb %>
+        		<li class="active">Calendar</li>
+      		</ol>
+    	</section>	
+    	<!-- Main content -->
+    	<section class="content">
+      		<div class="row">
+        		<div class="col-md-12">
+          			<div class="box box-primary">
+            			<div class="box-body no-padding">
+              				<!-- THE CALENDAR -->
+              				<div id="calendar"></div>
+              				
+<div class="modal fade" id="calendar_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        	<form class="form-horizontal" action="" method="POST" id="contentForm">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><b>Date : </b><span id="showSelectedDateID"></span></h4>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body" style="margin:0px 20px;">
+            	<div class="form-group" id="messageId">
+                	<label for="item_label"><strong>Task</strong><span class="f_req">*</span></label>
+                    <input type="hidden" id="current_date" value="">
+                   	<input type="hidden" id="task_name" name="task_name" value="">
+                   	<select id="task_mongo_id" name="task_mongo_id" class="form-control"></select>
+                </div>
+                
+                <div class="form-group" id="messageId">
+                	<label for="item_label"><strong>Reported by</strong><span class="f_req">*</span></label>
+                	<input type="hidden" id="reported_by" name="reported_by" value="">
+                   	<select required="required" class="form-control" name="reported_by_user_id" id="reported_by_user_id"></select>
+                </div>
+                <div class="form-group" id="messageId">
+                	<label for="item_label"><strong>Start time</strong><span class="f_req">*</span></label>
+                	<input type="hidden" id="start_timestamp" name="start_timestamp" value="">
+                	<div class='input-group date' id='start_timepicker'>
+                    	<input type='text' class="form-control" id="start_time" name="start_time" value="" />
+                    	<span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+                	</div>
+                </div>
+                <div class="form-group" id="messageId">
+                	<label for="item_label"><strong>End time</strong><span class="f_req">*</span></label>
+                	<input type="hidden" id="end_timestamp" name="end_timestamp" value="">
+                	<div class='input-group date' id='end_timepicker'>
+                    	<input type='text' class="form-control" id="end_time" name="end_time" value="" />
+                    	<span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+                	</div>
+                </div>
+               	<div class="form-group" id="messageId">
+                	<label for="item_label"><strong>Description</strong><span class="f_req">*</span></label>
+                	<textarea required="required" class="form-control" name="description" id="description"></textarea>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                	Close
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    Create
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+            			</div>
+            			<!-- /.box-body -->
+          			</div>
+          			<!-- /. box -->
+        		</div>
+        		<!-- /.col -->
+			</div>
+      	<!-- /.row -->
+    	</section>
+		<!--//body content--> 
+	</div>
+  	<!--//Main Content--> 
+  	
+	<!-- Footer Starts Here-->
+	<% include include/footer %>
+	<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="plugins/combobox/autocomplete-ui.js"></script>
+<script src="js/jquery.validate.js"></script>
+<script src="js/moment.js"></script>
+<script src="js/bootstrap-datetimepicker.min.js"></script>
+<script src='js/fullcalendar.min.js'></script>
+<script src='js/scheduler.min.js'></script>
+<!-- Page specific script -->
+<script language="javascript">
+var new_event=new Array();
+
+	function get_datetime(timestamp){
+		var new_date = new Date(timestamp * 1000);
+		return new_date;
+	}
+	function evaluate_slip_values (start_timestamp, end_timestamp){							
+		var timeslipsDiff= end_timestamp-start_timestamp;
+		var timeslipsMinutes = Math.floor(timeslipsDiff / 60);
+		return (timeslipsMinutes/60).toFixed(2);			
+	}
+	var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+	
+        $(document).ready(function() {
+        	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				if (element.attr("id") == "start_time") {
+					$('#start_timepicker').after(error);
+            	}else if (element.attr("id") == "end_time" ) {
+					$('#end_timepicker').after(error);
+            	}else{
+					$(element).closest('div').append(error);
+				}
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				description: { required: true },
+				task_mongo_id: { required: true },
+				reported_by_user_id: { required: true },
+				start_time: { required: true },
+				end_time: { required: true },
+			},
+			submitHandler: function(form) {
+				var timestampNum=return_timestamp_from_timepicker($('#current_date').val(), $('#start_time').val());
+        		$('#start_timestamp').val(timestampNum);
+        		
+				var timestampNum=return_timestamp_from_timepicker($('#current_date').val(), $('#end_time').val());
+				$('#end_timestamp').val(timestampNum);
+				var uuidSystemStr=	"<% if (typeof authenticatedUser.active_system_uuid !== 'undefined' && authenticatedUser.active_system_uuid !== null && authenticatedUser.active_system_uuid !== "") {	 %><%= authenticatedUser.active_system_uuid %><% } %>";
+				var slip_hours = evaluate_slip_values($('#start_timestamp').val(), $('#end_timestamp').val());
+   				
+   				$.ajax({
+					type: "POST",
+					dataType: "json",
+					url: backendDirectory+"/api_crud_post",
+					data: {"collection" : "timeslips", "action" : "create", "fieldName" : "_id", "fieldValue" : guid(), "uuid_system" : uuidSystemStr, "task_mongo_id" : $("#task_mongo_id").val(), "task_name" : $("#task_name").val(), "reported_by" : $("#reported_by").val(), "reported_by_user_id" : $("#reported_by_user_id").val(), "description" : $("#description").val(), "start_timestamp" : $("#start_timestamp").val(), "end_timestamp" : $("#end_timestamp").val(), "slip_hours" : slip_hours},
+					success: function(response){
+						if(response.success){
+							var new_arr=new Array();
+							new_arr['id']=response._id;
+							new_arr['title']=$("#reported_by").val()+": "+$("#task_name").val();
+							new_arr['task']=$("#task_name").val();
+							new_arr['reported_by']=$("#reported_by").val();
+							new_arr['description']=$("#description").val();
+							new_arr['start']=get_datetime($('#start_timestamp').val());
+							new_arr['end']=get_datetime($('#end_timestamp').val());
+							new_arr['url']=backendDirectory+'/timeslip?_id='+response._id;
+							new_arr['allDay']=false;
+							new_event.push(new_arr);
+	
+							$('#calendar').fullCalendar( 'removeEventSource', new_event );
+							$('#calendar').fullCalendar( 'addEventSource', new_event );
+							$("#calendar_modal").modal('hide');
+						} else{
+							$("#messageId").before('<div class="alert alert-danger insert_alert">Error while saving, please try after sometime</div>');
+						}
+					}
+				});
+ 			}
+		});
+		
+        	$('#start_timepicker').datetimepicker({
+        		format: 'LT'
+       		});
+  			$('#end_timepicker').datetimepicker({
+        		format: 'LT'
+       		});
+  			
+  			
+        	$("#start_timepicker").on("dp.change", function (e) {
+        		$('#end_timepicker').data("DateTimePicker").minDate(e.date);
+            	var timestampNum=return_timestamp_from_timepicker($('#current_date').val(), $('#start_time').val());
+        		$('#start_timestamp').val(timestampNum);
+        	});
+        	
+       	 	$("#end_timepicker").on("dp.change", function (e) {
+        		$('#start_timepicker').data("DateTimePicker").maxDate(e.date);
+            	var timestampNum=return_timestamp_from_timepicker($('#current_date').val(), $('#end_time').val());
+				$('#end_timestamp').val(timestampNum);
+       		});
+        
+			fetch_collection_autocomplete_list('tasks', 'task_mongo_id');
+			var reported_by='';
+			<% if (typeof authenticatedUser._id !== 'undefined' && authenticatedUser._id !== null && authenticatedUser._id!=="") { %>
+				reported_by='<%= authenticatedUser._id %>';
+			<% } %>
+			fetch_collection_autocomplete_list('users', 'reported_by_user_id', reported_by, 'status', '1');
+	
+            var flag=0;
+			
+            
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'month,agendaWeek,agendaDay',
+                    center: 'title',
+                    right: 'today prev,next'
+                },
+                selectable: true,
+                selectHelper: true,
+                editable: false,
+				
+				timeFormat: 'h(:mm)t',
+               
+                eventBackgroundColor: '#bb0040',
+				
+			dayClick: function(date, jsEvent, view) {
+				var dateStr=date._d;
+				var converted = days[dateStr.getDay()] + ", " + dateStr.getDate() + " " +months[dateStr.getMonth()];
+				var curr_month=Number(dateStr.getMonth())+1;
+				var curr_date=	curr_month+'/'+dateStr.getDate()+'/'+dateStr.getFullYear();
+				$("#current_date").val(curr_date)
+				$('#showSelectedDateID').html(converted);
+				$("#task_mongo_id").val('');
+				$("#task_name").val('');
+				$("#reported_by").val('');
+				$("#reported_by_user_id").val('');
+				$("#description").val('');
+				$("#start_timestamp").val('');
+				$("#end_timestamp").val('');
+				$("#start_time").val('');
+				$("#end_time").val('');
+				$('.insert_alert').remove();
+				$("#calendar_modal").modal('show'); 
+			},
+			viewRender: function( view, element ) {
+				var s_timestamp=parseInt(view.start._d.getTime())/1000;
+				var e_timestamp=parseInt(view.end._d.getTime())/1000;
+				var dataString = 'start_timestamp='+s_timestamp+'&end_timestamp='+e_timestamp+'&redirect=false';
+				
+				$.getJSON(backendDirectory+'/api_fetch_timestamp_based_list?collection=timeslips&'+dataString,function(result){
+					$('#calendar').fullCalendar( 'removeEventSource', new_event );
+					if(result){
+						new_event=new Array();
+						$.each(result.aaData, function(i,item){
+							var new_arr=new Array();
+							new_arr['id']=item._id;
+							new_arr['title']=item.reported_by+": "+item.task_name;
+							new_arr['task']=item.task_name;
+							new_arr['reported_by']=item.reported_by;
+							new_arr['description']=item.description;
+							new_arr['start']=get_datetime(item.start_timestamp);
+							new_arr['end']=get_datetime(item.end_timestamp);
+							new_arr['url']=backendDirectory+'/timeslip?_id='+item._id;
+							if(item.billing_status=="billed"  || item.billing_status=="chargeable"){
+								new_arr['backgroundColor']="#96bf48";
+							}else{
+								new_arr['backgroundColor']="#bb0040";
+							}
+							new_arr['allDay']=false;
+							new_event.push(new_arr);
+						});
+						$('#calendar').fullCalendar( 'addEventSource', new_event );
+					}
+				});
+			},
+			eventMouseover: function(event, jsEvent, view) {
+				if(event.title != null) {
+					var startTimeStr=event.start.format(), endTimeStr="";
+                	if(event.end!=null){
+                    	endTimeStr=event.end.format();
+                	}
+                	if(endTimeStr=="")	{
+                		endTimeStr=startTimeStr;
+                	}
+                	
+               		var content =
+					"Task name: " + event.task + "<br />" +
+					"Reported By: " + event.reported_by + "<br />" +
+					"Timeslip Desc: " + event.description + "<br />" +
+					"Start time: " + startTimeStr + "<br />" +
+					"End time: " + endTimeStr + "<br />";
+					
+					var tooltip = '<div class="toolTip" style="position:absolute;background-color:#333;border-radius:4px;color:#fff;padding:7px;z-index:1000;font-size:13px;">' + content + '</div>';
+					$("body").append(tooltip);
+					$(this).mouseover(function (e) {
+						$(this).css('z-index', 10000);
+						$('.toolTip').fadeIn('500');
+						$('.toolTip').fadeTo('10', 1.9);
+					}).mousemove(function (e) {
+						$('.toolTip').css('top', e.pageY + 10);
+						$('.toolTip').css('left', e.pageX + 20);
+					});
+				}
+			},
+			eventMouseout: function(event, jsEvent, view) {
+				$(this).css('z-index', 8000);
+				$('.toolTip').remove();
+			}
+		});
+			
+		// handler to close the new event popup just for displaying purposes
+        // more documentation for fullcalendar on http://arshaw.com/fullcalendar/
+        $(".popup .close-pop").click(function () {
+             $(".new-event").fadeOut("fast");
+         });
+	});
+function return_timestamp_from_timepicker (startDateStr, timeStr)	{
+	var datePartArr = startDateStr.split(' '),
+	timePartArr = timeStr.split(' '),
+	timeParts = timePartArr[0].split(':'),
+	dateParts = datePartArr[0].split('/'),
+	timeFormat = timePartArr[1],
+	date, hoursNum = parseInt(timeParts[0]);
+	
+	if(timeFormat=="PM"){
+		if(hoursNum == 12) {
+            hoursNum =hoursNum;
+        } else {
+            hoursNum = parseInt(hoursNum) + 12;
+        }
+	}
+	date = new Date(dateParts[2], parseInt(dateParts[0])-1, dateParts[1], hoursNum, timeParts[1]);
+	date= date.getTime();
+	date= parseInt(date)/1000;
+	return date;
+}
+//autocomplete
+	var xhr;
+  (function( $ ) {
+    $.widget( "custom.combobox", {
+      _create: function() {
+        this.wrapper = $( "<span>" )
+          .addClass( "custom-combobox" )
+          .insertAfter( this.element );
+ 
+        this.element.hide();
+        this._createAutocomplete();
+        this._createShowAllButton();
+      },
+ 
+      _createAutocomplete: function() {
+      	var ele_select= this.element;
+        var selected = this.element.children( ":selected" ),
+          value = selected.val() ? selected.text() : "";
+ 
+        this.input = $( "<input>" )
+          .appendTo( this.wrapper )
+          .val( value )
+          .attr( "title", "" )
+          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+          .autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: $.proxy( this, "_source" )
+          })
+          .tooltip({
+            tooltipClass: "ui-state-highlight"
+          });
+ 
+        this._on( this.input, {
+          autocompleteselect: function( event, ui ) {
+		  	//alert("show all");
+            ui.item.option.selected = true;
+			
+            this._trigger( "select", event, {
+              item: ui.item.option
+            });
+            if(ele_select.attr('id')=='reported_by_user_id'){
+				$('#reported_by').val($('#reported_by_user_id option:selected').text());
+			}
+			if(ele_select.attr('id')=='task_mongo_id'){
+				$('#task_name').val($('#task_mongo_id option:selected').text());
+			}
+          },
+ 
+          autocompletechange: "_removeIfInvalid"
+        });
+      },
+ 
+      _createShowAllButton: function() {
+        var input = this.input,
+          wasOpen = false;
+ 
+        $( "<a>" )
+          .attr( "tabIndex", -1 )
+          .attr( "title", "Show All Items" )
+          .tooltip()
+          .appendTo( this.wrapper )
+          .button({
+            icons: {
+              primary: "ui-icon-triangle-1-s"
+            },
+            text: false
+          })
+          .removeClass( "ui-corner-all" )
+          .addClass( "custom-combobox-toggle ui-corner-right" )
+          .mousedown(function() {
+            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+          })
+          .click(function() {
+            input.focus();
+ 
+            // Close if already visible
+            if ( wasOpen ) {
+              return;
+            }
+ 
+            // Pass last search string as value to search for, displaying last results
+            input.autocomplete( "search", 'SHOWALL' );
+          });
+      },
+ 
+      _source: function( request, response ) {
+        //var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+		var ele_select= this.element;
+		if(request.term=='SHOWALL'){
+			response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+		
+		}
+		else
+		{
+		
+		if(ele_select.attr('id')=='task_mongo_id'){
+			var jsonRow = backendDirectory+"/api_fetch_list?start=0&limit=20&collection=tasks&s="+request.term;
+		}else if(ele_select.attr('id')=='reported_by_user_id'){
+			var jsonRow = backendDirectory+"/api_fetch_list?start=0&limit=20&collection=users&findFieldName=status&findFieldValue=1&s="+request.term;
+		}
+		//alert(jsonRowURLStr);
+		if(xhr) xhr.abort();
+		xhr=$.getJSON(jsonRow,function(result){
+			
+			if(result.aaData.length>0){
+				var html='<option value=""></option>';
+
+				$.each(result.aaData, function(i,item)
+				{
+					if(ele_select.attr('id')=='task_mongo_id'){
+						html += '<option value="'+item._id+'">'+item.name+'</option>';
+					}else if(ele_select.attr('id')=='reported_by_user_id'){
+						var nameStr='';
+						if(item.firstname){
+							nameStr+=item.firstname;
+						}
+						if(item.lastname){
+							nameStr+=" "+item.lastname;
+						}
+						html += '<option value="'+item._id+'">'+nameStr+'</option>';
+					}
+				});
+				ele_select.html(html);
+				
+				
+				response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+				
+				
+			}
+		});
+       
+	  } 
+		
+      },
+ 
+      _removeIfInvalid: function( event, ui ) {
+ 
+        // Selected an item, nothing to do
+        if ( ui.item ) {
+
+          return;
+        }
+ 
+        // Search for a match (case-insensitive)
+        var value = this.input.val(),
+          valueLowerCase = value.toLowerCase(),
+          valid = false;
+        this.element.children( "option" ).each(function() {
+          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+            this.selected = valid = true;	
+			if(ele_select.attr('id')=='reported_by_user_id'){
+				$('#reported_by').val($('#reported_by_user_id option:selected').text());
+			}
+			if(ele_select.attr('id')=='task_mongo_id'){
+				$('#task_name').val($('#task_mongo_id option:selected').text());
+			}
+            return false;
+          }
+        });
+ 
+        // Found a match, nothing to do
+        if ( valid ) {
+          return;
+        }
+ 
+        // Remove invalid value
+        this.input
+          .val( "" )
+          .attr( "title", value + " didn't match any item" )
+          .tooltip( "open" );
+        this.element.val( "" );
+        this._delay(function() {
+          this.input.tooltip( "close" ).attr( "title", "" );
+        }, 2500 );
+        this.input.data( "ui-autocomplete" ).term = "";
+      },
+ 
+      _destroy: function() {
+        this.wrapper.remove();
+        this.element.show();
+      }
+    });
+  })( jQuery ); 
+</script>
+</body>
+</html>

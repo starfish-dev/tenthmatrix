@@ -1,0 +1,276 @@
+<% include include/main-header %>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Job Application <small><% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Job Application</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+      				<div class="panel-body no-padding-top bg-white"> 
+            			<% include include/display_returned_msg %>
+            			<div CLASS="col-md-6">
+	  						<form class="form-horizontal" action="<%= backendDirectory %>/save/job_application" method="POST" id="contentForm">
+            				<input type="hidden" class="form-control" id="table_name" name="table_name" value="job_applications">
+      						<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="_id">
+      						<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      						<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      						<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            				<input type="hidden" class="form-control" id="data" name="data" value="">
+            				<input type="hidden" class="form-control" id="uploaded_file_uuid" name="uploaded_file_uuid" value="<% if (typeof contentObj.uploaded_file_uuid !== 'undefined' && contentObj.uploaded_file_uuid !== null) { %><%= contentObj.uploaded_file_uuid %><% } %>">
+            				<input type="hidden" class="form-control" id="uploaded_file_name" name="uploaded_file_name" value="<% if (typeof contentObj.uploaded_file_name !== 'undefined' && contentObj.uploaded_file_name !== null) { %><%= contentObj.uploaded_file_name %><% } %>">
+            				<input type="hidden" class="form-control" id="uploaded_file_type" name="uploaded_file_type" value="<% if (typeof contentObj.uploaded_file_type !== 'undefined' && contentObj.uploaded_file_type !== null) { %><%= contentObj.uploaded_file_type %><% } %>">
+            				
+       		 				<div class="row">
+           		  				<div class=" col-sm-12 col-lg-12">
+  									<div class="form-group">
+    									<label for="" class="col-sm-3 control-label">Name<sup class="required">*</sup></label>
+    									<div class="col-sm-8 ">
+    										<input class="form-control" id="cv_content" name="cv_content" type="hidden" value="<% if (typeof contentObj.cv_content !== 'undefined' && contentObj.cv_content !== null) { %><%= contentObj.cv_content %><%	} %>">
+       										<input class="form-control" id="name" name="name" type="text" value="<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><%	} %>">
+    									</div>
+  									</div>
+  									<div class="form-group">
+    									<label for="" class="col-sm-3 control-label">Email<sup class="required">*</sup></label>
+    									<div class="col-sm-8 ">
+       										<input class="form-control" id="email_address" name="email_address" value="<% if (typeof contentObj.email_address !== 'undefined' && contentObj.email_address !== null) { %><%= contentObj.email_address %><%	} %>">
+    									</div>
+   									</div>
+  									<div class="form-group">
+    									<label for="" class="col-sm-3 control-label">Telephone/Mobile<sup class="required">*</sup></label>
+    									<div class="col-sm-8 ">
+       										<input class="form-control" id="contact_number" name="contact_number" type="text" value="<% if (typeof contentObj.contact_number !== 'undefined' && contentObj.contact_number !== null) { %><%= contentObj.contact_number %><%	} %>">
+    									</div>
+  									</div>
+  									<div class="form-group">
+    									<label for="" class="col-sm-3 control-label">Postcode</label>
+    									<div class="col-sm-8 ">
+       										<input class="form-control" id="postcode" name="postcode" type="text" value="<% if (typeof contentObj.postcode !== 'undefined' && contentObj.postcode !== null) { %><%= contentObj.postcode %><%	} %>">
+    									</div>
+   									</div>
+   									<% if (typeof contentObj.uploaded_file_uuid !== 'undefined' && contentObj.uploaded_file_uuid !== null && typeof contentObj.uploaded_file_name !== 'undefined' && contentObj.uploaded_file_name !== null && contentObj.uploaded_file_name !== "") { %>
+  									<div class="form-group">
+    									<label for="" class="col-sm-3 control-label">Download Original CV</label>
+    									<div class="col-sm-8 ">
+     										<a target="_blank" href="download/<%= contentObj.uploaded_file_uuid %>" title="Download CV"><i class="fa fa-download"></i> <%= contentObj.uploaded_file_name %></a>
+    									</div>
+  									</div>
+  									<%	}	%>
+  									<div class="form-group">
+    									<label for="" class="col-sm-3 control-label"> Upload new CV<sup class="required">*</sup></label>
+    									<div class="col-sm-8 ">
+     										<div class="form-control" id="fileInputId">
+												<input name="file" id="file" type="file"><span>&nbsp;</span>
+											</div>
+										</div>
+  									</div>
+  									
+  									<div class="form-group">
+    									<label for="" class="col-sm-3 control-label"> Comments</label>
+    									<div class="col-sm-8 ">
+     										<textarea rows="10" id="comments" name="comments" class="form-control"><% if (typeof contentObj.comments !== 'undefined' && contentObj.comments !== null) { %><%= contentObj.comments %><%	} %></textarea>
+										</div>
+  									</div>
+  									<div class="col-sm-12 margin-top-15 " align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/job_applications" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               						</div>
+ 	    						</div>
+       						</div>
+             				</form>
+	  					</div>
+	  					<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %>
+       					<div CLASS="col-md-6">
+	   						<div class="panel-body no-padding-top bg-white"> 
+     							<div data-example-id="togglable-tabs" STYLE="margin-bottom: 30px;">
+									<ul id="new-customer-tab" class="nav nav-tabs" role="tablist">
+      									<li role="presentation" class="active"><a href="#contentPreview" id="home-tab" role="tab" data-toggle="tab" aria-controls="customer-info" aria-expanded="true"> CV Preview</a></li>
+      									<li role="presentation"><a href="#licenceno" role="tab" id="profile-tab" data-toggle="tab" aria-controls="licenceno">  CV Extracted Information</a></li>  
+	  								</ul>
+    								<div id="myTabContent" class="tab-content" style="padding-top:25px; border-left: 1px solid #ddd; border-right: 1px solid #ddd;  border-bottom: 1px solid #ddd; padding-bottom:25px; padding-left:15px; padding-right:15px;">
+      									<div role="tabpanel" class="tab-pane fade in active" id="contentPreview" aria-labelledby="home-tab">
+      										
+      									</div>
+      									<div role="tabpanel" class="tab-pane fade" id="licenceno" aria-labelledby="profile-tab">
+       		 								<% if (typeof contentObj.cv_content !== 'undefined' && contentObj.cv_content !== null) { %><%= contentObj.cv_content %><%	} %>
+      									</div>
+      								</div>
+      							</div>
+  							</div>
+   						</div>
+   						<% } %>
+	   				</div>
+            	</div>
+        	</section>
+    	<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+	</div>
+
+<!-- modal box start -->
+<div class="modal fade" id="processingPrompt" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+        <div class="modal-content">
+        	<div class="modal-body" style="text-align:center" >
+                <h4>Saving CV, please wait and don't refresh the page while processing!</h4>.<br /> <img id="imgAjaxLoading" src="img/loading.gif" width="109" height="25" style="border-width: 0px;">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal box end -->            
+<!-- Page-Level Plugin Scripts-->
+<script src="js/jquery.validate.js"></script>
+<script>
+function upload_single_file(form){
+	$('#processingPrompt').modal('show');
+	var guidStr=$("#uploaded_file_uuid").val();
+	if(guidStr==""){
+		guidStr= guid();
+	}
+	$(".uploadFile").remove();
+	if($('#file').val().length>0)	{
+		var data = new FormData();
+		data.append('related_collection', $("#table_name").val());
+		data.append('uuid', guidStr);
+		data.append('collection_id', $("#id").val());
+		data.append('type', $("#table_name").val());
+		
+		var filesize=Number($('#file')[0].files[0].size)/(1024*1024);
+		
+		if(filesize>5){
+			$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>The file size larger than 5MB is not allowed</div>');
+			$('#file').focus();
+			return 'error';
+		}else{
+			var files= $('#file')[0].files;
+			var fileNameStr =files[0].name;
+				$.each(files, function(key, value){
+					data.append('file', value);
+				});
+			
+				$.ajax({
+					url: backendDirectory+'/find_remove_file',
+					type: 'POST',
+					data: {'uuid' : guidStr},
+					dataType: 'json',
+					success: function(response){
+						if(response.success){
+							$.ajax({
+								url: backendDirectory+'/upload',
+								type: 'POST',
+								data: data,
+								dataType: 'json',
+								contentType: false,
+								enctype: 'multipart/form-data',
+								cache: false,
+								processData: false, // Don't process the files
+								success: function(response){	
+									$('#processingPrompt').modal('hide');
+									if(response.success && response._id && response._id!=""){
+										$("#uploaded_file_uuid").val(guidStr);
+										$("#uploaded_file_name").val(fileNameStr);
+										$("#uploaded_file_type").val(response.mimetype);
+										if(response.cv_content && response.cv_content!=""){
+											$("#cv_content").val(response.cv_content);
+										}else{
+											$("#cv_content").val('');
+										}
+										if(response.postcode && response.postcode!=""){
+											$("#postcode").val(response.postcode);
+										}
+										$("#file").prop('disabled', true);
+										dataAsJson('contentForm', form);
+									} else if(response.error) {
+										$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>'+response.error+'</div>');
+										return 'error';
+									}else {
+										$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Sorry, error in uploading file!</div>');
+										return 'error';
+									}
+								}
+							});
+						}else {
+							$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Sorry, error in uploading file!</div>');
+							return 'error';
+						}
+					}
+				});
+		}
+	}	else {
+		$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Please select file to upload!</div>');
+		return 'error';
+	}
+}
+
+function load_application(){
+	if($("#uploaded_file_uuid").val()!="" && $("#uploaded_file_type").val()!="")	{
+		if($("#uploaded_file_type").val()=="application/pdf"){
+			var linkStr=backendDirectory+"/file/"+$("#uploaded_file_uuid").val();
+		}	else if($("#uploaded_file_type").val()=="application/vnd.openxmlformats-officedocument.wordprocessingml.document" || $("#uploaded_file_type").val()=="application/msword"){
+			var linkStr="https://view.officeapps.live.com/op/embed.aspx?src="+backendDirectory+"/file/"+$("#uploaded_file_uuid").val();
+		}else{
+			var linkStr="https://docs.google.com/viewer?embedded=true&url="+backendDirectory+"/file/"+$("#uploaded_file_uuid").val();
+		}
+		$('#contentPreview').html('<iframe src="'+linkStr+'?'+$.now()+'" width="98%" style="height:500px;"></iframe>');
+	}
+}
+$(document).ready(function(){
+	load_application();
+	
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				if (element.attr("id") == "file" ) {
+					$('#fileInputId').after(error);
+            	}else{
+					$(element).closest('div').append(error);
+				}
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name: { required: true },
+				email_address: { required: true, email: true },
+				contact_number: { required: true },
+				file: { required: true }
+			},
+			submitHandler: function(form) {
+				upload_single_file(form);
+ 			}
+		});	
+});
+</script>
+</body>
+</html>

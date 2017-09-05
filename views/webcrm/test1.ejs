@@ -1,0 +1,112 @@
+<% include include/main-header %>
+<link rel="stylesheet" href="css/chosen.css">
+<link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
+<style>
+#select_systems_chosen{
+width : 402px!important;
+}
+.uldragdrop{
+padding:0px;
+margin:0px;
+}
+.uldragdrop li{
+list-style: none;
+background: #fff;
+border: 1px solid #ddd;
+border-radius: 4px;
+cursor: pointer;
+padding: 7px 12px;
+margin-bottom: 6px;
+text-align: left;
+}
+		
+.uldragdrop li:hover{
+color:#fff;		
+background: #b90140;
+border:1px solid #8a0024;
+}
+</style>
+<link rel="stylesheet" href="css/jquery.tag-editor.css" />
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Document <small><% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj.Document %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Document</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			
+		<div class="row" id="printMessageDivID">
+			
+      		<div class="panel-body no-padding-top bg-white"> <% include include/display_returned_msg %>
+      			<div class="col-md-9 col-lg-9" ><div class="form-group">
+    										<label for="" class="col-sm-2 control-label">Body </label>
+    										<div class="col-sm-9">
+     											<TEXTAREA CLASS="form-control" STYLE="height:500px;" name="Body" id="Body"><% if (typeof contentObj.Body !== 'undefined' && contentObj.Body !== null) { %><%= contentObj.Body %><% } %></TEXTAREA>
+    										</div>
+										</div></div>
+										<div class="col-md-3 col-lg-3" style="">
+										<ul id="imageLibraryDiv" class="uldragdrop">
+              							
+              							</ul></div>
+      		</div>
+		</div>
+      			
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+
+
+<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+</div>
+<script SRC="plugins/tinymce/tinymce.min.js"></script>
+
+<script src="plugins/jquery-ui.min.js"></script>
+<script>
+tinymce.init({
+  selector: "textarea",  // change this value according to your HTML
+  plugins: "paste",
+  paste_filter_drop: true
+});
+
+
+$(function () {
+loadImagesGallery();
+});
+
+var xhrStatus;
+function loadImagesGallery(){
+	var jsonRow=backendDirectory+"/api_fetch_list?start=0&limit=20&collection=fs.files";
+	
+	if(xhrStatus) xhrStatus.abort();
+	xhrStatus = $.getJSON(jsonRow,function(html){
+		var contentHtml="";
+		if(html.aaData.length>0){
+			var noImageStr= backendDirectory+'/images/no_image.png';
+			$.each(html.aaData, function(i,row){
+				contentHtml+='<li>'+row.metadata.uuid+'</li>';
+			
+				//contentHtml+='<div><img src="'+backendDirectory+"/file/"+row.metadata.uuid+'?'+$.now()+'" class="img-responsive" style="border-radius: 0 0 3px 3px; border: 1px solid #ddd;" onerror="this.src=\''+noImageStr+'\'"/></div>';
+			});
+     	}
+		$("#imageLibraryDiv").html(contentHtml);
+
+	});
+}
+</script>
+</body>
+</html>

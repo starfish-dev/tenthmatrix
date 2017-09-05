@@ -1,0 +1,607 @@
+<% include include/main-header %>
+<link rel="stylesheet" href="plugins/combobox/autocomplete-ui.css"/>
+<link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
+<style>
+.custom-combobox {
+		position: relative;
+		display: inline-block;
+	}
+	.custom-combobox-toggle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin-left: -1px;
+		padding: 0;
+	}
+	.custom-combobox-input {
+		margin: 0;
+		padding: 5px 10px;
+	}
+	.ui-widget-overlay {
+		position: fixed;
+	}
+	.box-primary h4 {
+    border-bottom: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 20px;
+    margin: 7px 5px 0 0;
+    padding: 9px;
+}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Timeslip <small><% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %>Update<% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Timeslip</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+      						<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/timeslip" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="timeslips">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="_id">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						
+            						<div class="col-md-6 col-xs-12">
+          									<div class="box box-primary">
+		    									<h4>Main Details</h4>
+            									<div class="box-body">
+														<div class="row">
+           		  											<div class=" col-sm-12 col-lg-12">
+   																<div class="form-group">
+																	<label class="col-sm-2 control-label">Task <span style="color:#6E829B">*</span></label>
+																	<div class="col-sm-10">
+																		<input type="hidden" class="form-control col-md-5 col-xs-12" id="task_name" name="task_name" value="<% if (typeof contentObj.task_name !== 'undefined' && contentObj.task_name !== null) { %><%= contentObj.task_name %><% } %>">
+                   														<select id="task_mongo_id" name="task_mongo_id" class="form-control">
+																		</select>
+																	</div>
+																</div> 
+																<div class="form-group">
+                  													<label class="control-label col-md-2" for="">Reported by<span class="required">*</span></label>
+                  													<div class="col-md-9 col-lg-10">
+                   														<input type="hidden" class="form-control col-md-5 col-xs-12" id="reported_by" name="reported_by" value="<% if (typeof contentObj.reported_by !== 'undefined' && contentObj.reported_by !== null) { %><%= contentObj.reported_by %><% } %>">
+                   														<select required="required" class="form-control col-md-5 col-xs-12" name="reported_by_user_id" id="reported_by_user_id"></select>
+                  													</div>
+                												</div>
+  																
+  																<div class="form-group">
+    																<label for="" class="col-sm-2 control-label">Description<span class="required">*</span></label>
+    																<div class="col-sm-10">
+      																	<textarea name="description" class="form-control" rows="4" required id="description"><% if (typeof contentObj.description !== 'undefined' && contentObj.description !== null) { %><%= contentObj.description %><% } %></textarea>
+    																</div>
+  																</div>
+  																<div class="form-group">
+    																<label for="" class="col-sm-2 control-label">Billing Status</label>
+    																<div class="col-sm-10">
+      																	<select class="form-control col-md-5 col-xs-12" name="billing_status" id="billing_status"></select>
+                  													</div>
+  																</div>
+   															</div>
+       			 										</div>
+             									</div>
+          									</div>
+										</div>
+										<div class="col-md-6 col-xs-12">
+          									<div class="box box-primary">
+		    									<h4>Slip Duration</h4>
+            									<div class="box-body">
+														<div class="row">
+           		  											<div class=" col-sm-12 col-lg-12">
+   																<div class="form-group" id="durationMsgID">
+    																<label for="" class="col-md-3 control-label">Start Duration</label>
+    																<div class="col-md-9 col-lg-9" >
+    																	<input class="form-control col-md-5 col-xs-12" type="hidden" id="start_timestamp" name="start_timestamp" value="<% if (typeof contentObj.start_timestamp !== 'undefined' && contentObj.start_timestamp !== null) {  %><%= contentObj.start_timestamp %><% } %>" readonly>
+                    								
+                														<div class='input-group date' id='start_datetime_picker'>
+                    														<input type='text' class="form-control" id="start_date" value=""/>
+                    														<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                														</div>
+                													</div>
+  																</div>
+  																<div class="form-group">
+    																<label for="" class="col-md-3 control-label">End Duration</label>
+    																<div class="col-md-9 col-lg-9" >
+    																	<input class="form-control col-md-9 col-xs-12" type="hidden" id="end_timestamp" name="end_timestamp" value="<% if (typeof contentObj.end_timestamp !== 'undefined' && contentObj.end_timestamp !== null) {  %><%= contentObj.end_timestamp %><% } %>" readonly>
+                    								
+                														<div class='input-group date' id='end_datetime_picker'>
+                    														<input type='text' class="form-control" id="end_date" value=""/>
+                    														<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                														</div>
+                													</div>
+  																</div>
+  																<div class="form-group">
+    																<label for="" class="col-sm-3 control-label"></label>
+																	<div class="col-sm-9">
+																		<label><input id="lunchinterval" name="lunchinterval" value="true" type="checkbox" <% if (typeof contentObj.lunchinterval !== 'undefined' && contentObj.lunchinterval !== null && (contentObj.lunchinterval == true || contentObj.lunchinterval == 'true')) { %>checked<% } %>> Exclude break time</label>
+    			  													</div>
+  																</div>
+  																<div class="form-group breakTimeUIClass" style="display:none;">
+    																<label for="" class="col-md-3 control-label">Start Break Time</label>
+    																<div class="col-md-9 col-lg-9" >
+    																	<input class="form-control col-md-9 col-xs-12" type="hidden" id="start_interval_timestamp" name="start_interval_timestamp" value="<% if (typeof contentObj.start_interval_timestamp !== 'undefined' && contentObj.start_interval_timestamp !== null) {  %><%= contentObj.start_interval_timestamp %><% } %>" readonly>
+                    								
+                														<div class='input-group date' id='interval_start_timepicker'>
+                    														<input type='text' class="form-control" id="start_interval_time" value="" />
+                    														<span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+                														</div>
+                													</div>
+  																</div>
+  																<div class="form-group breakTimeUIClass" style="display:none;">
+    																<label for="" class="col-md-3 control-label">End Break Time</label>
+    																<div class="col-md-9 col-lg-9">
+    																	<input class="form-control col-md-9 col-xs-12" type="hidden" id="end_interval_timestamp" name="end_interval_timestamp" value="<% if (typeof contentObj.end_interval_timestamp !== 'undefined' && contentObj.end_interval_timestamp !== null) {  %><%= contentObj.end_interval_timestamp %><% } %>" readonly>
+                    								
+                														<div class='input-group date' id='interval_end_timepicker'>
+                    														<input type='text' class="form-control" id="end_interval_time" value="" />
+                    														<span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+                														</div>
+                													</div>
+  																</div>
+   																<div class="form-group">
+    																<label for="" class="col-md-3 control-label">Hours Spent</label>
+    																<div class="col-md-3">
+      																	<input type="text" class="form-control" id="slip_hours" name="slip_hours" placeholder="" value="<% if (typeof contentObj.slip_hours !== 'undefined' && contentObj.slip_hours !== null) { %><%= contentObj.slip_hours %><% } %>" readonly>
+    																</div>
+    																<label for="" class="col-md-3 control-label breakTimeUIClass">Interval Time</label>
+    																<div class="col-md-3 breakTimeUIClass">
+      																	<input type="text" class="form-control" id="interval_time" name="interval_time" placeholder="" value="<% if (typeof contentObj.interval_time !== 'undefined' && contentObj.interval_time !== null) { %><%= contentObj.interval_time %><% } %>" readonly>
+    																</div>
+  																</div>
+   															</div>
+       			 										</div>
+            									</div>
+          									</div>
+										</div>
+                					<div class="form-group">
+                   						<div class="col-md-12 col-lg-12" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/timeslips" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+              					</form>
+              				</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="plugins/combobox/autocomplete-ui.js"></script>
+<script src="js/jquery.validate.js"></script>
+<script src="js/moment.js"></script>
+<script src="js/bootstrap-datetimepicker.min.js"></script>
+<script language="javascript">
+function evaluate_slip_values (){
+	var intervalTimeHrs='', minutes=0;
+	if($('#end_interval_timestamp').val()!="" && $('#start_interval_timestamp').val()!=""){
+		var interval_diff_time= $('#end_interval_timestamp').val()-$('#start_interval_timestamp').val();
+						
+		var minutes = Math.floor(interval_diff_time / 60);
+		var intervalTimeHrs = (minutes/60).toFixed(2);
+	}
+	if(intervalTimeHrs>=1){
+		var intervalTimeStr = "("+intervalTimeHrs+" hr)";
+	}else{
+		var intervalTimeStr =  "("+intervalTimeHrs+" hrs)";
+	}
+	var time_diff= minutes*60;
+										
+	var timeslipsDiff= $('#end_timestamp').val()-$('#start_timestamp').val();
+	var timeslipsMinutes = Math.floor(timeslipsDiff / 60);
+	var slipHourStr= (timeslipsMinutes/60).toFixed(2);
+	if(time_diff==0){
+		$('#slip_hours').val(slipHourStr);
+	}	else	{
+		var totalSlipSeconds = slipHourStr*3600;
+		var evalSeconds= totalSlipSeconds-time_diff;
+		var evalHours = (evalSeconds/3600).toFixed(2);
+		$('#slip_hours').val(evalHours);
+	}		
+	$('#interval_time').val(intervalTimeHrs);						
+}
+function resetIntervalTime(){
+	$('#slip_hours').val('');
+	$('#interval_time').val('');
+	$('#end_interval_time').val('');
+	$('#end_interval_timestamp').val('');
+	$('#start_interval_time').val('');
+	$('#start_interval_timestamp').val('');
+	
+	evaluate_slip_values();
+}
+function return_timestamp_from_timepicker (startDateStr, timeStr)	{
+	var datePartArr = startDateStr.split(' '),
+	timePartArr = timeStr.split(' '),
+	timeParts = timePartArr[0].split(':'),
+	dateParts = datePartArr[0].split('/'),
+	timeFormat = timePartArr[1],
+	date, hoursNum = parseInt(timeParts[0]);
+	
+	if(timeFormat=="PM"){
+		if(hoursNum == 12) {
+            hoursNum =hoursNum;
+        } else {
+            hoursNum = parseInt(hoursNum) + 12;
+        }
+	}
+	date = new Date(dateParts[2], parseInt(dateParts[0])-1, dateParts[1], hoursNum, timeParts[1]);
+	date= date.getTime();
+	date= parseInt(date)/1000;
+	return date;
+}
+
+	$(function () {
+		$("#lunchinterval").on("click", function() {
+			$(".duration_alert").remove();
+			if($(this).is(":checked")){
+				if($('#end_date').val()!="" && $('#start_date').val()!=""){
+   					$('.breakTimeUIClass').show();
+   				}else{
+   					$("#durationMsgID").before('<div class="alert alert-danger duration_alert">Please select start and end durations</div>');
+					$("#lunchinterval").attr("checked", false);
+   				}
+   			}else{
+   				$('.breakTimeUIClass').hide();
+   				resetIntervalTime();
+   			}
+  		});
+  		
+  		<% if (typeof contentObj.end_timestamp !== 'undefined' && contentObj.end_timestamp !== null) {  %>
+  			var endDateStr=return_datetimepicker_from_timestamp("<%= contentObj.end_timestamp %>");
+  			$('#end_date').val(endDateStr);
+  		<% } %>
+  		<% if (typeof contentObj.start_timestamp !== 'undefined' && contentObj.start_timestamp !== null) {  %>
+  			var dateStr=return_datetimepicker_from_timestamp("<%= contentObj.start_timestamp %>");
+			$('#start_date').val(dateStr);
+  		<% } %>
+  		
+		$('#start_datetime_picker').datetimepicker({
+			defaultDate:new Date()
+		}).on("dp.show", function (e) {
+			if($('#end_date').val()!=""){
+				$('#start_datetime_picker').data("DateTimePicker").maxDate($('#end_date').val());
+			}
+        }).on("dp.change", function (e) {
+			$('#end_datetime_picker').data("DateTimePicker").minDate(e.date);
+			$('#interval_start_timepicker').data("DateTimePicker").minDate(e.date);
+			var timestampNum=return_timestamp_from_datetimepicker($('#start_date').val());
+			$('#start_timestamp').val(timestampNum);
+			resetIntervalTime();	 
+			evaluate_slip_values();			
+        });
+        
+        $('#end_datetime_picker').datetimepicker().on("dp.show", function (e) {
+        	if($('#start_date').val()!=""){
+				$('#end_datetime_picker').data("DateTimePicker").minDate($('#start_date').val());
+			}
+	   	}).on("dp.change", function (e) {
+        	$('#start_datetime_picker').data("DateTimePicker").maxDate(e.date);
+            $('#interval_end_timepicker').data("DateTimePicker").maxDate(e.date);
+            var timestampNum=return_timestamp_from_datetimepicker($('#end_date').val());
+			$('#end_timestamp').val(timestampNum);
+			resetIntervalTime();
+			evaluate_slip_values();
+        });
+        <% if (typeof contentObj.start_interval_timestamp !== 'undefined' && contentObj.start_interval_timestamp !== null) {  %>
+  			var dateStr=return_datetimepicker_from_timestamp("<%= contentObj.start_interval_timestamp %>",false);
+  			$('#start_interval_time').val(dateStr);
+  		<% } %>
+        <% if (typeof contentObj.end_interval_timestamp !== 'undefined' && contentObj.end_interval_timestamp !== null) {  %>
+  			var dateStr=return_datetimepicker_from_timestamp("<%= contentObj.end_interval_timestamp %>",false);
+  			$('#end_interval_time').val(dateStr);
+		<% } %>
+		
+		$('#interval_start_timepicker').datetimepicker({
+        	format: 'LT'
+        }).on("dp.change", function (e) {
+        	$('#interval_end_timepicker').data("DateTimePicker").minDate(e.date);
+            var timestampNum=return_timestamp_from_timepicker($('#start_date').val(), $('#start_interval_time').val());
+        	$('#start_interval_timestamp').val(timestampNum);
+        	evaluate_slip_values();
+        });
+        
+        $('#interval_end_timepicker').datetimepicker({
+        	format: 'LT'
+        }).on("dp.change", function (e) {
+        	 $('#interval_start_timepicker').data("DateTimePicker").maxDate(e.date);
+            var timestampNum=return_timestamp_from_timepicker($('#start_date').val(), $('#end_interval_time').val());
+			$('#end_interval_timestamp').val(timestampNum);
+			evaluate_slip_values();
+        });
+            
+        <% if (typeof contentObj.lunchinterval !== 'undefined' && contentObj.lunchinterval !== null && (contentObj.lunchinterval == true || contentObj.lunchinterval == 'true')) {  %>
+  			if($('#end_date').val()!="" && $('#start_date').val()!=""){
+   				$('.breakTimeUIClass').show();
+   				$("#lunchinterval").attr("checked", true);
+   			}else{
+   				$("#durationMsgID").before('<div class="alert alert-danger duration_alert">Please select start and end durations</div>');
+				$("#lunchinterval").attr("checked", false);
+   			}
+  		<% } %>
+  		
+		fetch_default_list("billing-status", "<% if (typeof contentObj.billing_status !== 'undefined' && contentObj.billing_status !== null) { %><%= contentObj.billing_status %><% } %>","billing_status");
+	
+		var sVal="", reportedBy='';
+		<% if (typeof queryStr !== 'undefined' && queryStr !== null && typeof queryStr.customer_id !== 'undefined' && queryStr.customer_id !== null && queryStr.customer_id !=="") { %>
+			sVal="<%= queryStr.customer_id %>";
+		<% }else if(typeof contentObj.task_mongo_id !== 'undefined' && contentObj.task_mongo_id !== null)	{ %>
+			sVal="<%= contentObj.task_mongo_id %>";
+		<% } %>
+		
+		<% if (typeof contentObj.reported_by_user_id !== 'undefined' && contentObj.reported_by_user_id !== null) { %>
+			reportedBy="<%= contentObj.reported_by_user_id %>";
+		<% } else if(typeof authenticatedUser._id !== 'undefined' && authenticatedUser._id !== null && authenticatedUser._id!=="") {%>
+			reportedBy="<%= authenticatedUser._id %>";
+		<% } %>
+		fetch_collection_autocomplete_list('tasks', 'task_mongo_id', sVal);
+		fetch_collection_autocomplete_list('users', 'reported_by_user_id', reportedBy, 'status', '1');
+		
+		<% if (typeof contentObj.reported_by_user_id !== 'undefined' && contentObj.reported_by_user_id !== null) {	%>
+			evaluate_slip_values();
+		<% } %>
+		// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				if (element.attr("id") == "start_date" || element.attr("id") == "end_date" ) {
+					$('.form_datetime').after(error);
+            	}else{
+					$(element).closest('div').append(error);
+				}
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				description: { required: true },
+				task_mongo_id: { required: true },
+				reported_by_user_id: { required: true },
+				start_date: { required: true },
+				end_date: { required: true },
+			},
+			submitHandler: function(form) {
+				dataAsJson('contentForm', form);
+ 			}
+		});			
+	});
+
+//autocomplete
+	var xhr;
+  (function( $ ) {
+    $.widget( "custom.combobox", {
+      _create: function() {
+        this.wrapper = $( "<span>" )
+          .addClass( "custom-combobox" )
+          .insertAfter( this.element );
+ 
+        this.element.hide();
+        this._createAutocomplete();
+        this._createShowAllButton();
+      },
+ 
+      _createAutocomplete: function() {
+      	var ele_select= this.element;
+        var selected = this.element.children( ":selected" ),
+          value = selected.val() ? selected.text() : "";
+ 
+        this.input = $( "<input>" )
+          .appendTo( this.wrapper )
+          .val( value )
+          .attr( "title", "" )
+          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+          .autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: $.proxy( this, "_source" )
+          })
+          .tooltip({
+            tooltipClass: "ui-state-highlight"
+          });
+ 
+        this._on( this.input, {
+          autocompleteselect: function( event, ui ) {
+		  	//alert("show all");
+            ui.item.option.selected = true;
+			
+            this._trigger( "select", event, {
+              item: ui.item.option
+            });
+            if(ele_select.attr('id')=='reported_by_user_id'){
+				$('#reported_by').val($('#reported_by_user_id option:selected').text());
+			}
+			if(ele_select.attr('id')=='task_mongo_id'){
+				$('#task_name').val($('#task_mongo_id option:selected').text());
+			}
+          },
+ 
+          autocompletechange: "_removeIfInvalid"
+        });
+      },
+ 
+      _createShowAllButton: function() {
+        var input = this.input,
+          wasOpen = false;
+ 
+        $( "<a>" )
+          .attr( "tabIndex", -1 )
+          .attr( "title", "Show All Items" )
+          .tooltip()
+          .appendTo( this.wrapper )
+          .button({
+            icons: {
+              primary: "ui-icon-triangle-1-s"
+            },
+            text: false
+          })
+          .removeClass( "ui-corner-all" )
+          .addClass( "custom-combobox-toggle ui-corner-right" )
+          .mousedown(function() {
+            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+          })
+          .click(function() {
+            input.focus();
+ 
+            // Close if already visible
+            if ( wasOpen ) {
+              return;
+            }
+ 
+            // Pass last search string as value to search for, displaying last results
+            input.autocomplete( "search", 'SHOWALL' );
+          });
+      },
+ 
+      _source: function( request, response ) {
+        //var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+		var ele_select= this.element;
+		if(request.term=='SHOWALL'){
+			response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+		
+		}
+		else
+		{
+		
+		if(ele_select.attr('id')=='task_mongo_id'){
+			var jsonRow = backendDirectory+"/api_fetch_list?start=0&limit=20&collection=tasks&s="+request.term;
+		}else if(ele_select.attr('id')=='reported_by_user_id'){
+			var jsonRow = backendDirectory+"/api_fetch_list?start=0&limit=20&collection=users&findFieldName=status&findFieldValue=1&s="+request.term;
+		}
+		//alert(jsonRowURLStr);
+		if(xhr) xhr.abort();
+		xhr=$.getJSON(jsonRow,function(result){
+			
+			if(result.aaData.length>0){
+				var html='<option value=""></option>';
+
+				$.each(result.aaData, function(i,item)
+				{
+					if(ele_select.attr('id')=='task_mongo_id'){
+						html += '<option value="'+item._id+'">'+item.name+'</option>';
+					}else if(ele_select.attr('id')=='reported_by_user_id'){
+						var nameStr='';
+						if(item.firstname){
+							nameStr+=item.firstname;
+						}
+						if(item.lastname){
+							nameStr+=" "+item.lastname;
+						}
+						html += '<option value="'+item._id+'">'+nameStr+'</option>';
+					}
+				});
+				ele_select.html(html);
+				
+				
+				response(ele_select.children( "option" ).map(function() {
+          var text = $( this ).text();
+		 var value= $( this ).val();
+          //if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+				
+				
+			}
+		});
+       
+	  } 
+		
+      },
+ 
+      _removeIfInvalid: function( event, ui ) {
+ 
+        // Selected an item, nothing to do
+        if ( ui.item ) {
+
+          return;
+        }
+ 
+        // Search for a match (case-insensitive)
+        var value = this.input.val(),
+          valueLowerCase = value.toLowerCase(),
+          valid = false;
+        this.element.children( "option" ).each(function() {
+          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+            this.selected = valid = true;	
+			if(ele_select.attr('id')=='reported_by_user_id'){
+				$('#reported_by').val($('#reported_by_user_id option:selected').text());
+			}
+			if(ele_select.attr('id')=='task_mongo_id'){
+				$('#task_name').val($('#task_mongo_id option:selected').text());
+			}
+            return false;
+          }
+        });
+ 
+        // Found a match, nothing to do
+        if ( valid ) {
+          return;
+        }
+ 
+        // Remove invalid value
+        this.input
+          .val( "" )
+          .attr( "title", value + " didn't match any item" )
+          .tooltip( "open" );
+        this.element.val( "" );
+        this._delay(function() {
+          this.input.tooltip( "close" ).attr( "title", "" );
+        }, 2500 );
+        this.input.data( "ui-autocomplete" ).term = "";
+      },
+ 
+      _destroy: function() {
+        this.wrapper.remove();
+        this.element.show();
+      }
+    });
+  })( jQuery ); 
+	</script>
+</body>
+</html>

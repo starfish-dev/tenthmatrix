@@ -1,0 +1,259 @@
+<% include include/main-header %>
+<% 
+function dateformat(unixTimestamp){
+var a = new Date(unixTimestamp * 1000);
+var year = a.getFullYear();
+var month = a.getMonth()+1;
+var dateNum = a.getDate();
+var hour = a.getHours();
+var min = a.getMinutes();
+var sec = a.getSeconds();
+return year + '-' + month + '-' + dateNum + ' ' + hour + ':' + min ;
+}
+
+if (typeof contentObj.Created !== 'undefined' && contentObj.Created !== null) {  
+	var entered_date = dateformat(contentObj.Created);
+} 
+%>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">	
+	<div class="wrapper">
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  			<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    		<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Lead <small><% if (typeof contentObj.lead_name !== 'undefined' && contentObj.lead_name !== null) { %><%= contentObj.lead_name %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Lead</li>
+      			</ol>
+    		</section>	
+    		<section class="content">	
+    			
+           				<div class="row">
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            				
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/lead" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="leads">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="_id">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						<div class=" col-sm-12 col-lg-8">
+            						<div class="form-group">
+                  						<label class="control-label col-md-3" for="lead_name">Lead Name<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-6">
+                    						<input type="text" required="required" id="lead_name" name="lead_name" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.lead_name !== 'undefined' && contentObj.lead_name !== null) { %><%= contentObj.lead_name %><% } %>">
+                  						</div>
+                					</div>
+              						<div class="form-group">
+                  						<label class="control-label col-md-3" for="">First name<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<input type="text"  required="required" class="form-control col-md-5 col-xs-6" id="first_name" name="first_name" value="<% if (typeof contentObj.first_name !== 'undefined' && contentObj.first_name !== null) { %><%= contentObj.first_name %><% } %>">
+                  						</div>
+                  					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Last name</label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" id="last_name" name="last_name" value="<% if (typeof contentObj.last_name !== 'undefined' && contentObj.last_name !== null) { %><%= contentObj.last_name %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Email<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" required id="email" name="email" value="<% if (typeof contentObj.email !== 'undefined' && contentObj.email !== null) { %><%= contentObj.email %><% } %>">
+                  						</div>
+                  					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3">Website</label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" id="website" name="website" value="<% if (typeof contentObj.website !== 'undefined' && contentObj.telephone !== null) { %><%= contentObj.website %><% } %>">
+                  						</div>
+                  					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Address 1<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<textarea class="form-control col-md-5 col-xs-12" required="required" id="address_line1" name="address_line1"><% if (typeof contentObj.address_line1 !== 'undefined' && contentObj.address_line1 !== null) { %><%= contentObj.address_line1 %><% } %></textarea>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Address 2</label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<textarea class="form-control col-md-5 col-xs-12" id="address_line2" name="address_line2"><% if (typeof contentObj.address_line2 !== 'undefined' && contentObj.address_liaddress_line2ne1 !== null) { %><%= contentObj.address_line2 %><% } %></textarea>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Town</label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" id="town" name="town" value="<% if (typeof contentObj.town !== 'undefined' && contentObj.town !== null) { %><%= contentObj.town %><% } %>">
+                  						</div>
+                  					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">County</label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" id="county" name="county" value="<% if (typeof contentObj.county !== 'undefined' && contentObj.county !== null) { %><%= contentObj.county %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Telephone<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" required id="telephone" name="telephone" value="<% if (typeof contentObj.telephone !== 'undefined' && contentObj.telephone !== null) { %><%= contentObj.telephone %><% } %>">
+                  						</div>
+                  					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Fax</label>
+                  						<div class="col-md-6 col-lg-6">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" id="fax" name="fax" value="<% if (typeof contentObj.fax !== 'undefined' && contentObj.fax !== null) { %><%= contentObj.fax %><% } %>">
+                  						</div>
+                					</div>
+                				
+                					<div class="form-group">
+                  						<label class="control-label col-md-3">Company Size</label>
+                  						<div class="col-md-6 col-lg-4">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" id="company_size" name="company_size" value="<% if (typeof contentObj.company_size !== 'undefined' && contentObj.company_size !== null) { %><%= contentObj.company_size %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Comments</label>
+                  						<div class="col-md-8 col-lg-8">
+                   							<textarea class="form-control col-md-5 col-xs-12" id="comments" name="comments"><% if (typeof contentObj.comments !== 'undefined' && contentObj.comments !== null) { %><%= contentObj.comments %><% } %></textarea>
+                  						</div>
+                					</div>
+                					
+                					
+									</div>
+									<div class=" col-sm-12 col-lg-4">
+										<% if (typeof entered_date !== 'undefined' && entered_date !== null) {  %>
+										<div class="form-group">
+              								<label for="dtp_input1" class="col-md-3 control-label" >Entered Date </label>
+                  							<div class="col-md-6 col-lg-6" >
+                								<input class="form-control col-md-5 col-xs-12" disabled type="text" id="Created" name="Created" value="<%= entered_date %>" >
+                    						</div>
+            							</div>
+            							<% } %>
+            							<div class="form-group">
+              								<label for="dtp_input1" class="col-md-3 control-label" >Entered By <span class="required">*</span></label>
+                  							<div class="col-md-6 col-lg-6" >
+                								<input class="form-control col-md-5 col-xs-12" required type="text" id="entered_by" name="entered_by" value="<% if (typeof contentObj.entered_by !== 'undefined' && contentObj.entered_by !== null) {  %><%= contentObj.entered_by %><% } %>">
+                    						</div>
+            							</div>
+										<div class="form-group">
+    										<label for="" class="col-sm-3 control-label">Status</label>
+    										<div class="col-sm-9">
+    											<div STYLE="float:left; margin-right:10px;display:inline-block;">
+      		  										<label> <input type="radio" id="status" name="status" value="1" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 1) { %>checked<% }else{ %>checked<% } %>> <strong style="font-weight:600">Active</strong></label>
+    			  								</div>
+				  								<div STYLE="float:left;display:inline-block;">
+      		  										<label> <input type="radio" id="status" name="status" value="0" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 0) { %>checked<% } %> > <strong style="font-weight:600">Inactive</strong></label>
+    			  								</div>
+											</div>
+										</div>
+										<div class="form-group">
+                  							<label class="control-label col-md-3" for="">Source<span class="required">*</span></label>
+                  							<div class="col-md-6 col-lg-4">
+                   								<input type="text" class="form-control col-md-5 col-xs-12" required id="source" name="source" value="<% if (typeof contentObj.source !== 'undefined' && contentObj.source !== null) { %><%= contentObj.source %><% } %>">
+                  							</div>
+                  						</div>
+                  						<div class="form-group">
+    										<label for="" class="col-sm-3 control-label"></label>
+    										<div class="col-sm-9">
+    											<label class="checkbox"> <input type="checkbox" id="QuarkUser" name="QuarkUser" value="1" <% if (typeof contentObj.QuarkUser !== 'undefined' && contentObj.QuarkUser !== null && contentObj.QuarkUser == 1) { %>checked<% }	%>> <strong style="font-weight:600">Quark User</strong></label>
+    			  							</div>
+										</div>
+										<div class="form-group">
+    										<label for="" class="col-sm-3 control-label"></label>
+    										<div class="col-sm-9">
+    											<label class="checkbox"> <input type="checkbox" id="InDesign_user" name="InDesign_user" value="1" <% if (typeof contentObj.InDesign_user !== 'undefined' && contentObj.InDesign_user !== null && contentObj.InDesign_user == 1) { %>checked<% }	%>> <strong style="font-weight:600">InDesign User</strong></label>
+    			  							</div>
+										</div>
+										<div class="form-group">
+    										<label for="" class="col-sm-3 control-label"></label>
+    										<div class="col-sm-9">
+    											<label class="checkbox"> <input type="checkbox" id="respondedtomail" name="respondedtomail" value="1" <% if (typeof contentObj.respondedtomail !== 'undefined' && contentObj.respondedtomail !== null && contentObj.respondedtomail == 1) { %>checked<% }	%>> <strong style="font-weight:600">Responded to mailing</strong></label>
+    			  							</div>
+										</div>
+										<div class="form-group">
+    										<label for="" class="col-sm-3 control-label"></label>
+    										<div class="col-sm-9">
+    											<label class="checkbox"> <input type="checkbox" id="given_to_reseller" name="given_to_reseller" value="1" <% if (typeof contentObj.given_to_reseller !== 'undefined' && contentObj.given_to_reseller !== null && contentObj.given_to_reseller == 1) { %>checked<% }	%>> <strong style="font-weight:600">Given to reseller</strong></label>
+    			  							</div>
+										</div>
+										<div class="form-group">
+    										<label for="" class="col-sm-3 control-label"></label>
+    										<div class="col-sm-9">
+    											<label class="checkbox"> <input type="checkbox" id="keep_us_posted" name="keep_us_posted" value="1" <% if (typeof contentObj.keep_us_posted !== 'undefined' && contentObj.keep_us_posted !== null && contentObj.keep_us_posted == 1) { %>checked<% }	%>> <strong style="font-weight:600">Keep Us Posted</strong></label>
+    			  							</div>
+										</div>
+										
+									</div>
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-6" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/leads" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+              					</form>
+              				</div>
+            			</div>
+      
+    		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+
+
+<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/jquery.validate.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				lead_name: { required: true },
+				first_name: { required: true },
+				email: { required: true },
+				address_line1: { required: true },
+				telephone: { required: true },
+				entered_by: { required: true },
+				source: { required: true }
+			},
+			submitHandler: function(form) {
+				dataAsJson('contentForm', form);
+ 			}
+		});		
+});
+</script>
+</body>
+</html>

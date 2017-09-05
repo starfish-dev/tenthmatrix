@@ -1,0 +1,103 @@
+<% include include/main-header %>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<!-- navbar top -->
+   	<div class="wrapper">
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  		<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+    		
+    <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Dashboard
+        <small>Control panel</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-dashboard"></i> Dashboard</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Small boxes (Stat box) -->
+      <div class="row" id="dashboard_items">
+			<h1 style="margin-left:20px;">Welcome to Control Panel</h1>
+      </div>
+      <!-- /.row -->
+      <!-- Main row -->
+      
+      <!-- /.row (main row) -->
+
+    </section>
+
+  </div>
+    
+    <!--//body content--> 
+
+  <!--//Main Content--> 
+	<!-- Footer Starts Here-->
+	<% include include/footer %>
+	<!-- Footer Ends Here-->
+
+</div>
+<script>
+function fetchDashboardItems(){
+	var jsonRow = backendDirectory+'/load_navigator';
+	$.getJSON(jsonRow,function(result){
+		if(result.aaData){
+			var contentStr ="", tableArr= new Array();
+			var styleClassArr=new Array("bg-blue", "bg-yellow", "bg-red", "bg-green");
+			
+			$.each(result.aaData, function(i,row){
+				if(row.displayOnDashboard==1 || row.displayOnDashboard=="1"){
+				
+				var iconNameStr='';
+				if(row.icon_class!=""){
+					iconNameStr='<i class="'+row.icon_class+'"></i>';
+				}
+				if(row.icon_path!=""){
+					iconNameStr='<img width="24" height="24" src="'+row.icon_path+'" alt="">';
+				}
+				var styleItem = styleClassArr[Math.floor(Math.random()*styleClassArr.length)];
+				contentStr+='<div class="col-lg-3 col-xs-6"><div class="small-box '+styleItem+'">';
+				
+				if(row.name.toLowerCase()=="players"){
+					contentStr+='<div class="inner"><h3 class="players_count">0</h3><p>'+row.name.toUpperCase()+'</p></div>';
+					tableArr.push('players');
+            	}else{
+            		contentStr+='<div class="inner"><h3 class="'+row.table+'_count">0</h3><p>'+row.name.toUpperCase()+'</p></div>';
+            		tableArr.push(row.table);
+            	}
+            	contentStr+='<div class="icon">	'+iconNameStr+'</div>';
+            	contentStr+='<a href="<%= backendDirectory %>/list/'+row.table+'" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>';
+          		contentStr+='</div></div>';
+          		}
+			});
+			$("#dashboard_items").html(contentStr);
+			
+			$.each(tableArr, function(i,row){
+				loadCollectionCount(row);
+			});
+		}
+	});
+}
+function loadCollectionCount(collectionStr){
+	var jsonRow = backendDirectory+'/api_get_count?collection='+collectionStr;
+	$.getJSON(jsonRow,function(result){
+		if(result.total){
+			$("."+collectionStr+"_count").html(result.total);
+		}
+	});
+}
+$(function () {
+	fetchDashboardItems();
+});
+</script>
+</body>
+</html>

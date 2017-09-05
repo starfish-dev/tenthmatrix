@@ -1,0 +1,482 @@
+ 
+
+ select{
+	 height: 37px !important;
+
+ }
+ 
+ 
+ .error{
+	 color:red!important;
+
+ }
+ 
+ 
+ 
+ .custom-combobox {
+    position: relative;
+    display: inline-block;
+	font-family: "Open Sans", Arial;
+    font-size: 12px;
+	top: 14px;
+	right:26px;
+  }
+  .custom-combobox-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+    /* support: IE7 */
+    *height: 1.7em;
+    *top: 0.1em;
+  }
+  .custom-combobox-input {
+    margin: 0;
+    padding: 0.3em;
+  }
+  .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+  	width:auto;
+	height:auto;
+	 line-height: 19px !important;
+    background: #fafafa !important;
+   padding: 7px 6px;
+	border: 1px solid #ddd;
+  }
+  .ui-autocomplete{
+  	max-height:300px;
+	overflow:scroll;
+  }
+  
+  .ui-autocomplete li a{
+  	color: #737f8d;
+	text-shadow: 1px 1px 1px #fff;
+  }
+  
+  
+  /*user setting page setting*/
+   #UserSetting .custom-combobox {
+	 width: 100%;
+    margin-left: 25px;
+    top: 0px;
+   
+  }
+ #UserSetting  .custom-combobox-input{
+	  width:91%;
+	   background: #ffffff;
+    background: -moz-linear-gradient(top, #ffffff 0%, #f0f1f2 100%);
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f0f1f2));
+    background:-webkit-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  -o-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background: -ms-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  linear-gradient(to bottom, #ffffff 0%,#f0f1f2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f0f1f2',GradientType=0 );
+    display: inline-block;
+    border: 1px solid #cfdde8;
+    border-radius: 5px;
+    background-position: 94%;
+    background-repeat: no-repeat;
+  }
+#UserSetting  .ui-button{
+	  background:#fff;
+	   background:  -moz-linear-gradient(top, #ffffff 0%, #f0f1f2 100%);
+    background:  -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f0f1f2));
+    background:  -webkit-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  -o-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  -ms-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  linear-gradient(to bottom, #ffffff 0%,#f0f1f2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f0f1f2',GradientType=0 );
+    display: inline-block;
+    border: 1px solid #cfdde8;
+    /*border-radius: 5px;*/
+    background-position: 94%;
+    background-repeat: no-repeat;
+	margin-left:-2px;
+	padding: 0 2px;
+  }
+  #UserSetting .ui-select {
+	  background-position:97%;
+  }
+  @media(max-width:767px){
+	 #UserSetting  .custom-combobox {
+	  	width:100%;
+ 	 }
+  #UserSetting .custom-combobox-input{
+	  width:95%;
+  }
+  }
+  
+  
+  .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+  font-family: "Open Sans", Arial!important;
+    font-size: 12px;
+  }
+  
+  
+  /*Edit/new -project page form setting*/
+    #ProjectForm .custom-combobox {
+	  width:42%;    
+  }
+   #ProjectForm .custom-combobox-input{
+	  width:91%;
+	   background: #ffffff;
+    background: -moz-linear-gradient(top, #ffffff 0%, #f0f1f2 100%)!;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f0f1f2));
+    background:-webkit-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  -o-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background: -ms-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  linear-gradient(to bottom, #ffffff 0%,#f0f1f2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f0f1f2',GradientType=0 );
+    display: inline-block;
+    border: 1px solid #cfdde8;
+    border-radius: 5px;
+    background-position: 94%;
+    background-repeat: no-repeat;
+  }
+  #ProjectForm .ui-button{
+	  background:#fff;
+	   background:  -moz-linear-gradient(top, #ffffff 0%, #f0f1f2 100%);
+    background:  -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f0f1f2));
+    background:  -webkit-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  -o-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  -ms-linear-gradient(top, #ffffff 0%,#f0f1f2 100%);
+    background:  linear-gradient(to bottom, #ffffff 0%,#f0f1f2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f0f1f2',GradientType=0 );
+    display: inline-block;
+    border: 1px solid #cfdde8;
+    /*border-radius: 5px;*/
+    background-position: 94%;
+    background-repeat: no-repeat;
+	margin-left:-2px;
+	padding: 0 2px;
+  }
+  #ProjectForm .ui-select {
+	  background-position:97%;
+  }
+    #ProjectForm .ui-state-default{
+		top:0px;
+	}
+  @media(max-width:767px){
+	  #ProjectForm .custom-combobox {
+	  	width:100%;
+ 	 }
+  #ProjectForm .custom-combobox-input{
+	  width:95%;
+  }
+  }
+  
+  
+  
+  .ui-state-default {
+    height: auto;
+    float: left !important;
+}
+  
+  
+  #TaskForm .custom-combobox{
+	width: 41%!important;
+	
+}
+
+#TaskForm .custom-combobox-input {
+    width: 95%!important;
+}
+
+
+ @media(max-width:767px){
+	 #TaskForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+ 
+ 
+ #FTPForm .custom-combobox{
+	width: 30%!important;
+	
+}
+
+#FTPForm .custom-combobox-input {
+    width: 100%!important;
+}
+
+
+ @media(max-width:767px){
+	 #FTPForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+  
+  #PurchaseInvoiceForm .custom-combobox{
+	width: 38%!important;
+	
+}
+
+#PurchaseInvoiceForm .custom-combobox-input {
+    width: 95%!important;
+}
+
+
+
+ @media(max-width:767px){
+	 #PurchaseInvoiceForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+ 
+ 
+#OrderForm .custom-combobox{
+	width: 38%!important;
+	
+}
+
+#OrderForm .custom-combobox-input {
+    width: 95%!important;
+}
+
+
+
+ @media(max-width:767px){
+	 #OrderForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+ 
+
+ 
+ 
+ 
+ #InvoiceForm .custom-combobox{
+	width: 38%!important;
+	
+}
+
+#InvoiceForm .custom-combobox-input {
+    width: 97%;
+}
+
+
+
+ @media(max-width:767px){
+	 #InvoiceForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+  #DocumentForm .custom-combobox{
+	width:47%!important;
+	
+}
+
+#DocumentForm .custom-combobox-input {
+    width: 100%!important;
+}
+
+
+
+ @media(max-width:767px){
+	 #DocumentForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+   #DomainForm .custom-combobox{
+	width:47%!important;
+	
+}
+
+#DomainForm .custom-combobox-input {
+    width: 100%!important;
+}
+
+
+
+ @media(max-width:767px){
+	 #DomainForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+ 
+  #MailSendForm .custom-combobox{
+	width:30%!important;
+	
+}
+
+#MailSendForm .custom-combobox-input {
+    width: 100%!important;
+}
+
+
+
+ @media(max-width:767px){
+	 #MailSendForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+   #ContactForm .custom-combobox{
+	width:39%!important;
+	
+}
+
+#ContactForm .custom-combobox-input {
+    width: 99%!important;
+}
+
+
+
+ @media(max-width:767px){
+	 #ContactForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+ 
+ 
+ 
+
+
+
+ 
+
+
+ 
+  #ProjectScriptForm .custom-combobox{
+	width:53%!important;
+	
+}
+
+#ProjectScriptForm .custom-combobox-input {
+    width: 99%!important;
+}
+
+
+
+ @media(max-width:767px){
+	 #ProjectScriptForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+   #AnalAccountForm .custom-combobox{
+	width:39%!important;
+	
+}
+
+#AnalAccountForm .custom-combobox-input {
+    width: 99%!important;
+}
+
+
+
+ @media(max-width:767px){
+	 #AnalAccountForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+
+ 
+  
+  #CompanyForm .custom-combobox{
+	width: 70%!important;
+	
+}
+
+#CompanyForm .custom-combobox-input {
+    width: 95%!important;
+}
+
+
+
+ @media(max-width:767px){
+	 #CompanyForm .custom-combobox{
+	width: 95%!important;
+	
+}
+ }
+ 
+ 
+ h4{
+
+color: #4a4a4a;
+margin-top: 23px;
+padding-bottom: 16px;
+font-size: 29px;
+border-bottom: 1px dashed #ddd;
+margin-bottom: 33px;
+	
+}
+
+
+
+
+
+input.search {
+    background: url("../img/lens.png") #fcfcfc no-repeat 95%;
+    box-shadow: none;
+    height: 27px;
+    font-size: 13px;
+    padding: 2px 6px;
+    border: 1px solid #d0dde9;
+    margin: 0;
+    border-radius: 2px;
+    top: 16px;
+    margin-left: 14px !important;
+    border-radius: 3px!important;
+	margin-right: 10px !important;
+	
+}
+
+
+
+
+.btn-group button.glow {
+    padding: 9px 10px 8px 10px !important;
+}
+
+
+
+
+.table-wrapper .filter-block .new-product {
+    padding: 8px 13px;
+}
+
+
+
+
+
+
+
+
+ 
+ 

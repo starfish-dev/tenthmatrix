@@ -1,0 +1,315 @@
+<% include include/main-header %>
+<link rel="stylesheet" href="css/jquery.tag-editor.css" />
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<style>
+.uldragdrop{
+padding:0px;
+margin:0px;
+}
+		
+.uldragdrop li{
+list-style: none;
+background: #fff;
+border: 1px solid #ddd;
+border-radius: 4px;
+cursor: pointer;
+padding: 7px 12px;
+margin-bottom: 6px;
+text-align: left;
+}
+		
+.uldragdrop li:hover{
+color:#fff;		
+background: #b90140;
+border:1px solid #8a0024;
+}
+#select_systems_chosen{
+width : 100%!important;
+}
+</style>
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    		<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Template <small><% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Template</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+      					<div class="panel-body no-padding-top bg-white"> 
+      						<% include include/display_returned_msg %>
+            				<div class="col-md-8 col-sm-12">
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/template/" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="templates">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="code">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="data" name="data" value="">
+      								<input type="hidden" class="form-control" id="maintain_history" name="maintain_history" value="false">
+     								      								
+            						<div class="form-group">
+                  						<label class="control-label col-md-2" for="first-name">Name<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-10">
+                    						<input type="text" required="required" id="name" name="name" class="form-control col-md-5 col-xs-12" onblur="generate_code('name','code')" onkeyup="generate_code('name','code')" value="<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } %>">
+                  						</div>
+                					</div>
+              						<div class="form-group">
+                  						<label class="control-label col-md-2" for="">Code<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-10">
+                   							<input type="text"  required="required" class="form-control col-md-5 col-xs-12" id="code" name="code" readonly value="<% if (typeof contentObj.code !== 'undefined' && contentObj.code !== null) { %><%= contentObj.code %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-2" for="">Content<span class="required">*</span></label>
+                  						<div class="col-md-10 col-lg-10">
+                   							<textarea rows="30" required="required" class="form-control col-md-5 col-xs-12" id="template_content" name="template_content"><% if (typeof contentObj.template_content !== 'undefined' && contentObj.template_content !== null) { %><%= contentObj.template_content %><% } %></textarea>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+    									<label for="firstname" class="col-sm-2  control-label">Tags </label>
+    									<div class="col-sm-10">
+    										<input type="hidden" class="form-control" id="default_tags" value="<% if (typeof contentObj.tags !== 'undefined' && contentObj.tags !== null) { %><%= contentObj.tags %><% } %>">
+    										<textarea type="text" class="form-control" name="tags" id="tags" rows="1"></textarea>
+										</div>
+                  					</div>
+                					<div class="form-group">
+    									<label for="" class="col-sm-2 control-label">Status</label>
+    									<div class="col-sm-9">
+    										<div class="radio" STYLE="float:left; margin-right:10px;">
+      		  									<label> <input type="radio" id="status" name="status" value="1" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 1) { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  							</div>
+				  							<div class="radio" STYLE="float:left;">
+      		  									<label> <input type="radio" id="status" name="status" value="0" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 0) { %>checked<% } %> > <strong style="font-weight:600">Inactive</strong></label>
+    			  							</div>
+										</div>
+									</div>
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-6" align="center">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/templates" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+              					</form>
+              				</div>
+              				<div class="col-md-4 col-sm-12 pull-right">
+              					<div class="well" style="overflow:hidden;"><div class="form-horizontal ">
+              						<h4 style="margin-top:0px;">Drag and drop tokens in "Content"</h4>
+              						<div class="form-group" style=""><div class="col-md-12 col-lg-12" style="padding: 0px 15px;">
+                  						<div class="btn-inline display-inline-block" style="width: 100%;">
+											<input class="form-control" style="height:36px;" required="" id="search_here" placeholder="Search here..." value="">
+											<button class="btn btn-left-align btn-link no-shadow bg-transparent no-padding-top padding-right-10 right-auto left" type="button" id="searchBtn" title="Search"><i class="glyphicon glyphicon-search"></i></button>
+										</div>
+                  					</div></div>
+                				
+              					<ul id="DragWordList" class="uldragdrop" runat="server">
+              					
+                  				</ul>
+                  				</div></div>
+                  				<% if (typeof contentObj._id !== "undefined" && contentObj._id !== null) { %>
+                  						<div class="well historyClass" style="overflow:hidden;display:none;"><div class="form-horizontal ">
+   											<h4 style="margin-top:0px;">History</h4>
+   											<div id="history_content">
+   											
+   											</div>
+  										</div></div>
+  									<% } %>
+              				</div>
+            		</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+ 		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+<!--//Main Content--> 
+</div>
+<!-- Page-Level Plugin Scripts-->
+
+<script src="plugins/jquery-ui.min.js"></script>
+<script src="js/jquery.validate.js"></script>
+
+ <script src="js/jquery.caret.min.js"></script>
+ <script src="js/jquery.tag-editor.min.js"></script>
+<script>
+var xhrStatus;
+function loadTokens(){
+	var jsonRow=backendDirectory+"/api_fetch_list?start=0&limit=10&collection=tokens";
+	if($("#search_here").val()!=""){
+		jsonRow+="&s="+$("#search_here").val();
+	}
+	if(xhrStatus) xhrStatus.abort();
+	xhrStatus = $.getJSON(jsonRow,function(html){
+		var contentHtml="";
+		if(html.aaData.length>0){
+			$.each(html.aaData, function(i,row){
+				contentHtml+="<li>"+row.code+"</li>";
+			});
+     	}
+		$("#DragWordList").html(contentHtml);
+		$("#DragWordList li").draggable({
+			appendTo: "body",
+        	helper: "clone",
+        	cursor: "select",
+        	revert: "invalid"
+    	});
+	});
+}
+
+$(function() {
+	 
+	$("#template_content").change(function() {
+     	$('#maintain_history').val(true);
+    });
+    $("#template_content").blur(function() {
+    	$('#maintain_history').val(true);
+    });
+
+	
+	$('form input').change(function() {
+    	if(this.id == "name" || this.id == "code"){
+     		$(this).change(function() {
+     			$('#maintain_history').val(true);
+     		});
+    		$(this).blur(function() {
+    			$('#maintain_history').val(true);
+     		});
+     	}
+	});
+	
+	drawTagsUi();	// call this method to initialise tags
+	
+	loadTokens();
+      
+    initDroppable($("#template_content"));
+    function initDroppable($elements) {
+    	$elements.droppable({
+        	hoverClass: "textarea",
+            accept: ":not(.ui-sortable-helper)",
+            drop: function(event, ui) {
+               var $this = $(this);
+ 
+                var tempid = ui.draggable.text();
+                var dropText;
+            	dropText = "<*--" + tempid + "--*>";
+                var droparea = document.getElementById('template_content');
+                var range1 = droparea.selectionStart;
+                var range2 = droparea.selectionEnd;
+                var val = droparea.value;
+                var str1 = val.substring(0, range1);
+                var str3 = val.substring(range1, val.length);
+                droparea.value = str1 + dropText + str3;
+                $('#maintain_history').val(true);
+            }
+    	});
+    }
+    
+    // validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name: { required: true },
+				code: { required: true },
+				template_content: { required: true }
+			},
+			submitHandler: function(form) {
+				var tempTags =$("#tags").val();
+				$("#tags").val(JSON.stringify(tempTags.split(',')));
+				
+				dataAsJson('contentForm', form);
+ 			}
+		});
+		
+	$("#search_here").blur(function()	{
+		loadTokens();
+	});	
+	$("#search_here").change(function()	{
+		loadTokens();
+	});	
+	$('#searchField').keypress(function (e) {
+  		if (e.which == 13) {
+    		loadTokens();
+  		}
+	});
+	$("#searchBtn").click(function()	{
+		loadTokens();
+	});
+	fetch_history();
+});
+
+function roll_back(btnID, btnsClass, uniqueIDStr, replaceIDStr, fieldName){
+	$("."+btnsClass+"_"+uniqueIDStr).hide();
+	$("#"+btnID+"_"+uniqueIDStr).show();
+	$('#maintain_history').val(true);
+	var replaceStr = $("#"+replaceIDStr+"_"+uniqueIDStr).val();
+	
+	if(fieldName=="Body"){
+		tinyMCE.activeEditor.setContent(replaceStr);
+	}else{
+		$("#"+fieldName).val(replaceStr);
+	}
+}
+
+function fetch_history(){
+	$('.historyClass').hide();
+	if($("#id").val()!=""){
+		var jsonRow=backendDirectory+"/api_fetch_history?start=0&limit=5&collection="+$('#table_name').val()+"&id="+$("#id").val();
+		$.getJSON(jsonRow,function(response){
+			if(response.aaData && response.aaData.length>0){
+				var contentHtml="", documentStr=$('#name').val(), bodyStr=$('#template_content').val(), codeStr=$('#code').val();
+				
+				$.each(response.aaData, function(i,row){
+					var tempContentHTMLStr='';
+					if(documentStr!==row.name){
+						tempContentHTMLStr+='<div class="col-sm-6 col-md-4" style="margin-top:10px;padding-left: 0px;">Name : <input type="hidden" id="d_rollback_val_'+row.history_created_uuid+'" value="'+row.name+'"><button id="d_rollback_'+row.history_created_uuid+'" class="btn btn-danger btn-sm d_btns_'+row.history_created_uuid+'" onClick="roll_back(\'d_cancel\', \'d_btns\', \''+row.history_created_uuid+'\', \'d_rollback_val\', \'name\'); return false;">Rollback</button><input type="hidden" id="d_original_val_'+row.history_created_uuid+'" value="'+documentStr+'"><button id="d_cancel_'+row.history_created_uuid+'" class="btn btn-primary btn-sm d_btns_'+row.history_created_uuid+'" style="display:none;" onClick="roll_back(\'d_rollback\', \'d_btns\', \''+row.history_created_uuid+'\', \'d_original_val\', \'name\'); return false;">Cancel</button></div>';
+					}
+					if(codeStr!==row.code){
+						tempContentHTMLStr+='<div class="col-sm-6 col-md-4" style="margin-top:10px;padding-left: 0px;">Code : <input type="hidden" id="c_rollback_val_'+row.history_created_uuid+'" value="'+row.code+'"><button id="c_rollback_'+row.history_created_uuid+'" class="btn btn-danger btn-sm c_btns_'+row.history_created_uuid+'" onClick="roll_back(\'c_cancel\', \'c_btns\', \''+row.history_created_uuid+'\', \'c_rollback_val\', \'code\'); return false;">Rollback</button><input type="hidden" id="c_original_val_'+row.history_created_uuid+'" value="'+codeStr+'"><button id="c_cancel_'+row.history_created_uuid+'" class="btn btn-primary btn-sm c_btns_'+row.history_created_uuid+'" style="display:none;" onClick="roll_back(\'c_rollback\', \'c_btns\', \''+row.history_created_uuid+'\', \'c_original_val\', \'code\'); return false;">Cancel</button></div>';
+					}
+					if(bodyStr!==row.template_content){
+						tempContentHTMLStr+='<div class="col-sm-6 col-md-4" style="margin-top:10px;padding-left: 0px;padding-right: 0px;">Content : <textarea style="display:none;" id="b_rollback_val_'+row.history_created_uuid+'">'+row.template_content+'</textarea><button id="b_rollback_'+row.history_created_uuid+'" class="btn btn-danger btn-sm b_btns_'+row.history_created_uuid+'" onClick="roll_back(\'b_cancel\', \'b_btns\', \''+row.history_created_uuid+'\', \'b_rollback_val\', \'template_content\'); return false;">Rollback</button><textarea style="display:none;" id="b_original_val_'+row.history_created_uuid+'">'+bodyStr+'</textarea><button id="b_cancel_'+row.history_created_uuid+'" class="btn btn-primary btn-sm b_btns_'+row.history_created_uuid+'" style="display:none;" onClick="roll_back(\'b_rollback\', \'b_btns\', \''+row.history_created_uuid+'\', \'b_original_val\', \'template_content\'); return false;">Cancel</button></div>';
+					}
+					if(tempContentHTMLStr!=""){
+						contentHtml+='<div class="col-md-12 col-sm-12" style="padding-left:0px;"><h5 style="font-weight:bold;">'+row.modified_by_user+' ('+return_datetimepicker_from_timestamp(row.history_created_timestamp)+')</h5>'+tempContentHTMLStr+'</div>';
+					}
+				});
+				$('.historyClass').show();
+     			$("#history_content").html(contentHtml);
+     		}
+		});
+	}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<% include include/main-header %>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<!-- navbar top -->
+   	<div class="wrapper">
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    		<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Dashboard
+        <small>Control panel</small>
+      </h1>
+      <ol class="breadcrumb">
+       	<% include include/dashboard-breadcrumb %>
+       	<li class="active">Module</li>
+      </ol>
+    </section>
+	<section class="content">
+      			<div class="row">
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            				
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/module" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="modules">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="code">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Name<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-3">
+                    						<input type="text" required="required" id="name" name="name" class="form-control col-md-5 col-xs-12" onblur="generate_code('name','code')" onkeyup="generate_code('name','code')" value="<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } %>">
+                  						</div>
+                					
+                  						<label class="control-label col-md-2" for="">Code<span class="required">*</span></label>
+                  						<div class="col-md-5 col-lg-3">
+                   							<input type="text"  required="required" class="form-control col-md-5 col-xs-12" id="code" name="code" readonly value="<% if (typeof contentObj.code !== 'undefined' && contentObj.code !== null) { %><%= contentObj.code %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-1" for="">Icon Class </label>
+                  						<div class="col-md-2">
+                  							<select id="icon_class" name="icon_class" class="form-control col-md-5 col-xs-12" onChange="showIcon(this.value)">
+                   								
+                    						</select>
+                  							<!--<input type="text" id="icon_class" name="icon_class" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.icon_class !== 'undefined' && contentObj.icon_class !== null) { %><%= contentObj.icon_class %><% } %>">
+                   						-->
+                   						</div>
+                   						<div class="col-md-1" id="showIconDiv" style="font-size:30px;">              						
+                   						</div>
+                   						<label class="control-label col-md-1" for="">Or </label>
+                   						<label class="control-label col-md-1" for="">Icon Image Path </label>
+                  						<div class="col-md-4 col-lg-3">
+                  							<input type="text" id="icon_path" name="icon_path" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.icon_path !== 'undefined' && contentObj.icon_path !== null) { %><%= contentObj.icon_path %><% } %>">
+                   						</div>
+                   						<div class="col-md-1">      
+                   							<a href="<%= backendDirectory %>/list/system_lists?keyword=icons-list" target="_blank" class="btn btn-danger btn-sm">+ Add new icon</a>				
+                   						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-1" for="">Table</label>
+                  						<div class="col-md-6 col-lg-3">
+                  							<select id="table" name="table" class="form-control col-md-5 col-xs-12" required="required">
+                   								
+                    						</select>
+                    					</div>
+                    					<div class="col-sm-3">
+    										<div class="checkbox" STYLE="float:left; margin-right:10px;">
+      		  									<label> <input type="checkbox" id="displayOnDashboard" name="displayOnDashboard" value="1" <% if (typeof contentObj.displayOnDashboard !== 'undefined' && contentObj.displayOnDashboard !== null && contentObj.displayOnDashboard == 1) { %>checked<% } %> > <strong style="font-weight:600">Display On Dashboard</strong></label>
+    			  							</div>
+										</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-1" for="">Sort Order</label>
+                  						<div class="col-md-6 col-lg-3">
+                   							<input type="text" class="form-control col-md-5 col-xs-12" id="sort_order" name="sort_order" value="<% if (typeof contentObj.sort_order !== 'undefined' && contentObj.sort_order !== null) { %><%= contentObj.sort_order %><% }else{ %>0<%	} %>">
+                  						</div>
+                				
+    									<div class="col-sm-3">
+    										<div class="checkbox" STYLE="float:left; margin-right:10px;">
+      		  									<label> <input type="checkbox" id="active" name="active" value="1" <% if (typeof contentObj.active !== 'undefined' && contentObj.active !== null && contentObj.active == 1) { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  							</div>
+										</div>
+									</div>
+									<div CLASS="ROW ">
+										<div CLASS="col-md-12 itemsContent" STYLE="margin-left:13px;">
+											<span style="float:right; font-weight:bold;">
+												<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal" style="margin-bottom: 10px;">+ Add new Item</button>
+											</span>
+										</div>
+									</div>
+									<div CLASS="row">
+										<div class="itemsContent col-md-12" id="itemsTable">
+    										<label for="" class="col-lg-1 col-sm-12 control-label" STYLE="padding-left:0px;"> Add Links</label>
+    										<div >
+												<input type="hidden" id="module_items" name="module_items" value="">
+												<div CLASS="table-responsive">
+										   		<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint">
+													<thead>
+												  		<tr class="item">
+												  			<th>&nbsp;</th>
+												  			<th>Label</th>
+													  		<th>Link</th>
+													 		<th>Sort Order</th>
+													  		<th>Target</th>
+													  		<th>Status</th>
+													  		<th colspan="2" align="center">Actions</th>
+													  	</tr>
+											  	</thead>
+											  	<tbody id="link_items">
+											  		<% if (typeof contentObj.module_items !== 'undefined' && contentObj.module_items !== null  && contentObj.module_items != "") { 	
+											  			try{
+															var module_items = JSON.parse(contentObj.module_items); 
+        												}	catch (error){
+       														var module_items =  contentObj.module_items; 
+    													} 
+											  			for(var i=0; i< module_items.length; i++){	%>
+											  			<tr class="itemClass item_<%= module_items[i].uuid %>">
+											  				<td><input type="checkbox" value="<%= module_items[i].uuid %>" id="Select" class="check itemtr_<%= module_items[i].uuid %>" name="Select"></td>
+											  				<td id="label"><%= module_items[i].label %></td>
+											  				<td id="link"><%= module_items[i].link %></td>
+											  				<td id="sort_order"><%= module_items[i].item_sort_order %></td>
+															<td id="target"><%= module_items[i].target %></td>
+															<td id="status"><%= module_items[i].status %></td>
+															<td><a href="javascript:void(0)" title="Edit" onClick="edit_item('<%= module_items[i].uuid %>')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item('<%= module_items[i].uuid %>')" title="Remove"><i class="fa fa-trash"></i></a></td>
+														</tr>
+			
+											  	<%	}
+											  }	%>
+											  </tbody>
+											</table>
+											<span style="float:right;font-size:12px;font-style:italic;color:#d9534f">Note: Please submit the form to save the changes!</span>
+											</div>
+											
+										</div>
+									</div>
+									</div>
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-6" align="center">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/modules" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+              					</form>
+              				</div>
+            			</div>
+
+    		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <button type="button" class="close" 
+                   data-dismiss="modal" onClick="resetItemForm()">
+                       <span aria-hidden="true">&times;</span>
+                       <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    Add link
+                </h4>
+            </div>
+			
+			<style>
+			.form-group {
+    			margin-bottom: 15px;
+    			overflow: hidden;
+			}
+			</style>
+            
+            <!-- Modal Body -->
+            <div class="modal-body">
+            	<div class="form-group" id="messageId">
+                    <label for="item_label"><strong>Label</strong><span class="f_req">*</span></label>
+                      <input class="form-control" id="item_label" placeholder="Enter label"/>
+                      <input type="hidden" class="form-control" id="item_uuid"/>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="item_type" id="itemlinklabel"><strong>Form Type</label>
+                	<select id="form_type" class="itemTargetDivClass form-control" style="margin-right:37px;">
+						<option value='manual'>Add manually</option>
+						<option value='defined'>Defined admin templates</option>
+					</select>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="item_type" id="itemlinklabel" class="col-md-12" style="padding-left:0px;"><strong>Link</strong><span class="f_req">*</span></label>
+                	<div class=" col-md-2 col-sm-4" style="padding-left:0px;"><input type="button" class="form-control" id="item_prefix_link" value="/"/></div>
+                	<div class=" col-md-10 col-sm-8" style="padding-left:0px;padding-right:0px;">
+                		<input type="text" class="form-control" id="item_link" name="item_link" placeholder="Link"/>
+                	</div>
+                  </div>
+                  
+                 <div class="form-group" style="margin-top:5px;">
+                 <label >   <span for="item_type"><strong>Sort Order</strong></span></label>
+                	<input type="" class="form-control" id="item_sort_order" placeholder="Sort Order" value="0"/>
+                  </div>
+                  <div class="form-group">
+                    <label for="item_type" class="itemTargetDivClass"><strong>Target</strong></label>
+                	<select name="item_target" id="item_target" class="itemTargetDivClass form-control" style="margin-right:37px;">
+						<option value='1'>Open in same tab</option>
+						<option value='0'>Open in new window</option>
+					</select>
+					</div>
+					
+					 <div class="form-group">
+					
+                   <LABEL> <span for="item_type"><strong>Status</strong></span></LABEL>
+                	<select name="item_active" id="item_active"  class="form-control">
+						<option value='1'>Active</option>
+						<option value='0'>Inactive</option>
+					</select>
+                  </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onClick="resetItemForm()">
+                	Close
+                </button>
+                <button type="button" class="btn btn-primary" onClick="savelinkitem()">
+                    Add
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	
+
+<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/jquery.validate.js"></script>
+<script>
+function showIcon(val){
+	$("#showIconDiv").html('<i class="'+val+'"></i>');
+}
+$(document).ready(function(){
+	$("#form_type").change(function(){
+		$('#item_link').val('');
+		if(this.value=="defined")	{
+			$("#item_prefix_link").val("/list/");
+			$('#item_defined_link').show();
+			$("#item_link").replaceWith('<select id="item_link" name="item_link" class="form-control"></select>');
+			fetch_admin_templates();
+		} else {
+			$("#item_prefix_link").val("/");
+			$("#item_link").replaceWith('<input type="text" class="form-control" id="item_link" name="item_link" placeholder="Link"/>');
+		}
+	});
+	returnAllCollections();
+	
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name: { required: true },
+				code: { required: true }
+			},
+			submitHandler: function(form) {
+				generateObjectJson();
+ 				dataAsJson('contentForm', form);
+ 			}
+		});		
+	fetch_default_list("icons-list", "<% if (typeof contentObj.icon_class !== 'undefined' && contentObj.icon_class !== null) { %><%= contentObj.icon_class %><% } %>","icon_class");
+});
+function fetch_admin_templates(){
+	var jsonRow=backendDirectory+"/api_fetch_list?limit=all&collection=system_templates";
+	$.getJSON(jsonRow,function(html){
+		var contentHtml="<option value=''></option>";
+		if(html.aaData.length>0){
+			$.each(html.aaData, function(i,row){
+				contentHtml+="<option value='"+row.code+"' >"+row.code+"</option>";
+			});
+     	}
+		$("#item_link").html(contentHtml);
+	});
+}
+function returnAllCollections(){
+	$("#table").html('');
+	var jsonRow=backendDirectory+"/api_fetch_collections";
+	var sVal="<% if (typeof contentObj.table !== 'undefined' && contentObj.table !== null) { %><%= contentObj.table %><% } %>";
+	
+		$.getJSON(jsonRow,function(aaData){
+			var contentHtml="<option value=''>--Select--</option>";
+			if(aaData.length>0){
+					$.each(aaData, function(i,row){
+						contentHtml+="<option value='"+row+"' ";
+						if(sVal==row){
+							contentHtml+="selected";
+						}
+						contentHtml+=" >"+row+"</option>";
+					});
+     		}
+			$("#table").html(contentHtml);
+
+		});
+}
+
+function generateObjectJson(){
+	var createArr=new Array();
+	var i=0;
+	$('.itemClass').each(function(){
+		var createObject={};
+		var uuid=$(this).find('#Select').val();
+  		createObject['uuid']=$(this).find('#Select').val();
+  		createObject['label']=$(this).find('#label').html();
+  		createObject['link']=$(this).find('#link').html();
+  		var sortORderNum=$(this).find('#sort_order').html();
+  		
+  		if(sortORderNum=="" || sortORderNum==null || sortORderNum === 'undefined'){
+  			sortORderNum=0;
+  		}
+  		createObject['item_sort_order']=sortORderNum;
+  		createObject['status']=$(this).find('#status').html();
+  		createObject['target']=$(this).find('#target').html();
+  		createArr[i]=createObject;
+  		i++;
+  	});
+  	$("#module_items").val(JSON.stringify(createArr));
+}
+function remove_item(e){
+	if(e!=""){
+		$(".itemtr_"+e).parents('.itemClass').remove();
+	}
+}
+
+function edit_item(e){
+	if(e!=""){
+		var row= $(".itemtr_"+e).parents('.itemClass');	
+		var label=row.find('#label').html();
+		var tempLinkStr = row.find('#link').html(), temp_prefix_link='/';
+		var tempPositionNum=tempLinkStr.lastIndexOf("/");
+		if(tempPositionNum>=0){
+			tempPositionNum = tempPositionNum+1;
+			if(tempPositionNum==0){
+				$("#form_type").val("manual");
+			} else {
+				$("#form_type").val("defined");
+			}
+			temp_prefix_link = tempLinkStr.substr(0, tempPositionNum);
+			tempLinkStr = tempLinkStr.substr(tempPositionNum);
+		}
+		$("#item_uuid").val(e);
+		$("#item_sort_order").val(row.find('#sort_order').html());
+		$("#item_target").val(row.find('#target').html());
+		$("#item_label").val(row.find('#label').html());
+		$("#item_prefix_link").val(temp_prefix_link);
+		$("#item_link").val(tempLinkStr);
+		$('#myModal').modal('show'); 
+	}
+}
+
+function savelinkitem(){
+	$("#msgSpan").remove();
+	var item_uuid=$("#item_uuid").val();
+	var item_label=$("#item_label").val();
+	var item_prefix_link=$("#item_prefix_link").val();
+	var temp_item_link=$("#item_link").val();
+	var item_sort_order=$("#item_sort_order").val();
+	var item_target=$("#item_target").val();
+	var item_active=$("#item_active").val();
+	var item_link= item_prefix_link+temp_item_link;
+	
+	if(item_label!="" && item_link!=""){
+		
+		var itemStatus="Inactive";
+		if(item_active==1){
+			itemStatus="Active";
+		}
+			if(item_uuid==""){
+				item_uuid=guid();
+				var htmlStr='<tr class="itemClass item_'+item_uuid+'"><td><input type="checkbox" value="'+item_uuid+'" id="Select" class="check itemtr_'+item_uuid+'" name="Select"></td><td id="label">'+item_label+'</td><td id="link">'+item_link+'</td><td id="sort_order">'+item_sort_order+'</td>';
+				htmlStr+='<td id="target">'+item_target+'</td><td id="status">'+itemStatus+'</td><td><a href="javascript:void(0)" title="Edit" onClick="edit_item(\''+item_uuid+'\')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item(\''+item_uuid+'\')" title="Remove"><i class="fa fa-trash"></i></a></td></tr>';
+			
+				$("#link_items").append(htmlStr);
+				//$("#contentField_"+item_uuid).val(item_link);
+			}else{
+				var htmlStr='<td><input type="checkbox" value="'+item_uuid+'" id="Select" class="check itemtr_'+item_uuid+'" name="Select"></td><td id="label">'+item_label+'</td><td id="link">'+item_link+'</td><td id="sort_order">'+item_sort_order+'</td>';
+				htmlStr+='<td id="target">'+item_target+'</td><td id="status">'+itemStatus+'</td><td><a href="javascript:void(0)" title="Edit" onClick="edit_item(\''+item_uuid+'\')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item(\''+item_uuid+'\')" title="Remove"><i class="fa fa-trash"></i></a></td>';
+			
+				$(".item_"+item_uuid).html(htmlStr);
+				//$("#contentField_"+item_uuid).val(item_link);
+			}
+			generateObjectJson();
+			$('#myModal').modal('hide');
+			resetItemForm();
+			
+			
+	}else{
+		$("#messageId").before('<span id="msgSpan" style="color:#CC0000;">Please add all the required fields!</span>');
+	}	
+}		
+function resetItemForm(){
+	$("#msgSpan").remove();
+	$("#item_uuid").val("");
+	$("#item_label").val('');
+	$("#form_type").val('manual');
+	$("#item_link").val('');
+	$("#item_prefix_link").val('/');
+	$("#item_sort_order").val(0);
+	$("#item_target").val(1);
+	$("#item_active").val(1);
+	$("#item_link").replaceWith('<input type="text" class="form-control" id="item_link" name="item_link" placeholder="Link"/>');
+}
+</script>
+</body>
+</html>

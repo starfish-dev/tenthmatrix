@@ -1,0 +1,52 @@
+<% include include/main-header %>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Monitoring</h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Monitoring</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row" id="drawIframeID" style="padding:20px;">
+      				
+      			</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script>
+$(document).ready(function() {
+    	var processedArrNum=0;
+		var linksArr= new Array('http://80.229.115.189:3012/', 'http://80.229.115.189:3002/', 'http://80.229.115.189:3004/', 'http://80.229.115.189:3000/');
+      	function myFunction () {
+    		$("#drawIframeID").html(' <iframe src="'+linksArr[processedArrNum]+'" style="width:100%;height:800px"></iframe> ');
+    		if((linksArr.length-1)==processedArrNum){
+    			processedArrNum=0;
+    		}else{
+    			processedArrNum++;
+    		}
+		}
+		myFunction();
+		var interval = setInterval(function () { myFunction(); }, 60000);
+    });
+</script>
+</body>
+</html>

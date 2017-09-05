@@ -1,0 +1,312 @@
+<% include include/main-header %>
+<% 
+var currentTemplateStr= "";
+if (typeof currentTemplate !== 'undefined' && currentTemplate !== null) {
+	currentTemplateStr=currentTemplate;
+}
+var keywordStr="";
+if (typeof searched_keyword !== 'undefined' && searched_keyword !== null) {
+	keywordStr=searched_keyword;
+}
+
+%>
+
+<!-- page specific css -->
+<link rel="stylesheet" href="css/basictable.css">
+<style>
+.alert{
+margin:10px;
+}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+
+  		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  		<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1 id="pageMainHeading">
+        Images Gallery
+        <small>Control panel</small>
+      </h1>
+      <ol class="breadcrumb">
+        <% include include/dashboard-breadcrumb %>
+        <li class="active" id="breadcrumbTitle">Images Gallery</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+	<section class="content">
+		<div CLASS="row">
+			<div class="clearfix hidden-xs">
+				<div class="col-md-6" style="">
+					<div class="btn-group">
+           			 	<a href="javascript:void(0)" onClick="__changeView('list'); return false;" id="list" class="btn btn-default btn-sm viewClass"><span class="glyphicon glyphicon-th-list"></span> List</a>
+           			 	&nbsp;<a href="javascript:void(0)" onClick="__changeView('grid'); return false;" id="grid" class="btn btn-default btn-sm viewClass active"><span class="glyphicon glyphicon-th"></span> Grid</a>
+        			</div>
+					
+					<span class="display_records_count" style="font-weight:bold;"></span>
+				</div>
+				<div class="col-md-6 text-right">
+      				<div class="form-group no-margin">
+     					<div class="pull-right margin-bottom-10 ">
+							<div class="form-inline" style="">                 	          
+                 				<div class="btn-inline display-inline-block">
+									<input class="form-control searchFieldClass" style="min-width:225px; height:36px;" required id="searchField" placeholder="Search here..." value="<%= keywordStr %>">
+									<button class="btn btn-left-align btn-link no-shadow bg-transparent no-padding-top padding-right-10 right-auto left" type="button" id="searchBtn" title="Search"><i class="glyphicon glyphicon-search"></i></button>
+								</div>
+                				<button class="btn btn-primary btn-circle" type="button" onclick="refresh_data()" title="Clear search term">  <i class="fa fa-refresh"></i></button>
+              				</div>
+         				</div>
+      				</div>
+				</div>
+			</div>
+				<div class="visible-xs" >
+
+					<div class="col-md-6 display_records_count" style="font-weight:bold;float:left;"></div>
+					<div class="col-md-6 btn-group" style="float:right;margin-bottom:10px;">
+           			 	<a href="javascript:void(0)" onClick="__changeView('list'); return false;" id="list" class="btn btn-default btn-sm viewClass"><span class="glyphicon glyphicon-th-list"></span> List</a>
+           			 	&nbsp;<a href="javascript:void(0)" onClick="__changeView('grid'); return false;" id="grid" class="btn btn-default btn-sm viewClass active"><span class="glyphicon glyphicon-th"></span> Grid</a>
+        			</div>
+
+					<div class="col-lg-6 col-sm-12 col-xs-12" style="margin-bottom:10px;">
+						<form class="form-inline" method="get" action=""> 
+							<input class="form-control xs-margin-btm10 searchFieldClass" required id="smallSearchField" name="keyword" placeholder="Search..." type="text" value="<%= keywordStr %>">
+                     	</form>
+                    </div>
+				</div>
+			</div>
+		<div class="row">
+	  		<div class="content table-responsive table-full-width" id="display_content_div">
+		 		<div class="table-responsive" style="border:none;display:none;" id="listViewUI">
+		 			<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint"  style="background-color: rgb(255, 255, 255); border-radius: 4px;" >
+                    	<thead><th>File</th><th>File Name</th><th>File Type</th><th>Created On</th><th>Action</th></thead>
+                    	<tfoot><th>File</th><th>File Name</th><th>File Type</th><th>Created On</th><th>Action</th></tfoot>
+                    	<tbody id="documents_data"></tbody>
+                    </table>
+                </div>
+				<div id="gridViewUI">
+		 			
+                </div>	
+			</div>
+			<div style="text-align:center; display:none;" id="display_more_btn">
+				<a style="width: 60%; margin-bottom: 10px;" class="btn palette-carrot btn-danger" title="Load more" onclick="load_more()" href="javascript:void(0);">
+					Load more
+				</a>
+        	</div>
+        	<div style="text-align:center" id="img_loading_div">
+				Loading...<br /> <img id="imgAjaxLoading" src="img/loading.gif" width="109" height="25" style="border-width: 0px;">
+			</div>
+		<!-- right col -->
+      </div>
+      <!-- /.row (main row) -->
+	</section>
+</div>
+ 
+ <!--//Main Content--> 
+	<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+<script src="js/basictable.js"></script>
+<script type="text/javascript">
+var templateStr="fs.files", searchStr="<%= keywordStr %>", displayedViewStr='grid';
+
+<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
+var	access_right="<%= authenticatedUser.access_right %>";
+<% }	else{	 %>
+var access_right=0;
+<% } %>
+var xhrStatus;
+var pageSize=10, totalNum=0, totalDisplayedNum=0, checkAllFlag= false;
+var start=0, end=pageSize;
+var accessRightCode=parseInt(access_right);
+var complete=false, completeScroll=false;
+
+function __changeView(val)	{
+	$('.viewClass').removeClass('active');
+	$('#'+val).addClass("active");
+	displayedViewStr=val;
+	$('#listViewUI').hide();
+	$('#gridViewUI').hide();
+	
+	if(displayedViewStr=="list") {
+		$('#listViewUI').show();
+	}	else	{
+		$('#gridViewUI').show();
+	}
+	refresh_data();
+}
+	function searchKeyword(e){
+		var searchField= $("#"+e).val();
+		if(searchField!=""){
+			totalDisplayedNum=0;
+			if(displayedViewStr=="list") {
+				$('#table-breakpoint').basictable('destroy');
+			}
+			$("#documents_data").html('');
+			$('#gridViewUI').html('');
+			$("#"+e).removeClass("errorPlaceHolder");
+			$('#display_more_btn').hide();
+			$('#img_loading_div').show();
+			searchStr=searchField;
+			start=0;
+			end=start+pageSize;
+			load_data();
+		}else{
+			$("#"+e).addClass("errorPlaceHolder");
+			$("#"+e).attr("placeholder" , "Please enter search term here");
+			$("#"+e).focus();
+		}
+	}
+	
+    $(document).ready(function() {
+    	$('#table').basictable();
+    	
+    	$('#display_more_btn').hide();
+		$('#img_loading_div').show();
+		load_data();
+		
+		$("#searchBtn").click(function()	{
+			searchKeyword('searchField');
+		});
+		
+		$('#searchField').keypress(function (e) {
+  			if (e.which == 13) {
+    			searchKeyword('searchField');
+  			}
+		});
+		$("#searchBtn").click(function()	{
+			searchKeyword('searchField');
+		});
+
+		$(window).scroll(function(){
+			if ($(window).scrollTop() == $(document).height() - $(window).height()){
+				if(complete==false && completeScroll==false) {
+					load_more();
+				}
+			}
+		});	
+	});
+
+function refresh_data(){
+	totalDisplayedNum=0;
+	if(displayedViewStr=="list") {
+		$('#table-breakpoint').basictable('destroy');
+	}
+	searchStr="";
+	$(".searchFieldClass").val("");
+	$("#documents_data").html('');
+	$('#gridViewUI').html('');
+	$('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	start=0;
+	end=start+pageSize;
+	load_data();
+}
+function load_more(){
+	if(displayedViewStr=="list") {
+		$('#table-breakpoint').basictable('destroy');
+	}
+	$('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	if(start==0)	{
+		start=end+1;
+	} else{
+		start=end;
+	}
+	end=start+pageSize;
+	load_data();
+}
+	
+	function load_data(){
+		completeScroll=true;
+		$(".alert").remove();
+		var jsonRow=backendDirectory+"/api_fetch_list?start="+start+"&limit="+pageSize+"&collection="+templateStr+"&s="+searchStr;
+		if(xhrStatus) xhrStatus.abort();
+		xhrStatus=$.getJSON(jsonRow,function(html){
+			if(html.error){
+				complete=true;
+				$(".topOptionsClass").hide();
+				$("#display_content_div").before('<div class="alert alert-danger">'+html.error+'</div>');
+			}else{
+				var editorPage="javascript:void(0)";
+				
+				if(html.total){
+					totalNum=parseInt(html.total);
+				} else {
+					totalNum=0;
+				}
+				if(html.iTotalRecordsReturned){
+					totalDisplayedNum=totalDisplayedNum+parseInt(html.iTotalRecordsReturned);
+				}
+				if(totalDisplayedNum>0 && totalNum>0){
+					$(".display_records_count").html("Showing "+totalDisplayedNum+" out of "+totalNum);
+					$(".display_records_count").show();
+				}else{
+					$(".display_records_count").hide();
+				}			
+				if(html.aaData.length>0){
+					var mainContentHtml='', contentHtml="";
+					$.each(html.aaData, function(i,row){
+						var imageNameStr= row.filename;
+						if(row.metadata && row.metadata.originalname && row.metadata.originalname!=""){
+							imageNameStr= row.metadata.originalname;
+						}
+						
+						var imageStr='', noImageStr= backendDirectory+'/images/no_image.png';
+						if(row.metadata && row.metadata.uuid && row.metadata.uuid!=""){
+							imageStr=backendDirectory+"/file/"+row.metadata.uuid+'?'+$.now();
+						}
+						if(displayedViewStr=="list") {
+							contentHtml+='<tr><td><img src="'+imageStr+'" class="img-responsive" style="border-radius: 0 0 3px 3px; border: 1px solid #ddd;" width=100" onerror="this.src=\''+noImageStr+'\'"/></td><td>'+imageNameStr+'</td><td>'+row.contentType+'</td><td>'+row.uploadDate+'</td>';
+							contentHtml+='<td class="actions-list"><a href="image?_id='+row._id+'" title="Edit '+imageNameStr+'"><i class="fa fa-pencil"></i></a></td></tr>';
+						}	else	{
+							contentHtml+='<div class="item col-lg-3 col-sm-6 col-xs-12"><div class="thumbnail" style="overflow:hidden;">';
+                			contentHtml+='<img style="height:250px; width:300px;" class="group list-group-image" src="'+imageStr+'" onerror="this.src=\''+noImageStr+'\'"/><span style="float:left;font-weight:bold">'+imageNameStr+'</span><a style="float:right;" href="image?_id='+row._id+'" title="Edit '+imageNameStr+'"><i class="fa fa-pencil"></i></a>';
+             				contentHtml+='</div></div>';
+						}
+					});
+					if(displayedViewStr=="list") {
+						//var headFootStr='<th>File</th><th>File Name</th><th>File Type</th><th>Created On</th><th>Action</th>';
+						//var mainContentHtml='<div class="table-responsive" style="border:none;" ><table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint"  style="background-color: rgb(255, 255, 255); border-radius: 4px;" >';
+                    	//mainContentHtml+='<thead>'+headFootStr+'</thead><tfoot>'+headFootStr+'</tfoot><tbody>'+contentHtml+'</tbody></table></div>';
+						$("#documents_data").append(contentHtml);
+					}else{
+						$("#gridViewUI").append(contentHtml);
+					}
+					if(html.total && html.iTotalRecordsReturned && html.iTotalRecordsReturned==html.total){
+						complete=true;
+					}else{
+						complete=false;
+					}
+     			}else{
+     				complete=true;
+					$("#display_content_div").before('<div class="alert alert-danger alert-dismissable"><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>No more records found!</div>');
+     			}
+     			if(displayedViewStr=="list") {
+     				//initialize table
+					$('#table-breakpoint').basictable({
+        				breakpoint: 751
+     				});
+     			}
+			}
+			
+			if(end< totalNum){
+				$('#display_more_btn').show();
+			}
+			$('#img_loading_div').hide();
+			completeScroll=false;
+		});
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+/*
+ * jQuery Basic Table
+ * Author: Jerry Low
+ */
+
+table.bt thead,
+table.bt tbody th {
+  display: none;
+}
+table.bt tbody tr{
+	margin-bottom:10px!important;
+}
+
+table.bt tfoot th,
+table.bt tfoot td,
+table.bt tbody td {
+ /* border: none;*/
+  display: block;
+  vertical-align: top;
+  
+}
+/*table.bt  th {
+  background:#f00;
+}*/
+
+
+table.bt tfoot th:before,
+table.bt tfoot td:before,
+table.bt tbody td:before {
+  content: attr(data-th) ": ";
+  font-weight: bold;
+  width: 6.5em;
+  display: inline-block;
+}
+
+table.bt tfoot th.bt-hide,
+table.bt tfoot td.bt-hide,
+table.bt tbody td.bt-hide {
+  display: none;
+}
+
+table.bt tfoot th .bt-content,
+table.bt tfoot td .bt-content,
+table.bt tbody td .bt-content {
+  vertical-align: top;
+}
+
+
+.bt-wrapper.active {
+  max-height: 310px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+	.bt-content{
+		white-space:normal;
+	}
+	
+   @media only screen and (max-width: 768px) {
+  table,tbody {
+  background: white;
+  border-collapse: collapse!important;
+  margin:0 0;
+  width: 100%;
+  border:none;
+}
+
+
+table tr,
+table th,
+table td {
+  border: none;
+  
+}
+
+table th,
+table td {
+  padding: 10px 12px;
+  text-align: left;
+}
+
+table th {
+  background: #3498db;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+table tr td {
+  background: #eaf3f5;
+  color: #999999;
+    }
+
+table tr:nth-of-type(2n+2) td {
+  background: #ffffff;
+}
+
+table.bt tfoot {
+	display:none;
+}
+table.bt tfoot th,
+table.bt tfoot td,
+table.bt tbody td {
+    padding: 0;
+
+	 background: #444;
+	
+	
+}
+
+table.bt tfoot th:before,
+table.bt tfoot td:before,
+table.bt tbody td:before {
+ 
+  color:#fff;
+  font-weight:normal;
+  padding:15px 10px;
+  width:30%;
+  vertical-align:middle;
+  font-weight:600;
+
+}
+
+table.bt tfoot th .bt-content,
+table.bt tfoot td .bt-content,
+table.bt tbody td .bt-content {
+  display: inline-block;
+  padding: 15px 10px;
+  width:70%;
+  background:#f9f9f9;
+  color:#000;
+}
+
+/*table.bt tfoot th:first-of-type:before,
+table.bt tfoot th:first-of-type .bt-content,
+table.bt tfoot td:first-of-type:before,
+table.bt tfoot td:first-of-type .bt-content,
+table.bt tbody td:first-of-type:before,
+table.bt tbody td:first-of-type .bt-content {
+  padding-top: 10px;
+}
+
+table.bt tfoot th:last-of-type:before,
+table.bt tfoot th:last-of-type .bt-content,
+table.bt tfoot td:last-of-type:before,
+table.bt tfoot td:last-of-type .bt-content,
+table.bt tbody td:last-of-type:before,
+table.bt tbody td:last-of-type .bt-content {
+  padding-bottom: 10px;
+}*/
+table.bt tbody tr{
+    margin-bottom: 10px!important;
+	display: block; 
+}
+   }
+   
+   
+   

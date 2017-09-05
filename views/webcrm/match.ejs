@@ -1,0 +1,451 @@
+<% include include/main-header %>
+
+<link rel="stylesheet" href="css/basictable.css">
+<link href="css/bootstrap-toggle.min.css" rel="stylesheet">
+<link href="plugins/datetime-picker/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<link rel="stylesheet" href="plugins/combobox/autocomplete-ui.css"/>
+<link rel="stylesheet" href="css/bootstrap.datepicker.css">
+<style>
+	.custom-combobox {
+		position: relative;
+		display: inline-block;
+		width: 272px;	
+	}
+	.custom-combobox-toggle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin-left: -1px;
+		padding: 0;
+	}
+	.custom-combobox-input {
+		margin: 0;
+		padding: 5px 10px;
+	}
+	.ui-widget-overlay {
+		position: fixed;
+	}
+	.newRowClass {
+		background-color: #f2dede !important;
+	}
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Match <small>Details</small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Match</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            				
+            					<form class="form-horizontal" action=""id="contentForm">
+            						<input type="hidden" id="fixture_id" name="fixture_id" value="<% if (typeof queryStr.fixture_id !== 'undefined' && queryStr.fixture_id !== null) { %><%= queryStr.fixture_id %><% } %>">
+            						<input type="hidden" id="event_uuid" name="event_uuid" value="<% if (typeof queryStr.uuid !== 'undefined' && queryStr.uuid !== null) { %><%= queryStr.uuid %><% } %>">
+            						<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Date/Time<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-2">
+                    						<input type="text" required="required" id="date_time" name="date_time" class="form-control col-md-5 col-xs-12 form_datetime" value="">
+                  						</div>
+                  						<label class="control-label col-md-1" for="first-name">Publish</label>
+                  						
+                  						<div class="col-md-6 col-lg-2">
+                  						<input id="publish_on_web" type="checkbox" class="toggleCheckbox">
+                  						</div>
+                					</div>
+            						              					
+                					<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Venue</label>
+                  						<div class="col-md-6 col-lg-4 ui-widget">
+                    						<select id="venue" name="venue" class="form-control combobox">
+                    						
+                    						</select>
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Type</label>
+                  						<div class="col-md-6 col-lg-4">
+                  							<select id="event_type" name="event_type" class="form-control" >
+                    						
+                    						</select>
+                  						</div>
+                					
+                  						<label class="control-label col-md-1" for="first-name">Overs</label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" id="total_overs" name="total_overs" class="form-control col-md-5 col-xs-12" value="">
+                  						</div>
+                					</div>
+                					<div class="form-group ">
+    										<label for="" class="col-sm-1 control-label">Toss won by</label>
+    										<div class="col-sm-9 tossClass" style="margin-top:6px;">
+    										
+											</div>
+										</div>
+									<div class="form-group teamsTableClass">
+                  						<label class="control-label col-md-1" for="first-name"></label>
+                  						<div class="col-md-5">
+                  							<h3 id="home_team">Home Team</h3>
+                  							<div class="table-responsive table-full-width">
+		 										<div class="table-responsive" style="border:none;" >
+                                					<table class="table table-striped  table-bordered table-hover custom-tbl-st bt table-breakpoint"  style="background-color: rgb(255, 255, 255); border-radius: 4px;" >
+                                						<thead>
+                                							<th>Innings</th>
+                                							<th>Over</th>
+                                       						<th>Score</th>
+                                       						<th>Wickets</th>
+                                       					</thead>
+                                   						<tbody id="documents_data">
+                                    						<tr>
+                                    							<td><input type="text" id="home_team_innings" class="form-control col-md-5 col-xs-12 isnum" value=""></td>
+                                    							<td><input type="text" id="home_team_over" class="form-control col-md-5 col-xs-12 isnum" value=""></td>
+                                    							<td><input type="text" id="home_team_score" class="form-control col-md-5 col-xs-12 isnum" value=""></td>
+                                    							<td><input type="text" id="home_team_wicket" class="form-control col-md-5 col-xs-12 isnum" value=""></td>
+                                    						</tr>
+                                    					</tbody>
+                                					</table>
+                                				</div>
+											</div>
+                  						</div>
+                  						
+                  						<div class="col-md-5">
+                  							<h3 id="away_team">Away Team</h3>
+                  							<div class="table-responsive table-full-width">
+		 										<div class="table-responsive" style="border:none;" >
+                                					<table class="table table-striped  table-bordered table-hover custom-tbl-st bt table-breakpoint"  style="background-color: rgb(255, 255, 255); border-radius: 4px;" >
+                                						<thead>
+                                							<th>Innings</th>
+                                							<th>Over</th>
+                                       						<th>Score</th>
+                                       						<th>Wickets</th>
+                                       					</thead>
+                                   						<tbody id="documents_data">
+                                    						<tr>
+                                    							<td id=""><input type="text" id="away_team_innings" class="form-control col-md-5 col-xs-12 isnum" value=""></td>
+                                    							<td id=""><input type="text" id="away_team_over" class="form-control col-md-5 col-xs-12 isnum" value=""></td>
+                                    							<td id=""><input type="text" id="away_team_score" class="form-control col-md-5 col-xs-12 isnum" value=""></td>
+                                    							<td id=""><input type="text" id="away_team_wicket" class="form-control col-md-5 col-xs-12 isnum" value=""></td>
+                                    						</tr>
+                                    					</tbody>
+                                					</table>
+                                				</div>
+											</div>
+                  						</div>
+                  					</div>
+                  					<div class="form-group ">
+    									<label for="" class="col-sm-1 control-label">Match Status</label>
+    									<div class="col-sm-5" style="margin-top:6px;">
+    										<select id="match_status" class="form-control">
+                    							<option value="">--Select--</option>
+                    							<option value="abandoned">Abandoned</option>
+                    							<option value="cancelled">Cancelled</option>
+                    							<option value="finished">Finished</option>
+                    							<option value="rain">Rain</option>
+                    						</select>
+                    						<!--
+    										<label> <input id="match_finished" value="true" type="checkbox"> <span style="font-weight:600">Match Finished</span></label>-->
+										</div>
+									
+    									<label for="" class="col-sm-1 control-label">Winner</label>
+    									<div class="col-sm-5 winnerClass" style="margin-top:6px;">
+    										
+										</div>
+									</div>
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-6" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Update details</button>
+               								<!--<button onClick="evaluate_results();return false;" class="btn btn-primary btn-color margin-right-5 btn-sm">Evaluate result</button>-->
+               							</div>
+               						</div>
+              					</form>
+              				</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/bootstrap-toggle.min.js"></script>
+<script src="js/basictable.js"></script>
+<script src="js/jquery.validate.js"></script>
+<script src="js/bootstrap.datepicker.js"></script>
+<script type="text/javascript" src="plugins/datetime-picker/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script src="plugins/combobox/autocomplete-ui.js"></script>
+<script src="scripts/matches.js"></script>
+<script>
+var eventDetailForm=true, defaultTotalOvers=50;
+$(document).ready(function(){
+	$('.isnum').keypress(function(e){
+		checknumber(e);	
+	});
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				date_time: { required: true },
+				total_overs: { number: true }
+			},
+			submitHandler: function(form) {
+ 				saveFixtureDetails();
+ 			}
+		});	
+		
+	$('#total_overs').val(defaultTotalOvers);
+		
+	load_teams();
+	load_fixture_type();
+		
+	loadFixtureEventDetails();
+		
+	$('#event_type').change(function(){
+		if($(this).val()==""){
+			$('#total_overs').val(defaultTotalOvers);
+		}else {
+			load_fixture_type_details($(this).val(), 'total_overs');
+		}
+	});
+	$('#match_status').change(function(){
+		$(".errorClass").remove();
+		if($(this).val()=="finished"){
+			evaluate_results();
+		}
+	});
+});
+
+function loadFixtureEventDetails(){	
+	var contentHTML="";
+	var jsonRow=backendDirectory+"/api_fetch_fixtures?id="+$('#fixture_id').val();
+	
+	if($('#event_uuid').val() && $('#event_uuid').val()!=""){
+		jsonRow+="&event_uuid="+$('#event_uuid').val();
+	}	
+	if(xhrStatus) xhrStatus.abort();
+	xhrStatus=$.getJSON(jsonRow,function(html){
+		if(html.aaData){
+			if(html.aaData.length>0){
+				var event_items = html.aaData[0];
+				if(event_items.date_time)	{
+					$("#date_time").val(datetime_picker_format(event_items.date_time));
+				}
+				if(event_items.venue_uuid && event_items.venue_name && event_items.venue_uuid!="" && event_items.venue_name!="")	{
+					$("#venue_uuid").html("<option value='"+event_items.venue_uuid+"' selected>"+event_items.venue_name+"</option>");
+				}	else {
+					load_venue();
+				}
+				var winnerHtml="", tossHtml="";
+				if(event_items.home_team_uuid && event_items.home_team_name && event_items.home_team_uuid!="" && event_items.home_team_name!="")	{
+					var tempName='Home Team: '+event_items.home_team_name+'&nbsp;<a target="_blank" href="'+backendDirectory+'/team?_id='+event_items.home_team_uuid+'&fixture='+$('#fixture_id').val()+'" title="Team details" style="position:relative;float:right;"><i class="fa fa-link"></i></a>';
+					var temp='<input type="hidden" id="home_team_uuid" value="'+event_items.home_team_uuid+'"><input type="hidden" id="home_team_name" value="'+event_items.home_team_name+'">';
+					$("#home_team").html(tempName);
+					$("#home_team").after(temp);
+					winnerHtml+='<div STYLE="margin-right:10px;display:inline-block;"><label> <input type="checkbox" id="winner" name="winner" value="'+event_items.home_team_uuid+'"> <span style="font-weight:600">'+event_items.home_team_name+'</span></label></div>';
+					tossHtml+='<div STYLE="margin-right:10px;display:inline-block;"><label> <input type="radio" id="toss_winner" name="toss_winner" value="'+event_items.home_team_uuid+'"> <span style="font-weight:600">'+event_items.home_team_name+'</span></label></div>';
+				}
+				if(event_items.away_team_uuid && event_items.away_team_name && event_items.away_team_uuid!="" && event_items.away_team_name!="")	{
+					var tempName='Away Team: '+event_items.away_team_name+'&nbsp;<a target="_blank" href="'+backendDirectory+'/team?_id='+event_items.away_team_uuid+'&fixture='+$('#fixture_id').val()+'" title="Team details" style="position:relative;float:right;"><i class="fa fa-link"></i></a>';
+					var temp='<input type="hidden" id="away_team_uuid" value="'+event_items.away_team_uuid+'"><input type="hidden" id="away_team_name" value="'+event_items.away_team_name+'">';
+					$("#away_team").html(tempName);
+					$("#away_team").after(temp);
+					winnerHtml+='<div STYLE="margin-right:10px;display:inline-block;"><label> <input type="checkbox" id="winner" name="winner" value="'+event_items.away_team_uuid+'"> <span style="font-weight:600">'+event_items.away_team_name+'</span></label></div>';
+					tossHtml+='<div STYLE="margin-right:10px;display:inline-block;"><label> <input type="radio" id="toss_winner" name="toss_winner" value="'+event_items.away_team_uuid+'"> <span style="font-weight:600">'+event_items.away_team_name+'</span></label></div>';
+				}
+				$('.winnerClass').html(winnerHtml);
+				$('.tossClass').html(tossHtml);
+				
+				if(event_items.publish_on_web==true || event_items.publish_on_web=="true")	{
+					$("#publish_on_web").prop("checked", true);
+				}
+				if(event_items.fixture_type_id)	{
+					$("#event_type").val(event_items.fixture_type_id);
+				}
+				if(event_items.total_overs && event_items.total_overs!="")	{
+					$("#total_overs").val(event_items.total_overs);
+				}
+				if(event_items.total_overs && event_items.total_overs!="")	{
+					$("#total_overs").val(event_items.total_overs);
+				}
+			}
+		}
+		fetch_results();	
+	});
+}
+
+function fetch_results(){
+	
+	var contentHTML="";
+	var jsonRow=backendDirectory+"/api_fetch_list?collection=results&findFieldName=event_uuid&findFieldValue="+$('#event_uuid').val();
+		
+	$.getJSON(jsonRow,function(html){
+		if(html.aaData){
+			if(html.aaData.length>0){
+				var scoresArr = html.aaData[0];
+				if(scoresArr.winner_team){
+					$("input[name='winner'][value='"+scoresArr.winner_team+"']").attr('checked', true);
+				}
+				if(scoresArr.toss_won_by){
+					$("input[name='toss_winner'][value='"+scoresArr.toss_won_by+"']").attr('checked', true);
+				}
+				if(scoresArr.home_team) {
+					var tempHomeObj=scoresArr.home_team;
+					if(tempHomeObj.team_id==$('#home_team_uuid').val()){
+						$('#home_team_score').val(tempHomeObj.score);
+  						$('#home_team_wicket').val(tempHomeObj.wickets);
+  						$('#home_team_over').val(tempHomeObj.playing_over);
+  						$('#home_team_innings').val(tempHomeObj.innings);
+					}
+				}
+				if(scoresArr.away_team) {
+					var tempAwayObj=scoresArr.away_team;
+					if(tempAwayObj.team_id==$('#away_team_uuid').val()){
+						$('#away_team_score').val(tempAwayObj.score);
+  						$('#away_team_wicket').val(tempAwayObj.wickets);
+  						$('#away_team_over').val(tempAwayObj.playing_over);
+  						$('#away_team_innings').val(tempAwayObj.innings);
+					}
+				}
+				if(scoresArr.match_status=="finished"){
+					$("#match_status").val(scoresArr.match_status);
+					evaluate_results();
+				}
+			}
+		}
+   		//initialize table
+		$('.table-breakpoint').basictable({
+  			breakpoint: 751
+		});				
+		basicInitialisations();		
+	});
+
+}
+
+function saveFixtureDetails(){
+	var publish_on_webFlag=false, winner_team='', toss_winner='';
+  	
+  	if($('#publish_on_web').is(":checked")){
+  		publish_on_webFlag=true;
+  	}
+  	if ($("input[name='toss_winner']:checked").val()) {
+    	toss_winner=$("input[name='toss_winner']:checked").val();
+    }
+    if ($("input[name='winner']:checked").val()) {
+    	winner_team=$("input[name='winner']:checked").val();
+    }
+  	if($('#home_team_name').val()!="" && $('#away_team_name').val()!="" && $('#date_time').val()!=""){
+  		var homeTeamArr=new Object(), awayTeamArr=new Object();
+  		homeTeamArr["name"]=$('#home_team_name').val();
+  		homeTeamArr["team_id"]=$('#home_team_uuid').val();
+  		homeTeamArr["score"]=$('#home_team_score').val();
+  		homeTeamArr["wickets"]=$('#home_team_wicket').val();
+  		homeTeamArr["playing_over"]=$('#home_team_over').val();
+  		homeTeamArr["innings"]=$('#home_team_innings').val();
+  		
+  		awayTeamArr["name"]=$('#away_team_name').val();
+  		awayTeamArr["team_id"]=$('#away_team_uuid').val();
+  		awayTeamArr["score"]=$('#away_team_score').val();
+  		awayTeamArr["wickets"]=$('#away_team_wicket').val();
+  		awayTeamArr["playing_over"]=$('#away_team_over').val();
+  		awayTeamArr["innings"]=$('#away_team_innings').val();
+  		
+  		var postContentURL=backendDirectory+"/saveMatchDetails";
+   		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: postContentURL,
+			data: {"action": "save", "save_scores": true, "fixture_id" : $('#fixture_id').val(), "uuid" : $('#event_uuid').val(), "date_time" : getTimestampFromDateTime($('#date_time').val()), "home_team_name" :$('#home_team_name').val(),
+			 "away_team_name" : $('#away_team_name').val(), "home_team_uuid": $('#home_team_uuid').val(), "away_team_uuid" : $('#away_team_uuid').val(), "venue_name" : $('#venue option:selected').text(), "winner_team" : winner_team, "toss_won_by" : toss_winner,
+			 "venue_uuid" : $('#venue').val(), "publish_on_web" : publish_on_webFlag, "match_status" : $("#match_status").val(), "fixture_type": $("#event_type option:selected").text(), "fixture_type_id": $("#event_type").val(), "total_overs" : $("#total_overs").val(), "home_team_results" : JSON.stringify(homeTeamArr), "away_team_results" : JSON.stringify(awayTeamArr)},
+			success: function(response){
+				if(response.success){
+					fetch_results();
+					__alertModalBox(response.success);
+				}else if(response.error){
+					__alertModalBox(response.error);
+				}
+			}
+		});
+	}else{
+		__alertModalBox('Please select date, home & away team!');
+	}
+}
+function checknumber(e)	{
+	var k = e.which;
+	/* numeric inputs can come from the keypad or the numeric row at the top */
+	 if ((k<48 || k>57) && (k!=46) && (k!=8) && (k!=0)) {
+		e.preventDefault();
+		return false;
+	}
+}
+	
+function evaluate_results(){
+	$(".errorClass").remove();
+	var match_finishedBool=false;
+	if($('#match_status').val()=="finished"){
+  		match_finishedBool=true;
+  	}
+  	
+  	if(match_finishedBool){
+  		var resultMsgStr='', winnerTeam='';
+  		if($('#home_team_score').val()!="" && $('#away_team_score').val()!="" && parseInt($('#home_team_score').val())>parseInt($('#away_team_score').val())){
+  			resultMsgStr= $('#home_team_name').val()+" won by ";
+  			winnerTeam = $('#home_team_uuid').val();
+  			if(parseInt($('#home_team_innings').val()) > parseInt($('#away_team_innings').val())){
+				resultMsgStr += 10-parseInt($('#home_team_wicket').val())+" wickets";
+			}	else {
+				resultMsgStr += parseInt($('#home_team_score').val())-parseInt($('#away_team_score').val())+" runs";
+			}
+  		} else if($('#home_team_score').val()!="" && $('#away_team_score').val()!="" && parseInt($('#home_team_score').val())<parseInt($('#away_team_score').val())){
+  			winnerTeam = $('#away_team_uuid').val();
+  			resultMsgStr= $('#away_team_name').val()+" won by ";
+  			if(parseInt($('#away_team_innings').val()) > parseInt($('#home_team_innings').val())){
+				resultMsgStr += 10-parseInt($('#away_team_wicket').val())+" wickets";
+			}	else {
+				resultMsgStr += parseInt($('#away_team_score').val())-parseInt($('#home_team_score').val())+" runs";
+			}
+  		} else if($('#home_team_score').val()!="" && $('#away_team_score').val()!="" && $('#home_team_score').val()==$('#away_team_score').val()){
+  			resultMsgStr= " Match draw";
+  		}
+  		
+  		if(winnerTeam){
+			$("input[name='winner'][value='"+winnerTeam+"']").attr('checked', true);
+		}
+		
+		if(resultMsgStr!=""){
+			$('.teamsTableClass').before('<div class="form-group errorClass"><label class="col-sm-1 control-label" for="">&nbsp;</label><div class="col-md-10"><div class="alert alert-success">'+resultMsgStr+'</div></div></div>');
+		}
+	}
+}
+</script>
+</body>
+</html>

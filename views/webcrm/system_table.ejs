@@ -1,0 +1,162 @@
+<% include include/main-header %>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Table <small><% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Table details</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+      						<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            				
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/system_table" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="system_tables">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="table">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						
+            						<div class="form-group">
+                  						<label class="control-label col-md-2" for="first-name">Table Name<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" required="required" id="table" name="table" class="form-control col-md-5 col-xs-12" onblur="fetch_table_fields();" onkeyup="fetch_table_fields();" value="<% if (typeof contentObj.table !== 'undefined' && contentObj.table !== null) { %><%= contentObj.table %><% } %>">
+                  						</div>
+                					</div>
+              						<div CLASS="ROW ">
+									<div CLASS="col-md-12">
+										<span style="float:right; font-weight:bold;">
+											<button type="button" class="btn btn-info" onClick="add_new_field();" style="margin-bottom: 10px;">+ Add new field</button>
+										</span>
+									</div>
+									</div>
+									<div CLASS="row">
+									
+									<div class="col-md-12" id="fieldsTable">
+    									<label for="" class="col-lg-2 col-sm-12 control-label" STYLE="padding-left:0px;">Table Fields</label>
+    									<input type="hidden" id="fields" name="fields" value="">
+										<div CLASS="table-responsive">
+										   	<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint">
+												<thead>
+												  <tr class="item">
+												  	  <th>Field name</th>
+													  <th colspan="2" align="center">Remove</th>
+												  </tr>
+											  </thead>
+											  <tbody id="table_fields">
+											 
+											  </tbody>
+											</table>
+											<span style="float:right;font-size:12px;font-style:italic;color:#d9534f">Note: Please submit the form to save the changes!</span>
+										</div>
+									</div>
+                					
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-6" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/system_tables" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+              					</form>
+              				</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/jquery.validate.js"></script>
+<script>
+function add_new_field(){
+	var newTrId=guid();
+	var newTrStr='<tr id="itemtr_'+newTrId+'"><td><input id="field_'+newTrId+'" type="text" class="form-control fieldsClass"></td><td><a href="javascript:void(0)" onClick="remove_item(\''+newTrId+'\')" title="Remove"><i class="fa fa-trash"></i></a></td></tr>';
+	$("#table_fields").prepend(newTrStr);
+	$('#field_'+newTrId).focus();
+}
+
+function generateObjectJson(){
+	var createArr=new Array();
+	var i=0;
+	$('.fieldsClass').each(function(){
+		createArr[i]=$(this).val();
+  		i++;
+  	});
+  	$("#fields").val(JSON.stringify(createArr));
+}
+
+function remove_item(e){
+	if(e!=""){
+		$("#itemtr_"+e).remove();
+	}
+}
+
+$(document).ready(function(){
+	fetch_table_fields();
+	
+		// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				table: { required: true }
+			},
+			submitHandler: function(form) {
+				generateObjectJson();
+ 				dataAsJson('contentForm', form);
+ 			}
+		});	
+});
+var xhr;
+function fetch_table_fields(){
+	var fieldsTableHtml="";
+	if($('#table').val()){
+		if(xhr) xhr.abort();
+		xhr=$.getJSON("<%= backendDirectory %>/fetchTableColumns?e="+$('#table').val(),function(response){
+			$.each(response, function(i,col){
+				var newTrId=guid();
+				fieldsTableHtml+='<tr id="itemtr_'+newTrId+'"><td><input id="field_'+newTrId+'" type="text" class="form-control fieldsClass" value="'+col+'"></td><td><a href="javascript:void(0)" onClick="remove_item(\''+newTrId+'\')" title="Remove"><i class="fa fa-trash"></i></a></td></tr>';
+			});
+			$("#table_fields").html(fieldsTableHtml);
+		});
+	}
+}
+</script>
+</body>
+</html>

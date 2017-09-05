@@ -1,0 +1,1249 @@
+<% include include/main-header %>
+
+<link rel="stylesheet" href="css/basictable.css">
+<link rel="stylesheet" href="plugins/combobox/autocomplete-ui.css"/>
+<link rel="stylesheet" href="css/jquery.tag-editor.css">
+<link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
+<style>
+	.custom-combobox {
+		position: relative;
+		display: inline-block;
+	}
+	.custom-combobox-toggle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin-left: -1px;
+		padding: 0;
+	}
+	.custom-combobox-input {
+		margin: 0;
+		padding: 5px 10px;
+	}
+	.ui-widget-overlay {
+		position: fixed;
+	}
+	
+	.injured {
+		background-color:#FFB2B2 !important;
+	}
+	.available {
+		background-color: #dff0d8 !important;
+	}
+	.unsure {
+		background-color: #fcf8e3 !important;
+	}
+	.home_only {
+		background-color: #d9edf7 !important;
+	}
+	.unavailable {
+		background-color: #f2dede !important;
+	}
+.box-primary h4 {
+    border-bottom: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 20px;
+    margin: 0px 5px 0 0;
+    padding: 9px;
+}
+.panel-group .panel {
+        border-radius: 0;
+        box-shadow: none;
+        border-color: #EEEEEE;
+    }
+
+    .panel-default > .panel-heading {
+        padding: 0;
+        border-radius: 0;
+        color: #212121;
+        background-color: #FAFAFA;
+        border-color: #EEEEEE;
+    }
+
+    .panel-title {
+        font-size: 14px;
+    }
+
+    .panel-title > a {
+        display: block;
+        padding: 15px;
+        text-decoration: none;
+    }
+
+    .more-less {
+        float: right;
+        color: #212121;
+    }
+
+    .panel-default > .panel-heading + .panel-collapse > .panel-body {
+        border-top-color: #EEEEEE;
+    }
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">	
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    	<!-- Sidebar Ends Here-->
+		<div class="content-wrapper">
+    	  	<!-- Content Header (Page header) -->
+    		<section class="content-header">
+      			<h1>Team <small><% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } else{	%>Add new<% }%></small></h1>
+      			<ol class="breadcrumb">
+        			<% include include/dashboard-breadcrumb %>
+        			<li class="active">Team</li>
+      			</ol>
+    		</section>	
+    		<section class="content">
+      			<div class="row">
+					
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<div class="box box-primary"><div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-12">
+            						<h4 style="margin-bottom:20px;">Team details</h4>
+									<% include include/display_returned_msg %>
+            				
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/team" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="teams">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="name">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						
+            						<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Club<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-4 autocomplete">
+                  							<select class="form-control" id="club_mongo_id" name="club_mongo_id" required>
+                            				</select>
+										</div>
+										
+                  					</div>
+                  					
+            						<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Name<span class="required">*</span></label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<input type="text" required="required" id="name" name="name" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } %>">
+                  						</div>
+                  						<label class="control-label col-md-1" for="first-name">Logo Path</label>
+                  						<div class="col-md-4 col-lg-4">
+                    						<input type="text" id="logo" name="logo" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.logo !== 'undefined' && contentObj.logo !== null) { %><%= contentObj.logo %><% } %>">
+                  						</div>
+                  					</div>
+                  					<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
+                  					<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Selected for fixture</label>
+                  						<div class="col-md-6 col-lg-4">
+                    						<select name="fixture_selected" id="fixture_selected" class="form-control"></select>
+                  						</div>
+                  					</div>
+                  					<% } %>
+                					<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name"></label>
+                  						<div class="col-md-4">
+                  							<button type="button" class="btn btn-primary btn-color margin-right-5 btn-sm" data-toggle="modal" data-target="#addPlayer"><i class="fa fa-plus"></i> Add players to team</button>
+											<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
+												<button type="button" class="btn btn-danger btn-color margin-right-5 btn-sm" data-toggle="modal" data-target="#notify_team_selection" title=" Notify team about selection"><i class="fa fa-send"></i> Notify team about selection</button>
+                  							<% } %>
+										</div>
+                  						<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
+                  						<div class="col-md-6 col-lg-6 text-right">
+                    						<button type="button" class="btn btn-primary btn-color margin-right-5 btn-sm" onClick="notify_team();" title="Send message to team"><i class="fa fa-send"></i> Send message to team</button>
+                  							<% if (typeof contentObj.players !== 'undefined' && contentObj.players !== null  && contentObj.players !== ""  && contentObj.players.length>0) { %>
+                  								<a href="javascript:void(0)" class="btn btn-primary btn-color margin-right-5 btn-sm" onClick="push_team_to_history();" id="push_team_to_history" title="Push team to history"><i class="fa fa-history"></i> Push team to history</a>
+                  							<% } %>
+                  						</div>
+                  						<% } %>
+                  						
+                					</div>
+                					<input type="hidden" class="form-control" id="club_name" name="club_name" value="<% if (typeof contentObj.club_name !== 'undefined' && contentObj.club_name !== null) { %><%= contentObj.club_name %><% } %>">
+											
+                					<input type="hidden" class="form-control" id="players" name="players" value="">
+                					<input type="hidden" class="form-control" id="fixture_id" value="<% if (typeof queryStr.fixture !== 'undefined' && queryStr.fixture !== null) { %><%= queryStr.fixture %><% } else if(typeof contentObj.fixture_selected !== 'undefined' && contentObj.fixture_selected !== null){ %><%= contentObj.fixture_selected %><% } %>">
+              						<div class="form-group">
+                  						<label class="control-label col-md-1" for="first-name">Players</label>
+                  						<div class="col-md-10">
+                  							<div class="table-responsive table-full-width">
+		 										<div class="table-responsive" style="border:none;" >
+                                					<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint"  style="background-color: rgb(255, 255, 255); border-radius: 4px;" >
+                                						<thead>
+                                       						<th>Player name</th>
+                                       						<th>Email</th>
+                                       						<th>Roles</th>
+                                       						<th>Batting Order</th>
+                                       						<th>Bowling Order</th>
+                                       						<th id="avaThID" style="display:none;">Availability</th>
+                                       						<th>Details</th>
+                                    					</thead>
+                                   						<tbody id="documents_data">
+                                    	
+                                    					</tbody>
+                                					</table>
+                   								</div>
+											</div>
+                  						</div>
+                  					</div>
+                  					
+                  					<div class="form-group">
+    									<label for="" class="col-sm-1 control-label">Status</label>
+    									<div class="col-sm-9" style="margin-top:6px;">
+    										<div STYLE="margin-right:10px;display:inline-block;">
+      		  									<label> <input type="radio" id="status" name="status" value="1" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 1) { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+    			  							</div>
+				  							<div STYLE="display:inline-block;">
+      		  									<label> <input type="radio" id="status" name="status" value="0" <% if (typeof contentObj.status !== 'undefined' && contentObj.status !== null && contentObj.status == 0) { %>checked<% } %> > <strong style="font-weight:600">Inactive</strong></label>
+    			  							</div>
+										</div>
+									</div>
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-6" align="CENTER">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/teams" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+                					<div style="font-style:italic; font-size:12px;" align="right"><b>Note:</b>
+               							Please click 'Submit' button after any modification to save the changes!
+               						</div>
+                			</form>
+                				</div></div></div></div>
+<!-- to display history -->
+<div class="box box-primary"><div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-12">
+		<h4 style="margin-bottom:20px;">History</h4>
+		<div class="panel-group history_content" id="accordion" role="tablist" aria-multiselectable="true">
+		
+   		</div>
+   		<div style="text-align:center;display:none;" id="display_more_btn">
+			<a style="width: 60%; margin-bottom: 10px;" class="btn palette-carrot btn-warning" title="Load more" onclick="load_more_hitsory()" href="javascript:void(0);">
+				Load more
+			</a>
+        </div>
+        <div style="text-align:center;display:none;" id="img_loading_div">
+			Loading...<br /> <img id="imgAjaxLoading" src="img/loading.gif" width="109" height="25" style="border-width: 0px;">
+		</div>
+</div></div></div></div>
+              					
+              				</div>
+            	</div>
+      		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+	
+		<!-- Footer Starts Here-->
+			<% include include/footer %>
+		<!-- Footer Ends Here-->
+
+<div id="addPlayer" class="modal fade" role="dialog" style="display: none;" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+    	<div class="modal-content" style="z-index: 10000;">
+     		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal" onClick="$('#user_id').val(''); clearModalBox();">×</button>
+        		<h3 class="modal-title">Add player to team</h3>
+      		</div>
+      		<div class="modal-body">
+       				<div class="row">
+        				<div class="col-md-12" id="n_msg_err" style="color:#FF0000;"></div>
+        				<div class="col-md-12" id="n_msg_suc" style="color:#006600;"></div>
+        			</div>
+					<div class="row">
+						<div class="col-md-12 ui-widget">
+                   			<label>Select date <span style="font-size:11px; font-style: italic;">(to find available players on selected date)</span></label>
+                   			<div class='input-group date' id='datetime_picker'>
+                    			<input type='text' class="form-control" id="selected_date" value=""/>
+                    			<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                			</div>	
+						</div>
+						<div class="col-md-12 ui-widget" id="select_players" style="margin-top:10px;">
+							<label>Search & select player</label>
+                   			<select class="combobox form-control" id="user_id" >
+                             					
+							</select>
+						</div>
+						
+					</div>
+      		</div>
+      		<div class="modal-footer">
+      			<button type="button" class="btn btn-info sm-btn" onclick="add_newPlayer();">Add new</button>
+      			<button type="button" class="btn btn-default" data-dismiss="modal" onClick="$('#user_id').val(''); clearModalBox();">Close</button>
+      		</div>
+    	</div>
+	</div>
+</div>
+
+<div id="notify_team" class="modal fade" role="dialog" style="display: none;" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+    	<div class="modal-content" style="z-index: 10000;">
+     		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal" onClick="close_notify_popup();">×</button>
+        		<h3 class="modal-title" id="notification_title">Send message to team</h3>
+      		</div>
+      		<div class="modal-body">
+       				<div class="row">
+        				<div class="col-md-12" id="notify_msg"></div>
+        				<input type="hidden" id="fixture_details_msg" value="">
+        				<input type="hidden" id="fixture_date_time" value="">
+        				<div class="col-md-12" id="notify_msg_err" style="color:#FF0000;"></div>
+        				<div class="col-md-12" id="notify_msg_suc" style="color:#006600;"></div>
+        			</div>
+					<div class="row">
+						<div class="col-md-12 ui-widget">
+							<input class="form-control" id="notification_users" type="hidden" value="">
+							<label>Subject</label><input class="form-control" id="notification_subject" value="">
+                   			<label>Message</label><textarea class="form-control" id="notification_text" ></textarea>
+                   			
+                   			<span style="font-size:11px;font-style:italic;">Note : This will send notification to all the players of this team.</span>
+						</div>
+						
+					</div>
+      		</div>
+      		<div class="modal-footer">
+      			<button type="button" class="btn btn-info sm-btn" onclick="$('#notify_msg_err').html(''); $('#notify_msg_suc').html(''); push_notification();">Push notification</button>
+      			<button type="button" class="btn btn-default" data-dismiss="modal" onClick="close_notify_popup();">Close</button>
+      		</div>
+    	</div>
+	</div>
+</div>
+
+
+<div id="notify_team_selection" class="modal fade" role="dialog" style="display: none;" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+    	<div class="modal-content" style="z-index: 10000;">
+     		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal" onClick="close_notify_popup();">×</button>
+        		<h3 class="modal-title">This will send notification to all the players of this team</h3>
+      		</div>
+      		<div class="modal-footer">
+      			<button type="button" class="btn btn-info sm-btn" onclick="selection_notification();">Go ahead</button>
+      			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      		</div>
+    	</div>
+	</div>
+</div>
+
+</div>
+<!-- Page-Level Plugin Scripts-->
+
+<script src="js/basictable.js"></script>
+<script src="js/jquery.validate.js"></script>
+<script src="plugins/combobox/autocomplete-ui.js"></script>
+<script src="js/jquery.tag-editor.min.js"></script>
+
+<script src="js/jquery.caret.min.js"></script>
+<script src="js/moment.js"></script>
+<script src="js/bootstrap-datetimepicker.min.js"></script>
+<script>
+var timestampNum="";
+var loadDefinedPlayertypes= new Array(), teamFixturesArr= new Array();
+
+var pageSize=6, totalHistoryNum=0, start=0, end=pageSize;
+
+function selection_notification(){
+	var createTeamArr=new Array();
+	var i=0;
+	$('.teamsTRClass').each(function(){
+		var createObject={};
+		createObject['user_mongo_id']=$(this).find('#user_uuid').val();
+  		createObject['roles']=$(this).find('#user_roles').val();
+  		createObject['fullname']=$(this).find('#fullname').val();
+  		createObject['user_email']=$(this).find('#user_email').val();
+  		createObject['send_notifications']=$(this).find('#send_notifications').val();
+  		createTeamArr[i]=createObject;
+  		i++;
+  	});
+  	if(createTeamArr.length>0){
+  		var selected_players= JSON.stringify(createTeamArr);
+  		var team_name = $("#name").val(), fixture_details='';
+  		if(teamFixturesArr.length>0 && $("#fixture_id").val()!=""){
+			for(var i=0;i<teamFixturesArr.length;i++){
+				var eventObj=teamFixturesArr[i];
+				if($("#fixture_id").val()==eventObj.uuid){
+					fixture_details = JSON.stringify(eventObj);
+					break;
+				}
+			}
+		}
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: backendDirectory+"/team_selection_notification",
+			data: {"selected_players" : selected_players, "team_name" : $("#name").val(), "fixture" : fixture_details, "fixture_info" : $("#fixture_date_time").val() },
+			success: function(response){
+				$('#notify_team_selection').modal('hide');
+  				if(response.success){
+					__alertModalBox(response.success);
+				}
+				if(response.error){
+					__alertModalBox(response.error);
+				}
+			}
+		});
+	}else {
+		$('#notify_team_selection').modal('hide');
+		__alertModalBox('Sorry, no players to send notification');
+	}
+}
+
+function close_notify_popup(){
+	$('#notification_subject').val('');
+	$('#notification_text').val('');
+	$('#notify_msg_err').html('');
+	$('#notify_msg_suc').html('');
+}
+function toggleIcon(e) {
+    $(e.target)
+        .prev('.panel-heading')
+        .find(".more-less")
+        .toggleClass('glyphicon-plus glyphicon-minus');
+}
+$('.panel-group').on('hidden.bs.collapse', toggleIcon);
+$('.panel-group').on('shown.bs.collapse', toggleIcon);
+
+
+function push_team_to_history(){
+	if($("#id").val()!="")	{
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: backendDirectory+"/push_team_to_history",
+			data: {"team" : $("#id").val() },
+			success: function(response){
+				if(response.success){
+					__alertModalBox(response.success);
+					
+					load_data(); // draw players table again
+					
+					// fetch new history details
+					totalHistoryNum=0; start=0; end=pageSize;
+					$('.history_content').html('');
+					$('#display_more_btn').hide();
+					$('#img_loading_div').show();
+					load_teams_history();
+					
+				}
+				if(response.error){
+					__alertModalBox(response.error);
+				}
+			}
+		});
+	}	else{
+		$('#notify_msg_err').html("Please enter both subject and message!");
+	}
+}
+
+function send_reminder (id, name) {
+	$("#notification_title").html("Send message to "+name);
+	var playersIdArr= new Array(id);
+	$("#notification_users").val(JSON.stringify(playersIdArr));
+	
+	$('#notify_team').modal('show');
+	push_notification();
+}
+
+function push_notification(){
+	if($("#notification_text").val()!="" && $("#notification_subject").val()!="")	{
+		if($("#notification_users").val()!=""){
+		var message_type="message";
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: backendDirectory+"/batch_notification",
+			data: {"notify_to" : $("#notification_users").val(), "team_name" : $("#name").val(), "message" : $("#notification_text").val().trim(), "subject" : $("#notification_subject").val(), "fixture" : $("#fixture_details_msg").val() },
+			success: function(response){
+				if(response.success){
+					$("#notification_subject").val('');
+					$("#notification_text").val('');
+					$("#notify_msg_suc").html(response.success);
+					$("#notification_users").val("");
+				}
+				if(response.error){
+					$("#notify_msg_err").html(response.error);
+				}
+			}
+		});
+		}else{
+			$('#notify_msg_err').html("No player selected to send notification!");
+		}
+	}	else{
+		$('#notify_msg_err').html("Please enter both subject and message!");
+	}
+}
+
+function notify_team(){
+	var playersIdArr= new Array(), count=0;
+	$("#notification_title").html("Send message to team");
+	$('.teamsTRClass').each(function(){
+		playersIdArr[count]=$(this).find('#user_uuid').val();
+		count++;
+	});
+	if(playersIdArr.length>0){
+		$("#notification_users").val(JSON.stringify(playersIdArr));
+		$('#notify_team').modal('show');
+		push_notification();
+	}else{
+		__alertModalBox("No player selected to send notification!");
+	}
+}
+
+function clearModalBox(){
+	$("#notification_title").html("Send message to team");
+	$("#n_msg_err").html('');
+	$("#n_msg_suc").html('');
+	$('.ui-autocomplete-input').val("");
+	loadPlayers();
+}
+
+function add_newPlayer(){
+	$(".alert-messages").remove();
+	var selectedUserStr=$("#user_id").val();
+	if(selectedUserStr!=""){
+		var jsonRow=backendDirectory+"/collection_details?collection=users&id="+selectedUserStr;
+		$.getJSON(jsonRow,function(html){
+			if(html.aaData){
+				var row=html.aaData;
+				var uniqueIDStr=row._id;
+				var battingOrderNum=1, bowlingOrderNum=1, row_uuid=guid(), checkForExistence=false;
+				
+				$('.teamsTRClass').each(function(){
+					if(uniqueIDStr==$(this).find('#user_uuid').val()){
+						checkForExistence=true;
+					}else{
+						if(battingOrderNum<=$(this).find('#batting_order').val()){
+							battingOrderNum=parseInt($(this).find('#batting_order').val())+1;
+						}
+						if(bowlingOrderNum<=$(this).find('#bowling_order').val()){
+							bowlingOrderNum=parseInt($(this).find('#bowling_order').val())+1;
+						}
+					}
+  				});
+  				
+  				if(checkForExistence){
+  					$("#n_msg_err").html('This player is already in team!');
+  				}else{
+					contentHtml="<tr class='teamsTRClass' id='tr_"+uniqueIDStr+"'>";
+					contentHtml+='<td>'+row.firstname+' '+row.lastname+'<input type="hidden" id="fullname" value="'+row.firstname+' '+row.lastname+'"><input type="hidden" id="send_notifications" value="'+row.send_notifications+'"></td>';
+					contentHtml+='<td>'+row.email+'<input type="hidden" id="user_email" value="'+row.email+'"></td>';
+					//contentHtml+='<td>'+row.player_qualities+'</td>';
+					contentHtml+='<td><textarea id="user_roles" class="form-control selected_qualities">'+row.player_qualities+'</textarea></td>';
+						
+					contentHtml+='<td><input id="batting_order" value="'+battingOrderNum+'" class="form-control" type="text"><input type="hidden" id="uuid" value="'+row_uuid+'"><input type="hidden" id="user_uuid" value="'+row._id+'"></td>';
+					contentHtml+='<td><input id="bowling_order" value="'+bowlingOrderNum+'" class="form-control" type="text"></td>';
+					if($("#fixture_id").val()!=""){
+							contentHtml+='<td>yes</td>';
+					}
+					contentHtml+='<td class="actions-list"><a href="user?_id='+uniqueIDStr+'" title="View player details" target="_blank"><i class="fa fa-link"></i></a>&nbsp;<a href="javascript:void(0)" onClick="removeItem(\''+uniqueIDStr+'\')" title="Remove"><i class="fa fa-trash"></i></a></td>';
+					contentHtml+="</tr>";
+					$("#documents_data").append(contentHtml);
+					
+					$("#addPlayer").modal('hide');
+					clearModalBox();
+					$('#table-breakpoint').basictable({
+        				breakpoint: 751
+     				});
+     				
+     				$('.selected_qualities').tagEditor('destroy');
+
+     				$('.selected_qualities').tagEditor({
+     					autocomplete: {
+       						delay: 0, // show suggestions immediately
+        					position: { collision: 'flip' }, // automatic menu position up/down
+        					source: loadDefinedPlayertypes
+    					},
+    					forceLowercase: false,
+    					placeholder: 'Add Roles',
+    					beforeTagSave: function(field, editor, tags, tag, val) {
+    						if($.inArray( val, loadDefinedPlayertypes)==-1){
+    							generate_new_player_type(val);
+        					}
+    					}
+					});
+				}
+			}else{
+				$("#n_msg_err").html('No such player found!');
+			}
+		});
+	}	else{	
+		$("#n_msg_err").html('Please select player to add to team');
+	}
+}
+
+function generateObjectJson(){
+	var createArr=new Array();
+	var i=0;
+	$('.teamsTRClass').each(function(){
+		var createObject={};
+		createObject['uuid']=$(this).find('#uuid').val();
+  		createObject['user_mongo_id']=$(this).find('#user_uuid').val();
+  		createObject['batting_order']=$(this).find('#batting_order').val();
+  		createObject['bowling_order']=$(this).find('#bowling_order').val();
+  		createObject['roles']=$(this).find('#user_roles').val();
+  		createArr[i]=createObject;
+  		i++;
+  	});
+  	$("#players").val(JSON.stringify(createArr));
+}
+$(document).ready(function(){
+	$("#fixture_selected").change(function()	{
+		$('#fixture_id').val($(this).val());
+		load_fixtures_details();
+	});
+	
+	$('#datetime_picker').datetimepicker({
+		format: 'L'
+	}).on("dp.change", function (e) {
+		loadPlayers();
+    });
+		
+	<%  if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
+			load_team_fixtures();
+			load_data();
+			$('#img_loading_div').show();
+			load_teams_history();
+	<% 	} %>
+		
+	load_player_types();
+	
+	load_clubs();
+		
+	loadPlayers();
+	
+		// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				club_mongo_id: { required: true },
+				name: { required: true },
+				code: { required: true }
+			},
+			submitHandler: function(form) {
+				$("#club_name").val($("#club_mongo_id option:selected").text());
+				generateObjectJson();
+				
+ 				dataAsJson('contentForm', form);
+ 			}
+		});
+});
+
+function load_team_fixtures(){
+		var jsonRow=backendDirectory+"/api_fetch_fixtures?team_id="+$("#id").val();
+		$.getJSON(jsonRow,function(html){
+			var contentStr='<option value="">--Select--</option>';
+			if(html.aaData && html.aaData.length>0){
+				teamFixturesArr= html.aaData;
+				teamFixturesArr.sort(dynamicSort(-"date_time"));
+				$.each(teamFixturesArr, function(i,row){
+					contentStr+='<option value="'+row.uuid+'"'
+					if($("#fixture_id").val()!="" && $("#fixture_id").val()==row.uuid){
+						contentStr+=' selected';
+					}
+					var opppositionTeam="";
+					if($("#id").val()==row.home_team_uuid){
+						opppositionTeam=row.away_team_name;
+					}else{
+						opppositionTeam=row.home_team_name;
+					}
+					contentStr+='>'+row.fixture_name+': With '+opppositionTeam+' ('+dateTimeFromUnix(row.date_time)+')</option>';
+				});
+			}
+			$("#fixture_selected").html(contentStr);
+			if($("#fixture_id").val()!=""){
+				load_fixtures_details();
+			}
+		});
+	}
+function removeItem(e){
+	$("#tr_"+e).remove();
+}
+
+	function load_fixtures_details(){
+		if(teamFixturesArr.length>0){
+			for(var i=0;i<teamFixturesArr.length;i++){
+				var eventObj=teamFixturesArr[i];
+				if($("#fixture_id").val()==eventObj.uuid){
+						var notificationMsgStr="<b>"+eventObj.home_team_name+"</b> vs <b>"+eventObj.away_team_name+"</b> on "+dateTimeFromUnix(eventObj.date_time);
+						$("#fixture_details_msg").val(notificationMsgStr);
+						$("#fixture_date_time").val(dateTimeFromUnix(eventObj.date_time));
+						$("#notify_msg").html("Match details: "+notificationMsgStr);
+						timestampNum=eventObj.date_time;
+						load_data();
+						break;
+					}
+				}
+		}
+	}	
+	function load_clubs(){
+		var statusNum=1, selectedVal='';
+		<% if (typeof contentObj.club_mongo_id !== 'undefined' && contentObj.club_mongo_id !== null) { %>
+			selectedVal="<%= contentObj.club_mongo_id %>";
+		<% } %>
+		
+		var jsonRow=backendDirectory+"/api_fetch_list?findFieldName=status&collection=clubs&findFieldValue="+statusNum;
+		$.getJSON(jsonRow,function(html){
+			var contentStr='<option value=""></option>';
+			if(html.aaData && html.aaData.length>0){
+				$.each(html.aaData, function(i,row){
+					contentStr+='<option value="'+row._id+'"';
+					if(selectedVal==row._id){
+						contentStr+=' selected';
+					}
+					contentStr+='>'+row.name+'</option>';
+				});
+			}
+			$("#club_mongo_id").html(contentStr);
+     		$('#club_mongo_id').combobox();
+		});
+	}
+	function load_player_types(){
+		loadDefinedPlayertypes= new Array();
+		var jsonRow=backendDirectory+"/api_fetch_list?limit=all&collection=player_types",
+		xhrStatus=$.getJSON(jsonRow,function(html){
+			if(html.error){
+				//
+			}else{
+				$.each(html.aaData, function(i,row){
+					loadDefinedPlayertypes.push(row.name);
+				});
+			}
+		});
+	}	
+	function generate_temp_code(passStr){
+		var val=passStr;
+		var patt=/[^A-Za-z0-9_-]/g;
+		var result=val.replace(patt,' ');
+		result=result.replace(/\s+/g, ' ');
+		result = result.replace(/^\s+|\s+$/g,'');
+		result=result.replace(/\s/g, '-');
+		var resultStr=result.toLowerCase();
+		return resultStr;
+	}
+	
+	function generate_new_player_type(val){
+		var codeStr=generate_temp_code(val);
+    	var postContentURL=backendDirectory+"/api_crud_get";
+    	var uuidSystemStr=	"<% if (typeof authenticatedUser.active_system_uuid !== 'undefined' && authenticatedUser.active_system_uuid !== null && authenticatedUser.active_system_uuid !== "") {	 %><%= authenticatedUser.active_system_uuid %><% } %>";
+		$.ajax({
+			type: "GET",
+			dataType: "json",
+			url: postContentURL,
+			data: {"collection" : "player_types", "action" : "create", "fieldName" : "code", "fieldValue" : codeStr, "name" : val, "code" : codeStr, "user_type_uuid" : $("#player_type_uuid").val(), "uuid_system" : uuidSystemStr},
+			success: function(response){
+				console.log(response);
+			}
+		});
+	}
+	var xhrstatus;
+	function load_data(){
+		$("#documents_data").html('');
+		$(".alert-messages").remove();
+		if($("#id").val()!=""){
+		var jsonRow=backendDirectory+"/api_fetch_players?start=0&limit=100&s=&team="+$("#id").val();
+		if(timestampNum!=""){
+			jsonRow+="&timestamp="+timestampNum;
+		}
+		if(xhrstatus) xhrstatus.abort();
+		xhrstatus=$.getJSON(jsonRow,function(html){
+			if(html.error){
+				$("#table-breakpoint").before('<div class="alert alert-danger alert-messages">No players in team!</div>');
+			}
+			
+			if(html.aaData) {
+				var existingMembersArr=new Array();
+				<% if (typeof contentObj.players !== 'undefined' && contentObj.players !== null  && contentObj.players !== "") {	%>
+					var tempselectedSearchArr=<%- JSON.stringify(contentObj.players) %>;
+					if(typeof(tempselectedSearchArr)=="object" || typeof(tempselectedSearchArr)=="array"){
+						existingMembersArr = tempselectedSearchArr;
+					}	else	{
+						existingMembersArr = JSON.parse(tempselectedSearchArr);
+					}
+				<% } %>
+								
+				var contentHtml="";
+				var createNewUsersJson= new Array();
+				
+				if(html.aaData.length>0){
+					$.each(html.aaData, function(i,row){
+						var subObject= row;
+						var uniqueIDStr=row._id;
+						var battingOrderNum=0, bowlingOrderNum=0, row_uuid="", roles= row.player_qualities;
+						
+						for(var j=0; j<existingMembersArr.length; j++){
+							if(uniqueIDStr==existingMembersArr[j].user_mongo_id){
+								battingOrderNum = existingMembersArr[j].batting_order;
+								if(existingMembersArr[j].bowling_order){
+									bowlingOrderNum = existingMembersArr[j].bowling_order;
+								}
+								row_uuid = existingMembersArr[j].uuid;
+								if(existingMembersArr[j].roles){
+									roles = existingMembersArr[j].roles;
+								}
+								break;
+							}
+						}
+						subObject['player_roles']=roles;
+						subObject['batting_order']=battingOrderNum;
+						subObject['bowling_order']=bowlingOrderNum;
+						subObject['team_player_uuid']=row_uuid;
+						createNewUsersJson[i]=subObject;
+					});
+					
+					createNewUsersJson.sort(dynamicSort("batting_order"));
+					
+					$.each(createNewUsersJson, function(i,row){
+						var uniqueIDStr=row._id;
+						var row_uuid=row.team_player_uuid;
+			
+						contentHtml+="<tr class='teamsTRClass' id='tr_"+uniqueIDStr+"'";
+						contentHtml+=">";
+						contentHtml+='<td>'+row.firstname+' '+row.lastname+'<input type="hidden" id="fullname" value="'+row.firstname+' '+row.lastname+'"><input type="hidden" id="send_notifications" value="'+row.send_notifications+'"></td>';
+						contentHtml+='<td>'+row.email+'<input type="hidden" id="user_email" value="'+row.email+'"><input type="hidden" id="uuid" value="'+row_uuid+'"><input type="hidden" id="user_uuid" value="'+row._id+'"></td>';
+						contentHtml+='<td><textarea id="user_roles" class="form-control selected_qualities">'+row.player_roles+'</textarea></td>';
+						
+						contentHtml+='<td><input id="batting_order" value="'+row.batting_order+'" class="form-control" type="text"></td>';
+						contentHtml+='<td><input id="bowling_order" value="'+row.bowling_order+'" class="form-control" type="text"></td>';
+						
+						if($("#fixture_id").val()!=""){
+							contentHtml+='<td id="ava_td_'+uniqueIDStr+'">No response</td>';
+						}
+						contentHtml+='<td class="actions-list">';
+						
+						if($("#fixture_id").val()!=""){
+							contentHtml+='<input id="ava_id_'+uniqueIDStr+'" value="'+row.bowling_order+'" type="hidden">';
+							contentHtml+='<a id="reminderClass_'+uniqueIDStr+'" href="javascript:void(0)" onClick="send_reminder(\''+uniqueIDStr+'\', \''+row.firstname+' '+row.lastname+'\')" title="Send reminder"><i class="fa fa-envelope-o"></i></a>&nbsp;';
+							contentHtml+='<a id="availabilityClass_'+uniqueIDStr+'" href="javascript:void(0)" onClick="add_comment(\''+uniqueIDStr+'\')" title="Leave message" style="display:none;"><i class="fa fa-envelope-o"></i></a>&nbsp;';
+						}
+						contentHtml+='<a href="user?_id='+uniqueIDStr+'" title="View player details" target="_blank"><i class="fa fa-link"></i></a>&nbsp;<a href="javascript:void(0)" onClick="removeItem(\''+uniqueIDStr+'\')" title="Remove"><i class="fa fa-trash"></i></a></td>';
+						
+						contentHtml+="</tr>";
+						
+						
+					});
+				
+					$("#documents_data").html(contentHtml);
+					$('.selected_qualities').tagEditor({
+						autocomplete: {
+       						delay: 0, // show suggestions immediately
+        					position: { collision: 'flip' }, // automatic menu position up/down
+        					source: loadDefinedPlayertypes
+    					},
+    					forceLowercase: false,
+    					placeholder: 'Add Roles',
+    					beforeTagSave: function(field, editor, tags, tag, val) {
+    						if($.inArray( val, loadDefinedPlayertypes)==-1){
+    							generate_new_player_type(val);
+        					}
+    					}
+					});
+     			}else{
+     				$("#documents_data").html("");
+					$("#table-breakpoint").before('<div class="alert alert-danger alert-messages">No more records found!</div>');
+     			}
+			}
+			
+			
+			if($("#fixture_id").val()!=""){
+				$("#avaThID").show();
+				if(html.playersAvailability && html.playersAvailability.length>0){
+					$.each(html.playersAvailability, function(i,row){
+						$("#ava_id_"+row.user_mongo_id).val(row._id);
+						$("#ava_td_"+row.user_mongo_id).html(row.available);
+						$("#reminderClass_"+row.user_mongo_id).hide();
+						$("#availabilityClass_"+row.user_mongo_id).show();
+					
+						if(row.available=="Unavailable"){
+							$("#tr_"+row.user_mongo_id).addClass('unavailable');
+						} else if(row.available=="Available"){
+							$("#tr_"+row.user_mongo_id).addClass('available');
+						} else {
+							$("#tr_"+row.user_mongo_id).addClass(row.available.toLowerCase());
+						}
+					});
+				}
+			}	else {
+				$("#avaThID").hide();
+			}
+			
+			//initialize table
+			$('#table-breakpoint').basictable({
+        		breakpoint: 751
+     		});
+		});
+		}
+	}
+
+function add_comment (id) {
+	if($('#ava_id_'+id).val()!="")	{
+		alert('Work in progress');
+		//window.location.href= "<%= backendDirectory %>/availability?id="+$('#ava_id_'+id).val();
+	}	else	{
+		alert('Sorry, this option is not available right now!');
+	}
+}
+
+function loadPlayers(){
+	var fetchPlayers= "api_fetch_players?start=0&limit=20&s=" ;
+	if($("#selected_date").val()!=="" && $("#selected_date").val()!==null && $("#selected_date").val()!=="null"){
+		fetchPlayers+="&availability=Available&timestamp="+return_timestamp_from_datetimepicker($("#selected_date").val(),false);
+	}
+	$.getJSON(fetchPlayers, function(result){
+		var dropdownStr='<option value=""></option>';
+		if(result.aaData.length>=1){
+			$.each(result.aaData, function(i,row){
+				var nameStr=row.firstname;
+				if(row.lastname){
+					nameStr+=" "+row.lastname;
+				}
+				dropdownStr+='<option value="'+row._id+'">'+nameStr+'</option>';
+			});
+		}
+		$("#user_id").html(dropdownStr);
+		$("#user_id").combobox();
+	});	
+}
+
+function load_more_hitsory(){	
+	$('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	var temp_start= end;
+	start=end+1;
+	end=temp_start+pageSize;
+	load_teams_history();
+}
+
+function set_as_current_team(e){
+	if(e)	{
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: backendDirectory+"/pull_team_from_history",
+			data: {"team" : $("#id").val(), "history_id" : e },
+			success: function(response){
+				if(response.success){
+					$("#push_team_to_history").show();
+					__alertModalBox(response.success);
+					load_data(); // draw players table again
+				}
+				if(response.error){
+					__alertModalBox(response.error);
+				}
+			}
+		});
+	}	else{
+		__alertModalBox('Sorry, can\'t set this team as current team.');
+	}
+}
+
+	function load_teams_history(){
+		var historyContentStr="";
+		var jsonRow=backendDirectory+"/api_fixture_history?id="+$("#id").val()+"&start="+start+"&limit="+pageSize;
+		$.getJSON(jsonRow,function(html){
+			if(html.aaData){
+				if(html.total){
+					totalHistoryNum= html.total;
+				}
+				var historyDataObj=html.aaData;
+				historyDataObj.sort(dynamicSort(-"date_time"));
+				$.each(historyDataObj, function(i,historyContentObj){
+			
+        			historyContentStr+='<div class="panel panel-default"><div class="panel-heading" role="tab" id="heading'+historyContentObj._id+'"><h5 class="panel-title">';
+					historyContentStr+='<a class="collapsed" href="#'+historyContentObj._id+'" role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="'+historyContentObj._id+'"><i class="more-less glyphicon glyphicon-plus"></i> ';
+					if(historyContentObj.type=="fixture_details"){
+						historyContentStr+='Match : '+historyContentObj.home_team_name+' vs '+historyContentObj.away_team_name+' ('+dateTimeFromUnix(historyContentObj.date_time)+')';
+					}else{
+						historyContentStr+=historyContentObj.home_team_name+' ('+dateTimeFromUnix(historyContentObj.date_time)+')';
+					}
+					historyContentStr+='</a></h5></div>';
+					historyContentStr+='<div id="'+historyContentObj._id+'"  class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading'+historyContentObj._id+'"><div class="panel-body">';
+					historyContentStr+='<div class="row"><div class="col-md-6"><b>Played on: </b>'+dateTimeFromUnix(historyContentObj.date_time)+'</div>';
+					
+					if(historyContentObj.venue_name){
+						historyContentStr+='<div class="col-md-6"><b>Venue: </b>'+historyContentObj.venue_name+'</div>';
+					}
+					historyContentStr+='</div>';
+					var teamDetailArr=new Object(), teamsName="";
+					if(historyContentObj.home_team_uuid == $("#id").val()){
+						teamDetailArr= historyContentObj.home_team_details;
+						teamsName = historyContentObj.home_team_name;
+					}
+					if(historyContentObj.away_team_uuid == $("#id").val()){
+						teamDetailArr= historyContentObj.away_team_details;
+						teamsName = historyContentObj.away_team_name;
+					}
+					if(teamDetailArr.players && teamDetailArr.players.length>0)	{
+						historyContentStr+='<div class="row"><div class="col-md-6"><b>Team: </b>'+teamsName+'</br></div><div class="col-md-6 text-right"><a href="javascript:void(0)" class="btn btn-danger btn-sm" onClick="set_as_current_team(\''+historyContentObj._id+'\');" title="Reset this team as current team"><i class="fa fa-refresh"></i> Reset this team as current team</a></div></div><br>';
+						historyContentStr+='<div class="row"><div class="table-responsive table-full-width" style="padding: 0px 10px 0px 10px;"><div class="table-responsive" style="border:none;" >';
+                        historyContentStr+='<table class="table table-striped table-bordered table-hover custom-tbl-st bt playersTable'+start+'" style="background-color: rgb(255, 255, 255); border-radius: 4px;" >';
+                        historyContentStr+='<thead>';
+                        historyContentStr+='<th>Username</th><th>Email</th><th>Roles</th><th>Batting Order</th><th>Bowling Order</th></thead>';
+                        historyContentStr+='<tbody>';
+                        $.each(teamDetailArr.players, function(j,playersDetails){
+                        	historyContentStr+='<tr><td class="name_'+playersDetails.user_mongo_id+'"></td><td class="email_'+playersDetails.user_mongo_id+'"></td><td>'+playersDetails.roles+'</td><td>'+playersDetails.batting_order+'</td><td>'+playersDetails.bowling_order+'</td></tr>';
+                        });
+                       	historyContentStr+='</tbody>';
+                        historyContentStr+='</table>';
+                    	historyContentStr+='</div></div></div>';
+					}
+					historyContentStr+='</div></div>';
+					historyContentStr+='</div>';
+				});
+				$(".history_content").append(historyContentStr);
+				
+				$('.playersTable'+start).basictable({
+        			breakpoint: 751
+     			});
+     			
+     			// to display names found
+     			if(html.player_details){
+     				$.each(html.player_details, function(i,playerObj){
+     					var nameStr= '';
+     					if(playerObj.firstname){
+     						nameStr+=playerObj.firstname;
+     					}
+     					if(playerObj.lastname){
+     						nameStr+=" "+playerObj.lastname;
+     					}
+     					$(".name_"+playerObj._id).html(nameStr);
+     					if(playerObj.email){
+     						$(".email_"+playerObj._id).html(playerObj.email);
+     					}
+     				});
+     			}
+     			
+				if(end< totalHistoryNum){
+					$('#display_more_btn').show();
+				}
+			}	else if(html.error)	{
+			
+			}
+			
+			$('#img_loading_div').hide();
+		});
+	}	
+
+var xhr;
+(function( $ ) {
+	$.widget( "custom.combobox", {
+		_create: function() {
+				this.wrapper = $( "<span>" )
+				.addClass( "custom-combobox" )
+				.insertAfter( this.element );
+
+				this.element.hide();
+				this._createAutocomplete();
+				this._createShowAllButton();
+				},
+
+				_createAutocomplete: function() {
+				var ele_select= this.element;
+				var selected = this.element.children( ":selected" ),
+				value = selected.val() ? selected.text() : "";
+
+				this.input = $( "<input>" )
+				.appendTo( this.wrapper )
+				.val( value )
+				.attr( "title", "" )
+				.addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+				.autocomplete({
+				delay: 0,
+				minLength: 0,
+				source: $.proxy( this, "_source" )
+				})
+				.tooltip({
+				tooltipClass: "ui-state-highlight"
+				});
+
+				this._on( this.input, {
+				autocompleteselect: function( event, ui ) {
+				//alert("show all");
+				ui.item.option.selected = true;
+
+				this._trigger( "select", event, {
+				  item: ui.item.option
+				});
+				
+				ele_select.trigger('change');
+					
+				},
+
+				autocompletechange: "_removeIfInvalid"
+				});
+				},
+
+				_createShowAllButton: function() {
+				var input = this.input,
+				wasOpen = false;
+
+				$( "<a>" )
+				.attr( "tabIndex", -1 )
+				.attr( "title", "Show All Items" )
+				.tooltip()
+				.appendTo( this.wrapper )
+				.button({
+				icons: {
+				  primary: "ui-icon-triangle-1-s"
+				},
+				text: false
+				})
+				.removeClass( "ui-corner-all" )
+				.addClass( "custom-combobox-toggle ui-corner-right" )
+				.mousedown(function() {
+				wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+				})
+				.click(function() {
+				input.focus();
+
+				// Close if already visible
+				if ( wasOpen ) {
+				  return;
+				}
+
+				// Pass last search string as value to search for, displaying last results
+				input.autocomplete( "search", 'SHOWALL' );
+				});
+				},
+
+				_source: function( request, response ) {
+				//var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+				var ele_select= this.element;
+				if(request.term=='SHOWALL'){
+				response(ele_select.children( "option" ).map(function() {
+				var text = $( this ).text();
+				var value= $( this ).val();
+				//if ( this.value && ( !request.term || matcher.test(text) ) )
+				return {
+				  label: text,
+				  value: text,
+				  option: this
+				};
+				}) );
+
+				}
+				else
+				{
+				
+				var jsonRow = '<%= backendDirectory %>/api_fetch_players?start=0&limit=20&s='+request.term;
+				if($("#selected_date").val()!=="" && $("#selected_date").val()!==null && $("#selected_date").val()!=="null"){
+					jsonRow+="&availability=Available&timestamp="+getTimestampFromDate($("#selected_date").val());
+				}
+				if(xhr) xhr.abort();
+				xhr=$.getJSON(jsonRow,function(result){
+					
+				if(result.error){
+					var html='<option value=""></option>';
+					ele_select.html(html);
+					response(ele_select.children( "option" ).map(function() {
+					var text = $( this ).text();
+					var value= $( this ).val();
+					//if ( this.value && ( !request.term || matcher.test(text) ) )
+					return {
+				  		label: text,
+				  		value: text,
+				  		option: this
+					};
+					}) );
+				}else{
+					var html='<option value=""></option>';
+					if(result.aaData.length>=1){
+						$.each(result.aaData, function(i,row){
+							var nameStr=row.firstname;
+							if(row.lastname){
+								nameStr+=" "+row.lastname;
+							}
+							html+='<option value="'+row._id+'">'+nameStr+'</option>';
+						});
+					}
+					
+					ele_select.html(html);
+					
+					
+					response(ele_select.children( "option" ).map(function() {
+				var text = $( this ).text();
+				var value= $( this ).val();
+				//if ( this.value && ( !request.term || matcher.test(text) ) )
+				return {
+				  label: text,
+				  value: text,
+				  option: this
+				};
+				}) );
+					
+					
+				}
+				});
+
+				} 
+
+				},
+
+				_removeIfInvalid: function( event, ui ) {
+
+					// Selected an item, nothing to do
+					if ( ui.item ) {
+
+					return;
+					}
+
+					// Search for a match (case-insensitive)
+					var value = this.input.val(),
+					valueLowerCase = value.toLowerCase(),
+					valid = false;
+					var ele_select= this.element;
+					this.element.children( "option" ).each(function() {
+					if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+						this.selected = valid = true;	
+						
+						ele_select.trigger('change');
+
+						return false;
+					}
+					});
+
+					// Found a match, nothing to do
+					if ( valid ) {
+					return;
+					}
+
+					// Remove invalid value
+					this.input
+					.val( "" )
+					.attr( "title", value + " didn't match any item" )
+					.tooltip( "open" );
+					this.element.val( "" );
+					this._delay(function() {
+					this.input.tooltip( "close" ).attr( "title", "" );
+					}, 2500 );
+					this.input.data( "ui-autocomplete" ).term = "";
+				},
+
+				_destroy: function() {
+					this.wrapper.remove();
+					this.element.show();
+				}
+			});
+			})( jQuery );
+</script>
+</body>
+</html>
