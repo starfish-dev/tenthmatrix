@@ -28,4 +28,9 @@
 <!--<script src="js/checkbox.js"></script>-->
 <script>
 var backendDirectory="<%= backendDirectory %>";
+<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
+var	access_right="<%= authenticatedUser.access_right %>";
+<% }	else{	 %>
+var access_right=0;
+<% } %>
 </script>

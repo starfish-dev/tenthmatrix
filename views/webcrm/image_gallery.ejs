@@ -119,12 +119,6 @@ margin:10px;
 <script src="js/basictable.js"></script>
 <script type="text/javascript">
 var templateStr="fs.files", searchStr="<%= keywordStr %>", displayedViewStr='grid';
-
-<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
-var	access_right="<%= authenticatedUser.access_right %>";
-<% }	else{	 %>
-var access_right=0;
-<% } %>
 var xhrStatus;
 var pageSize=10, totalNum=0, totalDisplayedNum=0, checkAllFlag= false;
 var start=0, end=pageSize;

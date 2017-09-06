@@ -277,13 +277,6 @@ if (typeof searched_keyword !== 'undefined' && searched_keyword !== null) {
 <script src="js/bootstrap.datepicker.js"></script>
 <script type="text/javascript">
 var searchStr="<%= keywordStr %>";
-
-<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
-var	access_right="<%= authenticatedUser.access_right %>";
-<% }	else{	 %>
-var access_right=0;
-<% } %>
-
 var xhrStatus;
 
 var pageSize=15, totalNum=0, totalDisplayedNum=0, checkAllFlag= false;

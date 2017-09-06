@@ -20,6 +20,13 @@ function generateHeading(e, upperCase){
 	return result;
 }
 
+function redraw_table(){
+	$('#table-breakpoint').basictable('destroy');
+	$('#display_more_btn').hide();
+	$('#img_loading_div').show();
+	end=start+pageSize;
+	load_data();
+}
 function filter_by_status(valNum){
 	totalDisplayedNum=0;
 	if(valNum=="all"){
@@ -27,13 +34,9 @@ function filter_by_status(valNum){
 	}else{
 		statusFieldValStr = valNum;
 	}
-	$('#table-breakpoint').basictable('destroy');
 	$("#documents_data").html('');
-	$('#display_more_btn').hide();
-	$('#img_loading_div').show();
-	start=0;
-	end=start+pageSize;
-	load_data();
+	start =0; 
+	redraw_table();
 }
 
 function setSelectedAs(valNum){
@@ -57,15 +60,10 @@ function setSelectedAs(valNum){
 				data: {"collection" : collectionNameStr, "selected_values" : $("#selectedRows").val(), "status" : valNum, "status_field" : statusFieldNameStr},
 				success: function(response){
 					if(response.success){
-						totalDisplayedNum=0;
-						$('#table-breakpoint').basictable('destroy');
-						searchStr="";
-						$(".searchFieldClass").val("");
-						$("#documents_data").html('');
-						$('#display_more_btn').hide();
-						$('#img_loading_div').show();
-						start=0;
-						load_data();
+						checkAllFlag=false;
+						$('.check_all').prop("checked", false);
+				  		$('.check').prop("checked", false);
+				  		refresh_data();
 					}else if(response.error){
 						__alertModalBox(response.error);
 					}
@@ -80,15 +78,11 @@ function setSelectedAs(valNum){
 		var searchField= $("#"+e).val();
 		if(searchField!=""){
 			totalDisplayedNum=0;
-			$('#table-breakpoint').basictable('destroy');
 			$("#documents_data").html('');
 			$("#"+e).removeClass("errorPlaceHolder");
-			$('#display_more_btn').hide();
-			$('#img_loading_div').show();
 			searchStr=searchField;
 			start=0;
-			end=start+pageSize;
-			load_data();
+			redraw_table();
 		}else{
 			$("#"+e).addClass("errorPlaceHolder");
 			$("#"+e).attr("placeholder" , "Please enter search term here");
@@ -151,31 +145,25 @@ function timeConverter(UNIX_timestamp){
 }
 
 function refresh_data(){
-	totalDisplayedNum=0
-	$('#table-breakpoint').basictable('destroy');
+	totalDisplayedNum=0;
 	searchStr="";
 	$(".searchFieldClass").val("");
+	$("#selectedRows").val('');
 	$("#documents_data").html('');
-	$('#display_more_btn').hide();
-	$('#img_loading_div').show();
 	start=0;
-	end=start+pageSize;
-	load_data();
+	redraw_table();
 }
 function load_more(){
-	$('#table-breakpoint').basictable('destroy');
-	$('#display_more_btn').hide();
-	$('#img_loading_div').show();
 	if(start==0)	{
 		start=end+1;
 	} else{
 		start=end;
 	}
-	end=start+pageSize;
-	load_data();
+	redraw_table ();
 }
 
 function delete_selection () {
+	$('#globalDeletionPrompt').modal('hide');
 	var selected_rows = $("#selectedRows").val();
 	if(selected_rows!="" && collectionNameStr!=""){
 			$.ajax({
@@ -185,15 +173,11 @@ function delete_selection () {
 				data: {"collection" : collectionNameStr, "selected_values" : $("#selectedRows").val() },
 				success: function(response){
 					if(response.success){
+						checkAllFlag=false;
+						$('.check_all').prop("checked", false);
+				  		$('.check').prop("checked", false);
 						totalDisplayedNum=0;
-						$('#table-breakpoint').basictable('destroy');
-						searchStr="";
-						$(".searchFieldClass").val("");
-						$("#documents_data").html('');
-						$('#display_more_btn').hide();
-						$('#img_loading_div').show();
-						start=0;
-						load_data();
+						refresh_data();
 					}else if(response.error){
 						__alertModalBox(response.error);
 					}
@@ -203,9 +187,34 @@ function delete_selection () {
 		__alertModalBox('Please select some items to delete!');
 	}
 }
+
+function delete_multiple_rows(){
+	var selected='';
+	$('.check').each(function(){
+		if($(this).is(":checked")){
+			if(selected==''){
+				selected=$(this).val();
+			}else{
+				selected+=","+$(this).val();
+			}
+		}
+	});
+		
+	if(selected!=''){
+		$("#selectedRows").val(selected);
+		$('#globalDeletionPrompt').modal('show');
+	}else{
+		__alertModalBox('Please select some items to delete!');
+	}
+}
+
 function delete_single_row(uniqueValue) {
 	$("#selectedRows").val(uniqueValue);
-	delete_selection();
+	if(uniqueValue!=""){
+		$('#globalDeletionPrompt').modal('show');
+	}else{
+		__alertModalBox('Please select some items to delete!');
+	}
 }
 	function load_data(){
 		completeScroll=true;
@@ -275,16 +284,16 @@ function delete_single_row(uniqueValue) {
 						var uniqueFieldVal="";
 						if (typeof html.uniqueField !== 'undefined' && html.uniqueField !== null && row.hasOwnProperty(html.uniqueField) ==true){
 							uniqueFieldVal=row[html.uniqueField];
-							if(accessRightCode==0){
-							
-							}else{
+						}
+							if(accessRightCode>=1){
+								$("#deleteActionDiv").show();
 								if(checkAllFlag){
-									contentHtml+='<td class="hidden-xs"><input type="checkbox" class="check" checked value="'+uniqueFieldVal+'"></td>';
+									contentHtml+='<td class="hidden-xs"><input type="checkbox" class="check" checked value="'+row._id+'"></td>';
 								}else{
-									contentHtml+='<td class="hidden-xs"><input type="checkbox" class="check" value="'+uniqueFieldVal+'"></td>';
+									contentHtml+='<td class="hidden-xs"><input type="checkbox" class="check" value="'+row._id+'"></td>';
 								}	
 							}
-						}
+							
 						if (typeof html.display_columns !== 'undefined' && html.display_columns !== null && html.display_columns!=""){
 							$.each(html.display_columns, function(k,col){
 								if(col!="Action"){
@@ -292,7 +301,7 @@ function delete_single_row(uniqueValue) {
 										contentHtml+="<td>"+timeConverter(row[col])+"</td>";
 									}else if(row.hasOwnProperty(col)==true && (col=="Status" || col=="status" || col=="active")){
 										statusFieldNameStr = col;
-										if (typeof html.uniqueField !== 'undefined' && html.uniqueField !== null && uniqueFieldVal!="" && accessRightCode>0){
+										if(accessRightCode>=1){
 											$("#statusActionDiv").show();
 										}
 										if (typeof html.table !== 'undefined' && html.table !== null && html.table=="email_queue"){

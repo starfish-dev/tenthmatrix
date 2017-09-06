@@ -44,6 +44,8 @@ if (typeof searched_keyword !== 'undefined' && searched_keyword !== null) {
 		<div CLASS="row">
 			<div class="clearfix hidden-xs">
 				<div class="col-md-6" style="">
+					<button CLASS="btn btn-danger hidden-xs" STYLE="display:none;" id="deleteActionDiv" onClick="delete_multiple_rows();"><i CLASS="fa fa-trash"></i></button>
+					
 					<button data-toggle="collapse" CLASS="btn btn-danger hidden-xs" STYLE="display:none;" data-target="#statusBtn" id="statusActionDiv"><i CLASS="fa fa-bars"></i>  Action </button>
 					<span class="display_records_count" style="font-weight:bold;"></span>
 					<div id="statusBtn" class="collapse" style="background-color: #efefef; border-radius: 4px;padding: 12px; margin-top: 11px; overflow:hidden;">
@@ -106,7 +108,23 @@ if (typeof searched_keyword !== 'undefined' && searched_keyword !== null) {
       <!-- /.row (main row) -->
 	</section>
 </div>
- 
+<div class="modal fade" id="globalDeletionPrompt" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+        <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">x</span></button>
+                	<h3 class="modal-title">Are you sure to delete?</h3>
+              </div>
+              <div class="modal-footer">
+              	<button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" onClick="delete_selection(); return false;">Yes, go ahead</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+	</div>
+</div>
+
  <!--//Main Content--> 
 	<!-- Footer Starts Here-->
 	<% include include/footer %>
@@ -114,12 +132,6 @@ if (typeof searched_keyword !== 'undefined' && searched_keyword !== null) {
 <script src="js/basictable.js"></script>
 <script type="text/javascript">
 var templateStr="<%= currentTemplateStr %>", searchStr="<%= keywordStr %>";
-
-<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
-var	access_right="<%= authenticatedUser.access_right %>";
-<% }	else{	 %>
-var access_right=0;
-<% } %>
 </script>
 <script type="text/javascript" src="scripts/listing.js"></script>
 </body>

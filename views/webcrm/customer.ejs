@@ -412,11 +412,6 @@ var table_row_id="<% if (typeof contentObj._id !== 'undefined' && contentObj._id
 var auth_user_id="<% if (typeof authenticatedUser._id !== 'undefined' && authenticatedUser._id !== null) { %><%= authenticatedUser._id %><% } %>";
 var auth_user_name="<% if (typeof authenticatedUser.firstname !== 'undefined' && authenticatedUser.firstname !== null) { %><%= authenticatedUser.firstname %><% } %>";
 	auth_user_name+="<% if (typeof authenticatedUser.lastname !== 'undefined' && authenticatedUser.lastname !== null) { %>&nbsp;<%= authenticatedUser.lastname %><% } %>";
-<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
-var	access_right="<%= authenticatedUser.access_right %>";
-<% }	else{	 %>
-var access_right=0;
-<% } %>
 var relatedCollectionStr='contacts', tableDisplayID='related_contacts', relatedFieldName='customer_mongo_id', relatedFieldValue=table_row_id;
 function draw_content_html (aaData) {
 	var contentHtml="";

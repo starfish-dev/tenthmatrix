@@ -348,11 +348,6 @@ var auth_user_id="<% if (typeof authenticatedUser._id !== 'undefined' && authent
 var auth_user_name="<% if (typeof authenticatedUser.firstname !== 'undefined' && authenticatedUser.firstname !== null) { %><%= authenticatedUser.firstname %><% } %>";
 	auth_user_name+="<% if (typeof authenticatedUser.lastname !== 'undefined' && authenticatedUser.lastname !== null) { %>&nbsp;<%= authenticatedUser.lastname %><% } %>";
 
-<% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
-var	access_right="<%= authenticatedUser.access_right %>";
-<% }	else{	 %>
-var access_right=0;
-<% } %>
 var relatedCollectionStr='tasks', tableDisplayID='related_tasks', relatedFieldName='project_mongo_id', relatedFieldValue=table_row_id;
 function draw_content_html (aaData) {
 	var contentHtml="";
