@@ -1564,6 +1564,29 @@ app.get(backendDirectoryPath+'/load_navigator/', requireLogin, function(req, res
 	}
 });
 
+//api to fetch groups in which logged in user
+app.get(backendDirectoryPath+'/api_fetch_user_groups/', requireLogin, function(req, res) {
+	var outputObj= new Object();
+	if(req.authenticationBool){
+		if(req.query._id && req.query._id!=""){
+		db.collection('groups').find({"users_list": { $in: new Array(req.query._id.toString()) }, "status": { $in: [ 1, "1" ] }}, {"name" : 1}).toArray(function(g_err, g_details) {
+			if(g_details && g_details.length>0){
+				outputObj["aaData"]   = g_details;
+			}	else {
+				outputObj["error"]   = "Sorry, user is not present in any group";
+			}
+			res.send(outputObj);
+		});
+		}else{
+			outputObj["error"]   = "Please pass the required parameters!";
+			res.send(outputObj);
+		}
+	}else{
+		outputObj["error"]   = "Authorization error!";
+		res.send(outputObj);
+	}
+});
+
 //GENERIC: fetch listing depending upon collection or template passed
 app.get(backendDirectoryPath+'/api_fetch_applications/', requireLogin, function(req, res) {
 	var itemsPerPage = 10, pageNum=1, collectionStr="job_applications", outputObj = new Object();

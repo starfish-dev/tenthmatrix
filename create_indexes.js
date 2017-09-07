@@ -38,7 +38,7 @@ init.MongoClient.connect(init.mongoConnUrl, function (err, database) {
    		db.collection('users').createIndex(  { "access_right": 1, "status" : 1 } );
    		db.collection('users').createIndex(  { "email": 1 } );
    		db.collection('users').createIndex(  { "username" : 1 } );
-   		db.collection('users').createIndex(  { "user_type" : 1 } );
+   		//db.collection('users').createIndex(  { "user_type" : 1 } );
    		db.collection('users').createIndex(  { "username": 1, "allow_web_access" : 1 } );
    		db.collection('users').createIndex(  { "players.user_mongo_id": 1, "status" : 1, "players.roles" : 1 } );
    		
