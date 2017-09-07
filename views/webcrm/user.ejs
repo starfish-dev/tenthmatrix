@@ -120,7 +120,7 @@
                 					</div><div class="col-xs-12 col-md-4" align="center">
                 						<div class="form-group">
     										<div class="col-sm-12">
-    											<img src="<% if (typeof contentObj.uploaded_file_uuid !== 'undefined' && contentObj.uploaded_file_uuid !== null) { %><%= backendDirectory %>/file/<%= contentObj.uploaded_file_uuid %>?<%= Math.random(); %><% }else{ %>img/no-avatar.jpg<% } %>" class="img-responsive img-circle" id="user_profile_pic" style="border:1px solid #ddd;" width="50%" onerror="this.src='img/no-avatar.jpg'"/>
+    											<img src="<% if (typeof contentObj.uploaded_file_uuid !== 'undefined' && contentObj.uploaded_file_uuid !== null && contentObj.uploaded_file_uuid !== "") { %><%= backendDirectory %>/file/<%= contentObj.uploaded_file_uuid %>?<%= Math.random(); %><% }else{ %>img/no-avatar.jpg<% } %>" class="img-responsive img-circle" id="user_profile_pic" style="border:1px solid #ddd;" width="50%" onerror="this.src='img/no-avatar.jpg'"/>
     										</div>
   										</div>
                 						<div class="form-group">
@@ -472,13 +472,6 @@ var configDropDown = {
 	'.chosen-select-no-single' : {disable_search_threshold:10},
 	'.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
 	'.chosen-select-width'     : {width:"95%"}
-}
-function load_uploaded_image(){
-	var defaultImageStr= 'img/no-avatar.jpg';
-	if($("#uploaded_file_uuid").val()!="")	{
-		defaultImageStr = backendDirectory+"/file/"+$("#uploaded_file_uuid").val()+'?'+$.now();
-	}
-	$("#user_profile_pic").attr("src", defaultImageStr);
 }
 function get_unique_username (){
 	if($("#username").val()==""){
