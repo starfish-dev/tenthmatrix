@@ -159,8 +159,18 @@ var new_event=new Array();
 	var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 	var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 	
-        $(document).ready(function() {
-        	// validate form on keyup and submit
+    $(document).ready(function() {
+    	//left right key press
+    	$(document).keydown(function(e){
+        	if (e.keyCode == 37) {
+               $('.fc-prev-button').trigger('click');
+    		}
+    		if (e.keyCode == 39) {
+               $('.fc-next-button').trigger('click');
+    		}
+		}); 
+    	    
+       	// validate form on keyup and submit
 		$("#contentForm").validate({
 			ignore: "",
 			onkeyup: false,
