@@ -777,9 +777,8 @@ function load_countries(){
 	function load_player_types(){
 		var userSelectedOptions=new Array();
 		<% if (typeof contentObj.player_qualities !== 'undefined' && contentObj.player_qualities !== null && contentObj.player_qualities !== "") {	 %>
-			var tempSelectedStr='<%= contentObj.player_qualities %>';
+			var tempSelectedStr='<%= contentObj.player_qualities.trim() %>';
 			userSelectedOptions= tempSelectedStr.split(",");
-			
 		<% } %>
 		
 		var e=$("#player_type_uuid").val();
