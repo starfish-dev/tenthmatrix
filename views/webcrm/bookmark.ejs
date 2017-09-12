@@ -620,8 +620,9 @@ $(document).ready(function(){
 			},
 			submitHandler: function(form) {
 				var tempTags =$("#tags").val();
-				$("#tags").val(JSON.stringify(tempTags.split(',')));
-				
+				if(tempTags!=""){
+					$("#tags").val(JSON.stringify(tempTags.split(',')));
+				}
 				generateObjectJson();
  				dataAsJson('contentForm', form);
  			}

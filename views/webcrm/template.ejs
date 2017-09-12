@@ -245,8 +245,9 @@ $(function() {
 			},
 			submitHandler: function(form) {
 				var tempTags =$("#tags").val();
-				$("#tags").val(JSON.stringify(tempTags.split(',')));
-				
+				if(tempTags!=""){
+					$("#tags").val(JSON.stringify(tempTags.split(',')));
+				}
 				dataAsJson('contentForm', form);
  			}
 		});

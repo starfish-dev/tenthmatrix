@@ -283,7 +283,9 @@ $(document).ready(function(){
 			},
 			submitHandler: function(form) {
 				var tempTags =$("#tags").val();
-				$("#tags").val(JSON.stringify(tempTags.split(',')));
+				if(tempTags!=""){
+					$("#tags").val(JSON.stringify(tempTags.split(',')));
+				}
 				
 				var userSystemsStr= $('#select_systems').val();  
 				if(userSystemsStr!="" && userSystemsStr!=null && userSystemsStr!="undefined"){
