@@ -423,7 +423,7 @@ app.get(backendDirectoryPath+'/forgot_password', system_preferences, function(re
     });   
 })
 
-//rootcms pages
+//index page
 app.get(backendDirectoryPath+'/', requireLogin, system_preferences, function(req, res) {
 	if(req.authenticationBool){
 		res.render(accessFilePath+'index', {
@@ -463,7 +463,7 @@ app.get(backendDirectoryPath+'/403', requireLogin, system_preferences, function(
 app.get(backendDirectoryPath+'/launchpad', requireLogin, system_preferences, function(req, res) {
 	if(req.authenticationBool){
 		var filesArr= new Array(), i=0;
-		fs.readdirSync('views/jobshout').forEach(file => {
+		fs.readdirSync('views/'+init.backendDirectoryName).forEach(file => {
  			filesArr[i]=file;
  			i++;
  		});
@@ -479,7 +479,7 @@ app.get(backendDirectoryPath+'/launchpad', requireLogin, system_preferences, fun
 	}
 }); 
 
-//jobshout logout
+//logout
 app.get(backendDirectoryPath+'/logout', function(req, res) {
 	if(req.cookies[init.cookieName] != null && req.cookies[init.cookieName] != 'undefined' && req.cookies[init.cookieName]!=""){
 		var mongoIDField= new mongodb.ObjectID(req.cookies[init.cookieName]);
@@ -495,23 +495,16 @@ app.get(backendDirectoryPath+'/logout', function(req, res) {
 //forgot password post
 app.post(backendDirectoryPath+'/forgot_password', (req, res) => {
 	var postJson=req.body;
-	
 	var checkForExistence= '{"email": \''+postJson.email+'\', "status": { $in: [ 1, "1" ] }}';
-	//eval('var obj='+checkForExistence);
-	//db.collection('users').findOne(obj, function(err, document) {
 	
 	initFunctions.crudOpertions(db, 'users', 'findOne', null, null, null, checkForExistence, function(result) {
 		if (result.aaData) {
-			var document= result.aaData;
-			
-			var addAuthToken=new Object();
+			var document= result.aaData, addAuthToken=new Object();
 			addAuthToken["user_id"]=document._id;
 			addAuthToken["status"]=true;
 				
-			//db.collection('authentication_token').save({"user_id": document._id, "status" : true}, (err, result) => {
 			initFunctions.crudOpertions(db, 'authentication_token', 'create', addAuthToken, null, null, null,function(result) {
-				var subjectStr='Reset your Jobshout password';
-					
+				var subjectStr='Reset your '+init.system_name+' password';
 				var nameStr=document.firstname;
 				if(document.lastname){
 					nameStr+=' '+document.lastname;
@@ -539,15 +532,13 @@ app.post(backendDirectoryPath+'/forgot_password', (req, res) => {
       	} else {
       		res.redirect(backendDirectoryPath+'/forgot_password?error=not_exist');
         }
-      
-	});
+    });
 })
 
 //validate user
 app.post(backendDirectoryPath+'/validlogin', (req, res) => {
 	var postJson=req.body;
 	var checkForExistence= '{"email": \''+postJson.email+'\', "status": { $in: [ 1, "1" ] }}';
-	
 	initFunctions.crudOpertions(db, 'users', 'findOne', null, null, null, checkForExistence, function(result) {
 		if (result.aaData) {
 			var document= result.aaData;
@@ -560,7 +551,6 @@ app.post(backendDirectoryPath+'/validlogin', (req, res) => {
       					res.redirect(backendDirectoryPath+'/sign-in?error=no');
     				}
   				});
-				
 			}else{
       			res.redirect(backendDirectoryPath+'/sign-in?error=password');
       		}
@@ -743,8 +733,7 @@ app.get(backendDirectoryPath+'/load_notifications', requireLogin, function(req, 
 
 // task scheduler
 app.get(backendDirectoryPath+'/task_scheduler', (req, res) => {
-	var schedulerFrom = req.query.schedulerFrom, schedulerTo=req.query.schedulerTo, collectionStr=req.query.collection;
-	var outputObj = new Object();
+	var schedulerFrom = req.query.schedulerFrom, schedulerTo=req.query.schedulerTo, collectionStr=req.query.collection, outputObj = new Object();
 	
 	db.collection(collectionStr).find({ $and:[ { timestamp_start: { $gte: schedulerFrom } },  { timestamp_start: { $lte: schedulerTo } } ] }).sort({modified: 1}).toArray(function(err, items) {
 		if (err) {

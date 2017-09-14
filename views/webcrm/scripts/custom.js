@@ -575,12 +575,24 @@ function getAge(date) {
   	}
   	return age;
 }
+	function checknumber(e)	{
+		var k = e.which;
+		/* numeric inputs can come from the keypad or the numeric row at the top */
+		 if ((k<48 || k>57) && (k!=46) && (k!=8) && (k!=0)) {
+			e.preventDefault();
+			//alert("Allowed characters are 0-9, +, -, (, )");
+			return false;
+		}
+	}
 $(function () {
 	$('#menuSearchBox').keypress(function (e) {
   		if (e.which == 13) {
     		load_navigation_data();
   		}
 	});
+	$('.num').keypress(function(e){
+		checknumber(e);	
+	}); 
     load_navigation_data();
     fetch_users_sites();
     load_notifications();

@@ -162,26 +162,13 @@
     $("#selected_skin").val(cls);
     return false;
   }
-  /**
-   * Get a prestored setting
-   *
-   * @param String name Name of of the setting
-   * @returns String The value of the setting | null
-   */
-  function get(name) {
-  	if (typeof defaultSkinStr === "undefined") { 
-		var defaultSkinStr = "skin-blue";
-	}
-  	return defaultSkinStr;
-  }
-
-  /**
+    /**
    * Retrieve default settings and apply them to the template
    *
    * @returns void
    */
   function setup() {
-    var tmp = get('skin');
+    var tmp = defaultSkinStr;
     if (tmp && $.inArray(tmp, my_skins))
       change_skin(tmp);
 

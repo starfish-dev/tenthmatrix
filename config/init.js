@@ -33,7 +33,7 @@
 		adminTablesArr : definedAdminTablesArr,
 		maintainHistoryTablesArr : definedMaintainHistoryTablesArr,
 		historyDatabaseName : 'jobshout_live_history',
-		system_name : "Tenthmatrix Website",
+		system_name : "WebCRM",
 		recipientStr : 'bwalia@tenthmatrix.co.uk',
 		websiteUrl : 'http://hh4.tenthmatrix.co.uk:3000',
 		appUrl : 'http://hh4.tenthmatrix.co.uk:3009/webcrm'

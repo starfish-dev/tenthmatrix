@@ -822,7 +822,6 @@ function upload_single_file(form){
 $(".uploadFile").remove();
 if( $('#file').length )	{
 	if($('#file').val().length>0)	{
-		$('#processingPrompt').modal('show');
 		var guidStr=$("#uploaded_file_uuid").val();
 		if(guidStr==""){
 			guidStr= guid();
@@ -834,11 +833,12 @@ if( $('#file').length )	{
 		data.append('type', $("#table_name").val());
 		
 		var filesize=Number($('#file')[0].files[0].size)/(1024*1024);
-		
 		if(filesize>5){
 			$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>The file size larger than 5MB is not allowed</div>');
 			$('#file').focus();
 		}else{
+			$('#processingPrompt').modal('show');
+		
 			var files= $('#file')[0].files;
 			var fileNameStr =files[0].name;
 				$.each(files, function(key, value){
@@ -877,6 +877,7 @@ if( $('#file').length )	{
 								}
 							});
 						}else {
+							$('#processingPrompt').modal('hide');
 							$('#contentForm').before('<div class="alert alert-error alert-dismissable uploadFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Sorry, error in uploading file!</div>');
 						}
 					}
@@ -896,7 +897,6 @@ $(document).ready(function() {
         	if(response.aaData && response.aaData.length>0){
 				var tempGroupStr= ""
 				$.each(response.aaData, function(i,row){
-					console.log(row)
 					if(tempGroupStr!=""){
 						tempGroupStr+=", "+row.name;
 					}else{

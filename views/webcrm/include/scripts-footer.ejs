@@ -4,6 +4,8 @@
 <script>
 <% if (typeof system_preferences !== 'undefined' && typeof system_preferences.selected_skin !== 'undefined' && system_preferences.selected_skin !== null && system_preferences.selected_skin !== "") { %>
 var defaultSkinStr='<%= system_preferences.selected_skin %>';
+<% } else { %>
+var defaultSkinStr="skin-blue";
 <% } %>
 </script>
 <script src="js/customize-skins.js"></script>
