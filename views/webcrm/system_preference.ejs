@@ -32,6 +32,7 @@
       								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
             						<input type="hidden" class="form-control" id="data" name="data" value="">
             						<input type="hidden" class="form-control" name="type" value="default">
+            						<input type="hidden" class="form-control" name="selected_skin" id="selected_skin" value="">
             						<input type="hidden" class="form-control" id="main_logo_uuid" name="main_logo_uuid" value="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.main_logo_uuid !== 'undefined' && system_preferences.main_logo_uuid !== null) { %><%= system_preferences.main_logo_uuid %><% } %>">
             						<input type="hidden" class="form-control" id="thumbnail_logo_uuid" name="thumbnail_logo_uuid" value="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.thumbnail_logo_uuid !== 'undefined' && system_preferences.thumbnail_logo_uuid !== null) { %><%= system_preferences.thumbnail_logo_uuid %><% } %>">
             						
@@ -62,7 +63,12 @@
                    							<textarea class="form-control" id="meta_keywords" name="meta_keywords"><% if (typeof system_preferences !== 'undefined' && typeof system_preferences.meta_keywords !== 'undefined' && system_preferences.meta_keywords !== null) { %><%= system_preferences.meta_keywords %><% } %></textarea>
                   						</div>
                 					</div>
-									
+                					<div class="form-group">
+                						<label class="control-label col-md-2" for="">Skins</label>
+										<div class="col-md-6 draw_skins_ui">
+      										
+	 									</div>
+	  								</div>
                 					<% if (typeof system_preferences !== 'undefined' && typeof system_preferences._id !== 'undefined' && system_preferences._id !== null) { %>
                 					<div class="well" style="overflow:hidden;">
    										<h4 style="margin-top:0px;">System Logo's</h4>

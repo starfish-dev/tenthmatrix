@@ -18,14 +18,8 @@
 </footer>
 <!-- jQuery 2.2.3 -->
 
-<script src="js/jquery-2.2.3.min.js"></script>
-
-<script src="js/bootstrap.min.js"></script>
-<!--<script src="js/bootstrap-checkbox-radio-switch.js"></script>-->
-<script src="js/app.min.js"></script>
-
+<% include scripts-footer %>
 <script src="scripts/custom.js"></script>
-<!--<script src="js/checkbox.js"></script>-->
 <script>
 var backendDirectory="<%= backendDirectory %>";
 <% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null) {	%>
