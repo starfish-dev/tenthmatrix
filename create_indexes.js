@@ -31,9 +31,6 @@ init.MongoClient.connect(init.mongoConnUrl, function (err, database) {
    		// compound index on session's table
    		db.collection('session').createIndex(  { "user_id": 1, "status" : 1, "allow_web_access" : 1 } );
    		
-   		// compound index on teams's table
-   		db.collection('teams').createIndex(  {"players.user_mongo_id": 1, "status": 1} );
-   		
    		// index on users's table
    		db.collection('users').createIndex(  { "access_right": 1, "status" : 1 } );
    		db.collection('users').createIndex(  { "email": 1 } );
@@ -43,10 +40,13 @@ init.MongoClient.connect(init.mongoConnUrl, function (err, database) {
    		db.collection('users').createIndex(  { "players.user_mongo_id": 1, "status" : 1, "players.roles" : 1 } );
    		
    		// index on session's table
-   		db.collection('availability').createIndex(  { "user_mongo_id": 1, "start_timestamp" : 1 } );
+   		/**db.collection('availability').createIndex(  { "user_mongo_id": 1, "start_timestamp" : 1 } );
    		db.collection('availability').createIndex(  { "available": 1 } );
    		db.collection('availability').createIndex(  { "user_mongo_id": 1, "fixture_event_uuid" : 1 } );
    		
+   		// compound index on teams's table
+   		db.collection('teams').createIndex(  {"players.user_mongo_id": 1, "status": 1} );  		
+   		*/
    		// index on notifications's table
    		db.collection('notifications').createIndex(  { "notify_to" : 1 } );
    		
@@ -55,12 +55,27 @@ init.MongoClient.connect(init.mongoConnUrl, function (err, database) {
    	  	
    	  	db.collection('bookmarks').createIndex({"tags":"text"});
    	  	
+   	  	db.collection('tokens').createIndex({ "$**": "text" },{ name: "TextIndex" });
+   	  	db.collection('tokens').createIndex(  { "code": 1, "status" : 1 } );
+   	  	
+   	  	db.collection('templates').createIndex({ "$**": "text" },{ name: "TextIndex" });
+   	  	db.collection('templates').createIndex(  { "code": 1, "uuid_system" : 1, "status" : 1 } );
+   	  	
+   	  	//documents table
+   	  	db.collection('documents').createIndex(  { "Code": 1, "uuid_system" : 1 } );
+   	  	db.collection('documents').createIndex({ "$**": "text" },{ name: "TextIndex" });
+   	  	
+   	  	db.collection('mailing_preferences').createIndex(  { "email_address": 1, "uuid_system" : 1, "uuid" : 1 } );
+   	  	db.collection('system_lists').createIndex(  { "code": 1 } );
+   	  	
+   	  	db.collection('fs.files').createIndex(  { "metadata.uuid": 1 } );
+   	  	
 		db.collection('uk_towns_cities').ensureIndex({
     		loc : "2dsphere"
 		});
 		db.collection('uk_towns_cities').createIndex({"tags":"text"});
-   	  	//created indexes and now terminating this process
+   	  	console.log('created indexes and now terminating this process');
    	  	
-   	  	//process.exit();	
+   	  	process.exit();	
   	}
 });
