@@ -169,11 +169,10 @@
    * @returns String The value of the setting | null
    */
   function get(name) {
-  	if(defaultSkinStr!=""){
-  		return defaultSkinStr;
-  	}else if (typeof (Storage) !== "undefined") {
-  		window.alert('Please use a modern browser to properly view this template!');
-    }
+  	if (typeof defaultSkinStr === "undefined") { 
+		var defaultSkinStr = "skin-blue";
+	}
+  	return defaultSkinStr;
   }
 
   /**
