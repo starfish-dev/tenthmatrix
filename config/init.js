@@ -16,7 +16,7 @@
 	var MongoClient = mongodbRe.MongoClient;
 	
 	// Connection URL. This is where your mongodb server is running.
-	var url = 'mongodb://localhost:27017/jobshout_live';
+	var url = 'mongodb://localhost:27017/webcrm_documentation';
 	
 	var _db;
 	var definedAdminTablesArr= new Array("systems", "Country", "availability", "authentication_token", "email_queue", "system_lists", "system_tables", "tags", "modules", "uk_towns_cities");
@@ -26,15 +26,15 @@
     	mongodb : mongodbRe,
     	MongoClient : MongoClient,
     	mongoConnUrl : url,
-    	port : 3009,
+    	port : 3014,
 		cookieName : "webcrm_login",
 		backendDirectoryPath : "/webcrm",
 		backendDirectoryName : "webcrm",
 		adminTablesArr : definedAdminTablesArr,
 		maintainHistoryTablesArr : definedMaintainHistoryTablesArr,
-		historyDatabaseName : 'jobshout_live_history',
+		historyDatabaseName : 'webcrm_documentation_history',
 		system_name : "WebCRM",
 		recipientStr : 'bwalia@tenthmatrix.co.uk',
-		websiteUrl : 'http://hh4.tenthmatrix.co.uk:3000',
-		appUrl : 'http://hh4.tenthmatrix.co.uk:3009/webcrm'
+		websiteUrl : 'http://hh4.tenthmatrix.co.uk:3015',
+		appUrl : 'http://hh4.tenthmatrix.co.uk:3014/webcrm'
 	};
