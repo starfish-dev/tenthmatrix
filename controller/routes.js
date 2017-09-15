@@ -1442,6 +1442,30 @@ app.get(backendDirectoryPath+'/swtich_user_system/', requireLogin, function(req,
 	}
 });
 
+//api_next_sequence_number
+app.get(backendDirectoryPath+'/api_next_sequence_number/', requireLogin, function(req, res) {
+	var resultObj = new Object();
+	
+	if(req.authenticationBool){
+		if(req.query.table && req.query.table!=""){
+			db.collection(req.query.table).find({}).count(function (e, count) {
+				if(count){
+					resultObj["seq_num"] = count+1;
+				} else {
+					resultObj["seq_num"] = 1;
+				}
+				res.send(resultObj);
+			});
+    	}else{
+    		resultObj["seq_num"] = 1;
+			res.send(resultObj);
+    	}
+	}else{
+		resultObj["seq_num"] = 1;
+		res.send(resultObj);
+	}
+});
+
 //api_unique_username
 app.get(backendDirectoryPath+'/api_unique_username/', requireLogin, function(req, res) {
 	var resultObj = new Object();

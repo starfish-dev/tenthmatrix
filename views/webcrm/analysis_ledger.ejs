@@ -1,0 +1,332 @@
+<% include include/main-header %>
+<link rel="stylesheet" href="css/basictable.css">
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<!-- navbar top -->
+   	<div class="wrapper">
+   		<!-- Header Starts here-->
+  		<% include include/header %>
+  		<!-- Header Ends here-->
+  		
+  		<!-- Sidebar Starts Here-->
+  			<% include include/sidebar %>
+    		<!-- Sidebar Ends Here-->
+    	<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Dashboard
+        <small>Control panel</small>
+      </h1>
+      <ol class="breadcrumb">
+       	<% include include/dashboard-breadcrumb %>
+       	<li class="active">Module</li>
+      </ol>
+    </section>
+	<section class="content">
+      			<div class="row">
+            				<div class="panel-body no-padding-top bg-white"> 
+            					<% include include/display_returned_msg %>
+            				
+            					<form class="form-horizontal" action="<%= backendDirectory %>/save/analysis_ledger" method="POST" id="contentForm">
+            						<input type="hidden" class="form-control" id="table_name" name="table_name" value="analysis_ledgers">
+      								<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="name">
+      								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
+      								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
+      								<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
+            						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						<div class="form-group">
+                  						<label class="control-label col-md-2" for="first-name">Name<span class="required">*</span></label>
+                  						<div class="col-md-6">
+                    						<input type="text" required="required" id="name" name="name" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.name !== 'undefined' && contentObj.name !== null) { %><%= contentObj.name %><% } %>">
+                  						</div>
+                					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-2" for="">Types of Accounts </label>
+                  						<div class="col-md-6">
+                  							<select id="account_type" name="account_type" class="form-control col-md-5 col-xs-12"></select>
+                   						</div>
+                					</div>
+                					
+                					<div class="form-group">
+                  						<label class="control-label col-md-2" for="">Notes</label>
+                  						<div class="col-md-6 ">
+                   							<textarea class="form-control col-md-5 col-xs-12" id="notes" name="notes" ><% if (typeof contentObj.notes !== 'undefined' && contentObj.notes !== null) { %><%= contentObj.notes %><%	} %></textarea>
+                  						</div>
+									</div>
+									<div CLASS="ROW ">
+										<div CLASS="col-md-12 itemsContent" STYLE="margin-left:13px;">
+											<span style="float:right; font-weight:bold;">
+												<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal" style="margin-bottom: 10px;">+ Add new Item</button>
+											</span>
+										</div>
+									</div>
+									<div CLASS="row">
+										<div class="itemsContent col-md-12" id="itemsTable">
+    										<label for="" class="col-lg-2 col-sm-12 control-label" STYLE="padding-left:0px;"> Analysis accounts in this ledger</label>
+    										<div >
+												<div CLASS="table-responsive">
+												<input type="hidden" id="analysis_account" name="analysis_account" value="">
+												
+										   		<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-breakpoint">
+													<thead>
+												  		<tr class="item">
+												  			<th>IS IN SCOPE OF TAX</th>
+												  			<th>ACCOUNT NAME</th>
+													  		<th>MONEY IN OR OUT</th>
+													 		<th>CURRENCY CODE</th><th>NOTES</th>
+													  		<th colspan="2" align="center">Actions</th>
+													  	</tr>
+											  	</thead>
+											  	<tbody id="link_items">
+											  		<% if (typeof contentObj.analysis_account !== 'undefined' && contentObj.analysis_account !== null  && contentObj.analysis_account != "") { 	
+											  			try{
+															var analysis_account = JSON.parse(contentObj.analysis_account); 
+        												}	catch (error){
+       														var analysis_account =  contentObj.analysis_account; 
+    													} 
+											  			for(var i=0; i< analysis_account.length; i++){	%>
+											  			<tr class="itemClass itemtr_<%= analysis_account[i].uuid %>">
+											  				<td><input type="hidden" id="uuid" value="<%= analysis_account[i].uuid %>"><input type="checkbox" <% if(analysis_account[i].is_in_scope_of_tax==1) { %>checked value="1"<% }else{ %>value="0"<% } %> id="is_in_scope_of_tax" class="check"></td>
+											  				<td><input type="hidden" value="<%= analysis_account[i].account_name %>" id="account_name"><%= analysis_account[i].account_name %></td>
+											  				<td><input type="hidden" value="<%= analysis_account[i].money_in_or_out %>" id="money_in_or_out"><%= analysis_account[i].money_in_or_out %></td>
+											  				<td><input type="hidden" value="<%= analysis_account[i].currency_code %>" id="currency_code"><%= analysis_account[i].currency_code %></td>
+															<td><input type="hidden" value="<%= analysis_account[i].notes %>" id="notes"><%= analysis_account[i].notes %></td>
+															<td><a href="javascript:void(0)" title="Edit" onClick="edit_item('<%= analysis_account[i].uuid %>')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item('<%= analysis_account[i].uuid %>')" title="Remove"><i class="fa fa-trash"></i></a></td>
+														</tr>
+			
+											  	<%	}
+											  }	%>
+											  </tbody>
+											</table>
+											<span style="float:right;font-size:12px;font-style:italic;color:#d9534f">Note: Please submit the form to save the changes!</span>
+											</div>
+											
+										</div>
+									</div>
+									</div>
+                					<div class="form-group">
+                   						<div class="col-md-9 col-lg-6" align="center">
+               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/list/modules" class="btn btn-danger btn-sm">Cancel</a>
+               								<%	}else{	%>
+               									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+               								<% } %>
+               								</div>
+               							</div>
+                					</div>
+              					</form>
+              				</div>
+            			</div>
+
+    		</section>
+    		<!--//body content--> 
+  		</div>
+  		<!--//Main Content--> 
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <button type="button" class="close" 
+                   data-dismiss="modal" onClick="resetItemForm()">
+                       <span aria-hidden="true">&times;</span>
+                       <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    Add link
+                </h4>
+            </div>
+			
+			<style>
+			.form-group {
+    			margin-bottom: 15px;
+    			overflow: hidden;
+			}
+			</style>
+            
+            <!-- Modal Body -->
+            <div class="modal-body">
+            	<div class="form-group" id="messageId">
+                    <label for="item_label"><strong>Account name</strong><span class="f_req">*</span></label>
+                      <input class="form-control" id="item_account_name" placeholder="Account name"/>
+                      <input type="hidden" class="form-control" id="item_uuid"/>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="item_type" id="itemlinklabel"><strong>Money in or out</label>
+                	<select id="item_money_in_or_out" class="form-control">
+						<option value='Money in'>Money in</option>
+						<option value='Money out'>Money out</option>
+					</select>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="item_type" id="itemlinklabel"><strong>Currency Code</label>
+                	<select id="item_currency_code" class="form-control">
+					</select>
+                  </div>
+                   <div class="form-group">
+                    	<label for="item_label"></label>
+                      <label><input type="checkbox" id="item_is_in_scope_of_tax"> Entries in this account are in scope of Tax (VAT) ? </label>
+                  </div>
+                  <div class="form-group">
+                    <label for="item_label"><strong>Notes</strong></label>
+                      <textarea class="form-control" id="item_notes" placeholder="Notes"></textarea>
+                  </div>
+                 
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+            	<button type="button" class="btn btn-default" data-dismiss="modal" onClick="resetItemForm()">Close</button>
+                <button type="button" class="btn btn-primary" onClick="savelinkitem()">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	
+
+<!-- Footer Starts Here-->
+	<% include include/footer %>
+<!-- Footer Ends Here-->
+</div>
+<!-- Page-Level Plugin Scripts-->
+<script src="js/jquery.validate.js"></script>
+<script src="js/basictable.js"></script>
+<script>
+$(document).ready(function(){
+	// validate form on keyup and submit
+		$("#contentForm").validate({
+			ignore: "",
+			onkeyup: false,
+			errorClass: 'error',
+			validClass: 'valid',
+			errorElement: "em",
+			errorPlacement: function(error, element) {
+				$(element).closest('div').append(error);
+			},
+			onfocusout: false,
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {                    
+					validator.errorList[0].element.focus();
+				}
+			},
+			rules: {
+				name: { required: true },
+				account_type: { required: true },
+				analysis_account : {required : true}
+			},
+			messages: {
+				analysis_account: "Please add analysis accounts in this ledger",
+			},
+			submitHandler: function(form) {
+				generateObjectJson();
+ 				dataAsJson('contentForm', form);
+ 			}
+		});		
+	$('#table-breakpoint').basictable({
+        breakpoint: 751
+    });
+	fetch_default_list("currency-list", "","item_currency_code");
+	fetch_default_list("type-of-accounts", "<% if (typeof contentObj.account_type !== 'undefined' && contentObj.account_type !== null) { %><%= contentObj.account_type %><% } %>","account_type");
+});
+
+function generateObjectJson(){
+	var createArr=new Array();
+	var i=0;
+	$('.itemClass').each(function(){
+		var createObject={};
+		createObject['uuid']=$(this).find('#uuid').val();
+  		createObject['account_name']=$(this).find('#account_name').val();
+  		createObject['money_in_or_out']=$(this).find('#money_in_or_out').val();
+  		createObject['currency_code']=$(this).find('#currency_code').val();
+  		createObject['notes']=$(this).find('#notes').val();
+  		createObject['is_in_scope_of_tax']=$(this).find('#is_in_scope_of_tax').val();
+  		createArr[i]=createObject;
+  		i++;
+  	});
+  	$("#analysis_account").val(JSON.stringify(createArr));
+}
+function remove_item(e){
+	if(e!=""){
+		$(".itemtr_"+e).remove();
+	}
+}
+
+function edit_item(e){
+	if(e!=""){
+		var row= $(".itemtr_"+e);	
+		$("#item_uuid").val(e);
+		$("#item_account_name").val(row.find('#account_name').val());
+		$("#item_money_in_or_out").val(row.find('#money_in_or_out').val());
+		$("#item_currency_code").val(row.find('#currency_code').val());
+		$("#item_notes").val(row.find('#notes').val());
+
+		if(row.find('#is_in_scope_of_tax').is(":checked")) {
+			$("#item_is_in_scope_of_tax").prop('checked', true);
+		}else{
+			$("#item_is_in_scope_of_tax").prop('checked', false);
+		}
+		$('#myModal').modal('show'); 
+	}
+}
+
+function savelinkitem(){
+	$("#msgSpan").remove();
+	var item_uuid=$("#item_uuid").val();
+	var item_account_name=$("#item_account_name").val();
+	var item_money_in_or_out=$("#item_money_in_or_out").val();
+	var item_currency_code=$("#item_currency_code").val();
+	var item_notes=$("#item_notes").val();
+	var scope_of_tax="", scope_of_tax_num=0;
+	if ($('#item_is_in_scope_of_tax').is(":checked")) {
+		scope_of_tax="checked";
+		scope_of_tax_num=1;
+	}
+	if(item_account_name!="" && item_money_in_or_out!="" && item_currency_code!=""){
+			var newEntryBool=false;
+			if(item_uuid==""){
+				item_uuid=guid();
+				newEntryBool = true;
+			}
+			var htmlStr='<td><input type="hidden" id="uuid" value="'+item_uuid+'"><input type="checkbox" value="'+scope_of_tax_num+'" id="is_in_scope_of_tax" '+scope_of_tax+' class="check"></td>';
+			htmlStr +='<td><input type="hidden" value="'+item_account_name+'" id="account_name">'+item_account_name+'</td>';
+			htmlStr +='<td><input type="hidden" value="'+item_money_in_or_out+'" id="money_in_or_out">'+item_money_in_or_out+'</td>';
+			htmlStr +='<td><input type="hidden" value="'+item_currency_code+'" id="currency_code">'+item_currency_code+'</td>';
+			htmlStr +='<td><input type="hidden" value="'+item_notes+'" id="notes">'+item_notes+'</td>';
+			htmlStr +='<td><a href="javascript:void(0)" title="Edit" onClick="edit_item(\''+item_uuid+'\')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item(\''+item_uuid+'\')" title="Remove"><i class="fa fa-trash"></i></a></td>';
+														
+			if(newEntryBool){
+				$("#link_items").append('<tr class="itemClass itemtr_'+item_uuid+'">'+htmlStr+'</tr>');
+			}else{
+				$(".itemtr_"+item_uuid).html(htmlStr);
+			}
+			generateObjectJson();
+			$('#myModal').modal('hide');
+			resetItemForm();
+			$('#table-breakpoint').basictable('destroy');	
+			$('#table-breakpoint').basictable({
+				breakpoint: 751
+   			});
+	}else{
+		$("#messageId").before('<span id="msgSpan" style="color:#CC0000;">Please add all the required fields!</span>');
+	}	
+}		
+function resetItemForm(){
+	$("#msgSpan").remove();
+	$("#item_uuid").val("");
+	$("#item_account_name").val('');
+	$("#item_account_name").val('');
+	$("#item_is_in_scope_of_tax").prop('checked', false);
+	$("#item_currency_code").val('');
+	$("#item_notes").val('');
+}
+</script>
+</body>
+</html>
