@@ -87,8 +87,8 @@ function fetchNotes(){
 						if(row.user_name){
 							added_by=row.user_name;
 						}
-						contentHtml+="<tr class='item-row'><td>"+added_by+"</td>";
-						contentHtml+="<td>"+dateTimeFromUnix(row.modified)+"<input type='hidden' class='noteUUID form-control' value='"+row.uuid+"' ></td>";
+						contentHtml+="<tr class='item-row notesRowClass'><td><input type='hidden' id='user_name' value='"+row.user_name+"' ><input type='hidden' id='user_uuid' value='"+row.user_uuid+"' >"+added_by+"</td>";
+						contentHtml+="<td>"+dateTimeFromUnix(row.modified)+"<input type='hidden' class='noteUUID form-control' value='"+row.uuid+"' ><input type='hidden' id='created' value='"+row.created+"' ><input type='hidden' id='modified' value='"+row.modified+"' ></td>";
 						contentHtml+="<td><span class='noteSpan'>"+row.note+"</span><input type='text' class='noteField form-control' style='display:none;' value='"+row.note+"' ></td>";
 						contentHtml+='<td class="hidden-xs">';
 						if(row.user_uuid==auth_user_id){
@@ -144,6 +144,22 @@ function save_note_method(uuid,actionStr, note){
 	});
 	$('#addNote').modal('hide');
 	$('#add_note').val('');
+}
+function generateNotesJson(){
+	var createArr=new Array();
+	var i=0;
+	$('.notesRowClass').each(function(){
+		var createObject={};
+  		createObject['uuid']=$(this).find('.noteUUID').val();
+  		createObject['note']=$(this).find('.noteField').val();
+  		createObject['user_uuid']=$(this).find('#user_uuid').val();
+  		createObject['user_name']=$(this).find('#user_name').val();
+  		createObject['modified']=$(this).find('#modified').val();
+  		createObject['created']=$(this).find('#created').val();
+  		createArr[i]=createObject;
+  		i++;
+  	});
+  	$("#notes").val(JSON.stringify(createArr));
 }
 $(function () {
 	fetchNotes();

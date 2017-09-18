@@ -1,4 +1,4 @@
-function applyTaxEntered(){
+	function applyTaxEntered(){
 		$("tax_message").remove();
 		if($('#dlg_tax_rate').val()!=null && $('#dlg_tax_rate').val()!=""){
 			$('#tax_rate').val($('#dlg_tax_rate').val());
@@ -53,29 +53,41 @@ function roundNumber(number,decimals) {
   return newString; // Output the result to the form field (change for your purposes)
 }
 function update_total() {
-  var total = 0, tot_rate = 0, tot_hour = 0, total_with_tax = 0, hour=0;
-  
-  $('.hours').each(function(i){
+	var sub_total = 0, tot_rate = 0, tot_hour = 0, total_with_tax = 0, total_due_without_tax = 0, hour=0, discount_perc=0, discount=0;
+	$('.hours').each(function(i){
     	hour = $(this).val();
 		if (!isNaN(hour)) tot_hour += Number(hour);
-  });
+  	});
+  	
+  	$('.price').each(function(i){
+		price = $(this).val();
+    	if (!isNaN(price)) sub_total += Number(price);
+  	});
   
-  $('.price').each(function(i){
-    price = $(this).val();
-    if (!isNaN(price)) total += Number(price);
-  });
-  tot_hour = roundNumber(tot_hour,2);
-  total = roundNumber(total,2);
-  tot_rate=$('#tax_rate').val();
-  tot_tax = roundNumber(total*tot_rate/100,2);
-  total_with_tax = roundNumber(Number(total)+Number(tot_tax),2);
+	tot_hour = roundNumber(tot_hour,2);
+	sub_total = roundNumber(sub_total,2);
+  	
+	//discount applied if any
+	discount_perc= $("#discount_applied").val();
+	if(discount_perc >=0){
+		discount = roundNumber(sub_total*discount_perc/100,2);
+	}
+	total_due_without_tax = roundNumber(sub_total - discount,2);
+	
+	//evaluate total with tax applied
+	tot_rate=$('#tax_rate').val();
+	tot_tax = roundNumber(total_due_without_tax*tot_rate/100,2);
+	total_with_tax = roundNumber(Number(total_due_without_tax)+Number(tot_tax),2);
+	
+  	$('#subtotal').val(sub_total);
   
-  $('#total_hours').val(tot_hour);
-  $('#total_due').val(total);
-  $('#total_tax').val(tot_tax);
-  $('#total_due_with_tax').val(total_with_tax);
+  	$('#total_hours').val(tot_hour);
+  	$('#total_due_without_tax').val(total_due_without_tax);
   
-  update_balance();
+  	$('#total_tax').val(tot_tax);
+  	$('#total_due_with_tax').val(total_with_tax);
+  
+  	update_balance();
 }
 
 function update_balance() {
@@ -88,7 +100,10 @@ function update_balance() {
 	
 function calculate_amount(){
 	var tempAmount= $("#item_rate").val() * $("#item_hours").val();
-	$("#item_amount").val(tempAmount);
+	var item_discount = roundNumber(tempAmount * $('#item_discount').val()/100,2);
+  	var price= tempAmount - item_discount;
+ 
+	$("#item_amount").val(price);
 }
 function generateObjectJson(){
 	var createArr=new Array();
@@ -99,13 +114,13 @@ function generateObjectJson(){
   		createObject['description']=$(this).find('#description').val();
   		createObject['rate']=$(this).find('#rate').val();
   		createObject['hours']=$(this).find('#hours').val();
+  		createObject['discount']=$(this).find('#discount').val();
   		createObject['amount']=$(this).find('#amount').val();
   		createArr[i]=createObject;
   		i++;
   	});
-  	$("#invoice_items").val(JSON.stringify(createArr));
+  	$("#order_items").val(JSON.stringify(createArr));
 }
-
 function remove_item(e){
 	if(e!=""){
 		$(".itemtr_"+e).remove();
@@ -119,6 +134,7 @@ function edit_item(e){
 		$("#item_description").val(row.find('#description').val());
 		$("#item_rate").val(row.find('#rate').val());
 		$("#item_hours").val(row.find('#hours').val());
+		$("#item_discount").val(row.find('#discount').val());
 		$("#item_amount").val(row.find('#amount').val());
 		$('#myModal').modal('show'); 
 	}
@@ -131,18 +147,19 @@ function savelinkitem(){
 	var item_rate=$("#item_rate").val();
 	var item_hours=$("#item_hours").val();
 	var item_amount=$("#item_amount").val();
+	var item_discount=$("#item_discount").val();
 	
-	if(item_description!="" && item_rate!="" && item_hours!="" && item_amount!=""){
+	if(item_description!="" && item_rate!="" && item_hours!="" && item_amount!="" && item_rate>0 && item_hours>0 && item_amount>0){
 			var newEntryBool= false;
 			if(item_uuid==""){
 				item_uuid=guid();
 				newEntryBool= true;
 			}
 			var htmlStr='<td><input type="hidden" id="uuid" value="'+item_uuid+'"><input type="hidden" id="description" value="'+item_description+'">'+item_description+'</td>';
-			htmlStr+='<td><input type="hidden" class="price" id="rate" value="'+item_rate+'">'+item_rate+'</td>';
+			htmlStr+='<td><input type="hidden" id="rate" value="'+item_rate+'">'+item_rate+'</td>';
 			htmlStr+='<td><input type="hidden" id="hours" class="hours" value="'+item_hours+'">'+item_hours+'</td>';
-			var tempAmountNum = item_rate*item_hours;
-			htmlStr+='<td><input type="hidden" id="amount" value="'+tempAmountNum+'">'+tempAmountNum+'</td>';
+			htmlStr+='<td><input type="hidden" id="discount" value="'+item_discount+'">'+item_discount+'</td>';
+			htmlStr+='<td><input type="hidden" class="price" id="amount" value="'+item_amount+'">'+item_amount+'</td>';
 			htmlStr+='<td><a href="javascript:void(0)" title="Edit" onClick="edit_item(\''+item_uuid+'\')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item(\''+item_uuid+'\')" title="Remove"><i class="fa fa-trash"></i></a></td>';
 														
 			if(newEntryBool){
@@ -155,8 +172,8 @@ function savelinkitem(){
 			$('#myModal').modal('hide');
 			resetItemForm();
 			update_total();
-			$('#table-invoice-items').basictable('destroy');	
-			$('#table-invoice-items').basictable({
+			$('#table-items').basictable('destroy');	
+			$('#table-items').basictable({
 				breakpoint: 751
    			});
 	}else{
@@ -168,6 +185,7 @@ function resetItemForm(){
 	$("#item_uuid").val("");
 	$("#item_description").val('');
 	$("#item_rate").val(0);
+	$("#item_discount").val(0);
 	$("#item_hours").val(0);
 	$("#item_amount").val(0);
 }
@@ -177,7 +195,12 @@ $(function () {
 	$("#total_paid").blur( function() {
 		update_balance();
 	});
-  	$("#tax_rate").blur( function() {
+  	$("#discount_applied").blur( function() {
+		update_total();
+	}).keypress( function() {
+		update_total();
+	});
+	$("#tax_rate").blur( function() {
 		update_total();
 	});
 	$('#tax_code').change(function(){
@@ -192,7 +215,7 @@ $(function () {
 		update_total();
 	});
 	
-	$('#table-invoice-items').basictable({
+	$('#table-items').basictable({
     	breakpoint: 751
     });
 	
@@ -219,30 +242,26 @@ $(function () {
 				}
 			},
 			rules: {
-				invoice_no: { required: true },
-				terms: { required: true },
+				order_id: { required: true },
 				client_mongo_id: { required: true },
-				invoiced_date: { required: true },
-				due_date : { required: true },
-				invoice_status : { required: true },
+				ordered_date: { required: true },
+				order_status : { required: true },
 				project_mongo_id : { required: true },
 				tax_code: { required: true },
-				invoice_items: { required: true }
+				order_items: { required: true }
 			},
 			messages: {
-				invoice_items: "Please add invoice items",
+				order_items: "Please add order items",
 			},
 			submitHandler: function(form) {
 				generateObjectJson();
 				generateNotesJson();
+				
 				$('#project_name').val($('#project_mongo_id option:selected').text());
 				$('#client_name').val($('#client_mongo_id option:selected').text());
 				
-				var startTimestampNum=return_timestamp_from_datetimepicker($('#invoiced_date').val(), false);
-				$('#invoiced_timestamp').val(startTimestampNum);
-				
-				var endTimestampNum=return_timestamp_from_datetimepicker($('#due_date').val(), false);
-				$('#due_timestamp').val(endTimestampNum);
+				var startTimestampNum=return_timestamp_from_datetimepicker($('#ordered_date').val(), false);
+				$('#ordered_timestamp').val(startTimestampNum);
 				
 				var endTimestampNum=return_timestamp_from_datetimepicker($('#paid_date').val(), false);
 				$('#paid_timestamp').val(endTimestampNum);
@@ -252,47 +271,36 @@ $(function () {
  			}
 		});	
 			/* datepicker plugin */
-			if($("#invoiced_timestamp").val()!=""){
-				var tempDisplayDate=return_datetimepicker_from_timestamp($("#invoiced_timestamp").val());
-				$("#invoiced_date").val(tempDisplayDate)
+			if($("#ordered_timestamp").val()!=""){
+				var tempDisplayDate=return_datetimepicker_from_timestamp($("#ordered_timestamp").val());
+				$("#ordered_date").val(tempDisplayDate)
 			}
-            $('#invoiced_datetime_picker').datetimepicker({
+            $('#ordered_datetime_picker').datetimepicker({
 				format: 'L',
 				defaultDate:new Date()
 			}).on("dp.show", function (e) {
 				if($('#due_date').val()!=="")	{
-					$('#invoiced_datetime_picker').data("DateTimePicker").maxDate($('#due_date').val());
+					$('#ordered_datetime_picker').data("DateTimePicker").maxDate($('#due_date').val());
 				}
         	}).on("dp.change", function (e) {
         		$('#due_datetime_picker').data("DateTimePicker").minDate(e.date);
         	});
 			
-			if($("#due_timestamp").val()!=""){
-				var tempDisplayDate=return_datetimepicker_from_timestamp($("#due_timestamp").val());
-				$("#due_date").val(tempDisplayDate)
-			}
-            $('#due_datetime_picker').datetimepicker({
-				format: 'L'
-			}).on("dp.show", function (e) {
-				if($('#invoiced_date').val()!==""){
-					$('#due_datetime_picker').data("DateTimePicker").minDate($('#invoiced_date').val());
-				}
-        	}).on("dp.change", function (e) {
-        		$('#invoiced_datetime_picker').data("DateTimePicker").maxDate(e.date);
-            });
-            
-            if($("#paid_timestamp").val()!=""){
+			if($("#paid_timestamp").val()!=""){
 				var tempDisplayDate=return_datetimepicker_from_timestamp($("#paid_timestamp").val());
 				$("#paid_date").val(tempDisplayDate)
 			}
             $('#paid_datetime_picker').datetimepicker({
 				format: 'L'
-			});
-			
-	//fetch_ledger_accounts
-	setTimeout(function(){ fetch_ledger_accounts(); }, 1000);	
+			}).on("dp.show", function (e) {
+				if($('#ordered_date').val()!==""){
+					$('#paid_datetime_picker').data("DateTimePicker").minDate($('#ordered_date').val());
+				}
+        	}).on("dp.change", function (e) {
+        		$('#ordered_datetime_picker').data("DateTimePicker").maxDate(e.date);
+            });
+				
 });
-
 function fetch_client_details(){
 	if($("#client_mongo_id").val()!="" && $("#client_mongo_id").val()!=="undefined" && $("#client_mongo_id").val()!==null){
 		$.getJSON(backendDirectory+"/collection_details?collection=customers&id="+$("#client_mongo_id").val(),function(response){
@@ -320,34 +328,6 @@ function fetch_client_details(){
 				$("#bill_to").val(bill_to_str);
 			}
 		});
-	}
-}
-
-function fetch_ledger_accounts(){
-	if($("#analysis_ledger_mongo_id").val()!="" && $("#analysis_ledger_mongo_id").val()!=="undefined" && $("#analysis_ledger_mongo_id").val()!==null){
-		$.getJSON(backendDirectory+"/collection_details?collection=analysis_ledgers&id="+$("#analysis_ledger_mongo_id").val(),function(response){
-			if(response.aaData && response.aaData.analysis_account && response.aaData.analysis_account!=""){
-				try{
-					var analysis_account = JSON.parse(response.aaData.analysis_account); 
-        		}	catch (error){
-       				var analysis_account =  response.aaData.analysis_account; 
-    			} 
-    			if(analysis_account && analysis_account.length>0){
-    				var analysisAccStr='<option value="">--Select--</option>';
-    				for(var i=0; i< analysis_account.length; i++){
-    					var selectedStr='';
-    					if(analysis_account_mongo_id==analysis_account[i].uuid){
-    						selectedStr= "selected";
-    					}
-    					analysisAccStr+='<option value="'+analysis_account[i].uuid+'" '+selectedStr+'>'+analysis_account[i].account_name+'</option>';
-    				}
-    				$("#analysis_account_mongo_id").html(analysisAccStr);
-    				$("#analysis_acc_ui").show();
-    			}
-			}
-		});
-	}else{
-		$("#analysis_acc_ui").hide();
 	}
 }
 
@@ -398,9 +378,6 @@ function fetch_ledger_accounts(){
 			}
 			if(ele_select.attr('id')=='project_mongo_id'){
 				$('#project_name').val($('#project_mongo_id option:selected').text());
-			}
-			if(ele_select.attr('id')=='analysis_ledger_mongo_id'){
-				fetch_ledger_accounts();
 			}
           },
  
@@ -518,9 +495,6 @@ function fetch_ledger_accounts(){
 			}
 			if(ele_select.attr('id')=='project_mongo_id'){
 				$('#project_name').val($('#project_mongo_id option:selected').text());
-			}
-			if(ele_select.attr('id')=='analysis_ledger_mongo_id'){
-				fetch_ledger_accounts();
 			}
             return false;
           }

@@ -12,7 +12,7 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
 <link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
 <link rel="stylesheet" href="css/basictable.css">
 <style>
-.custom-combobox {
+	.custom-combobox {
 		position: relative;
 		display: inline-block;
 	}
@@ -38,7 +38,6 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
     padding: 9px;
 }
 </style>
-
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 	<div class="wrapper">	
@@ -52,10 +51,10 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
 		<div class="content-wrapper">
     	  	<!-- Content Header (Page header) -->
     		<section class="content-header">
-      			<h1>Invoice <% if (typeof contentObj.invoice_no !== 'undefined' && contentObj.invoice_no !== null) { %>Number: <%= contentObj.invoice_no %><% } %> <small><% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>Edit <% } else{	%>Add new<% }%></small></h1>
+      			<h1>Order <% if (typeof contentObj.order_id !== 'undefined' && contentObj.order_id !== null) { %>Number: <%= contentObj.order_id %><% } %> <small><% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>Edit <% } else{	%>Add new<% }%></small></h1>
       			<ol class="breadcrumb">
         			<% include include/dashboard-breadcrumb %>
-        			<li class="active">Invoice</li>
+        			<li class="active">Order</li>
       			</ol>
     		</section>	
     		<section class="content">
@@ -63,9 +62,9 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
       				
       				<div class="panel-body no-padding-top bg-white"> 
       				<% include include/display_returned_msg %>
-      				<form class="form-horizontal" action="<%= backendDirectory %>/save/invoice" method="POST" id="contentForm">
-            			<input type="hidden" class="form-control" id="table_name" name="table_name" value="invoices">
-      					<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="invoice_no">
+      				<form class="form-horizontal" action="<%= backendDirectory %>/save/order" method="POST" id="contentForm">
+            			<input type="hidden" class="form-control" id="table_name" name="table_name" value="orders">
+      					<input type="hidden" class="form-control" id="unique_field" name="unique_field" value="order_id">
       					<input type="hidden" class="form-control" id="id" name="id" value="<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %><%= contentObj._id %><% } %>">
       					<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
       					<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
@@ -74,8 +73,7 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
       					<div class="nav-tabs-custom">
             				<!-- Tabs within a box -->
            					<ul class="nav nav-tabs pull-left">
-            					<li class="active"><a href="#first" data-toggle="tab">Invoice Details</a></li>
-            					<li><a href="#second" data-toggle="tab">Internal Notes & Currency details</a></li>
+            					<li class="active"><a href="#first" data-toggle="tab">Order Details</a></li>
            						<% if (typeof contentObj._id !== "undefined" && contentObj._id !== null) { %>
            						<li><a href="#third" data-toggle="tab">Notes</a></li>
            						<% } %>
@@ -83,109 +81,94 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
             				<div class="tab-content ">
             					<div class="chart tab-pane active" id="first" >	
             						<div class="row" STYLE="margin-top:10px;">
-            						<div class="col-md-8 col-xs-12"><div class="box box-primary">
+            						<div class="col-md-7 col-xs-12"><div class="box box-primary">
             						<h4>Main Details</h4>
             						<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-12">
             						<div class="form-group">
-                  						<label class="control-label col-md-3" for="first-name">Invoice number<span class="required">*</span></label>
-                  						<div class="col-md-9 col-lg-9">
-                    						<input type="text" readonly required id="invoice_no" name="invoice_no" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.invoice_no !== 'undefined' && contentObj.invoice_no !== null) { %><%= contentObj.invoice_no %><% } %>">
+                  						<label class="control-label col-md-2" for="first-name">Order number<span class="required">*</span></label>
+                  						<div class="col-md-10 col-lg-5">
+                    						<input type="text" readonly required id="order_id" name="order_id" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.order_id !== 'undefined' && contentObj.order_id !== null) { %><%= contentObj.order_id %><% } %>">
                   						</div>
                 					</div>
-              						<div class="form-group">
-                  						<label class="control-label col-md-3" for="">Terms<span class="required">*</span></label>
-                  						<div class="col-md-9 col-lg-9">
-                   							<select required class="form-control col-md-5 col-xs-12" name="terms" id="terms"></select>
-                  						</div>
-                					</div>
+              						
                 					<div class="form-group">
-                  						<label class="control-label col-md-3" for="">Client<span class="required">*</span></label>
-                  						<div class="col-md-9 col-lg-9">
+                  						<label class="control-label col-md-2" for="">Client<span class="required">*</span></label>
+                  						<div class="col-md-10 col-lg-9">
                   							<input type="hidden" class="form-control" id="client_name" name="client_name" value="">
                   							<div class="ui-widget"><select required class="form-control col-md-5 col-xs-12" name="client_mongo_id" id="client_mongo_id" placeholder="Search or select client"></select></div>
                   						</div>
                 					</div>
                 					<div class="form-group">
-                  						<label class="control-label col-md-3" for="">Bill to</label>
-                  						<div class="col-md-9 col-lg-9">
+                  						<label class="control-label col-md-2" for="">Bill to</label>
+                  						<div class="col-md-10 col-lg-10">
                    							<textarea class="form-control col-md-5 col-xs-12" rows="4" id="bill_to" name="bill_to"><% if (typeof contentObj.bill_to !== 'undefined' && contentObj.bill_to !== null) { %><%= contentObj.bill_to %><% } %></textarea>
                   						</div>
                 					</div>
                 														                                                  
 									<div class="form-group">
-										<label class="col-sm-3 control-label">Order By </label>
-										<div class="col-md-9 col-lg-9">
+										<label class="col-md-2 control-label">Order By </label>
+										<div class="col-md-10 col-lg-10">
 											<input name="order_by" class="form-control" type="order_by" value="<% if (typeof contentObj.order_by !== 'undefined' && contentObj.order_by !== null) { %><%= contentObj.order_by %><% } else if(typeof loggedInUserNameStr !== 'undefined' && loggedInUserNameStr !== null && loggedInUserNameStr !== ""){ %><%- loggedInUserNameStr %><% } %>" id="order_by">
 										</div>
 									</div>
                 					<div class="form-group">
-                  						<label class="control-label col-md-3" for="">Leave a note</label>
-                  						<div class="col-md-9 col-lg-9">
-                   							<textarea class="form-control col-md-5 col-xs-12" rows="4" id="note" name="note"><% if (typeof contentObj.note !== 'undefined' && contentObj.note !== null) { %><%= contentObj.note %><% } %></textarea>
+                  						<label class="control-label col-md-2" for="">Comments</label>
+                  						<div class="col-md-10 col-lg-10">
+                   							<textarea class="form-control col-md-5 col-xs-12" rows="4" id="comments" name="comments"><% if (typeof contentObj.comments !== 'undefined' && contentObj.comments !== null) { %><%= contentObj.comments %><% } %></textarea>
                   						</div>
                 					</div>
                 					
                 					<div class="form-group">
-                  						<label class="control-label col-md-3" for="">Project<span class="required">*</span></label>
+                  						<label class="control-label col-md-2" for="">Project<span class="required">*</span></label>
                   						<div class="col-md-9 col-lg-9">
                   							<input type="hidden" class="form-control" id="project_name" name="project_name" value="">
                   							<div class="ui-widget"><select required class="form-control col-md-5 col-xs-12" name="project_mongo_id" id="project_mongo_id" placeholder="Search or select project"></select></div>
                   						</div>
                 					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-2" for="">Status<span class="required">*</span></label>
+                  						<div class="col-md-10 col-lg-8">
+                   							<select required class="form-control col-md-5 col-xs-12" name="order_status" id="order_status"></select>
+                  						</div>
+                					</div>
                             		</div></div>
                             		</div></div></div>
-							        <div class="col-md-4 col-xs-12"><div class="box box-primary">
+							        <div class="col-md-5 col-xs-12"><div class="box box-primary">
 							        <h4>Important Dates and Other Details</h4>
             						<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-12">
 							        
                 					<div class="form-group">
-    									<label for="" class="col-sm-3 control-label">Date<sup class="required">*</sup></label>
-    									<div class="col-sm-9">
-    										<input type="hidden" class="form-control" id="invoiced_timestamp" name="invoiced_timestamp" value="<% if (typeof contentObj.invoiced_timestamp !== 'undefined' && contentObj.invoiced_timestamp !== null) { %><%= contentObj.invoiced_timestamp %><% } %>">
-    										<div class='input-group date' id='invoiced_datetime_picker'>
-                    							<input type='text' class="form-control" id="invoiced_date" value="" required/>
+    									<label for="" class="col-sm-4 control-label">Date<sup class="required">*</sup></label>
+    									<div class="col-sm-8">
+    										<input type="hidden" class="form-control" id="ordered_timestamp" name="ordered_timestamp" value="<% if (typeof contentObj.ordered_timestamp !== 'undefined' && contentObj.ordered_timestamp !== null) { %><%= contentObj.ordered_timestamp %><% } %>">
+    										<div class='input-group date' id='ordered_datetime_picker'>
+                    							<input type='text' class="form-control" id="ordered_date" value="" required/>
                     							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                 							</div>	
     									</div>
   									</div>
-									<div class="form-group">
- 										<label for="" class="col-sm-3 control-label">Due Date</label>
- 										<div class="col-sm-9">
-											<input type="hidden" class="form-control" id="due_timestamp" name="due_timestamp" value="<% if (typeof contentObj.due_timestamp !== 'undefined' && contentObj.due_timestamp !== null) { %><%= contentObj.due_timestamp %><% } %>">
-    										<div class='input-group date' id='due_datetime_picker'>
-                    							<input type='text' class="form-control" id="due_date" value="" required/>
-                    							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                							</div>	
-										</div>
-									</div>
-									<div class="form-group">
-                  						<label class="control-label col-md-3" for="">Status<span class="required">*</span></label>
-                  						<div class="col-md-9 col-lg-9">
-                   							<select required class="form-control col-md-5 col-xs-12" name="invoice_status" id="invoice_status"></select>
-                  						</div>
-                					</div>
-                					                           		
+								           					                           		
 									<div class="form-group" >
-										<label class="col-sm-3 control-label">Grand Total</label>
-										<div class="col-md-9 col-lg-7">
+										<label class="col-sm-4 control-label">Grand total</label>
+										<div class="col-md-8 col-lg-8">
 											<input readonly name="grand_total" class="form-control num" type="text" value="<% if (typeof contentObj.grand_total !== 'undefined' && contentObj.grand_total !== null) { %><%= contentObj.grand_total %><% } %>" id="grand_total">
 										</div>
 									</div>     
 									<div class="form-group" >
-										<label class="col-sm-3 control-label">Total Paid</label>
-										<div class="col-md-9 col-lg-7">
+										<label class="col-md-4 control-label">Total Paid</label>
+										<div class="col-md-8 col-lg-8">
 											<input name="total_paid" class="form-control num" type="text" value="<% if (typeof contentObj.total_paid !== 'undefined' && contentObj.total_paid !== null) { %><%= contentObj.total_paid %><% } %>" id="total_paid">
 										</div>
 									</div> 
 									 <div class="form-group" >
-										<label class="col-sm-3 control-label">Balancing Outstanding</label>
-										<div class="col-md-9 col-lg-7">
+										<label class="col-md-4 control-label">Balancing outstanding</label>
+										<div class="col-md-8 col-lg-8">
 											<input readonly name="balance_due" class="form-control num" type="text" value="<% if (typeof contentObj.balance_due !== 'undefined' && contentObj.balance_due !== null) { %><%= contentObj.balance_due %><% } %>" id="balance_due">
 										</div>
 									</div> 
 									<div class="form-group">
- 										<label for="" class="col-sm-3 control-label">Paid Date</label>
- 										<div class="col-sm-9">
+ 										<label for="" class="col-sm-4 control-label">Paid date</label>
+ 										<div class="col-sm-8">
 											<input type="hidden" class="form-control" id="paid_timestamp" name="paid_timestamp" value="<% if (typeof contentObj.paid_timestamp !== 'undefined' && contentObj.paid_timestamp !== null) { %><%= contentObj.paid_timestamp %><% } %>">
     										<div class='input-group date' id='paid_datetime_picker'>
                     							<input type='text' class="form-control" id="paid_date" value=""/>
@@ -194,15 +177,29 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
 										</div>
 									</div>
 									<div class="form-group" >
-										<label class="col-sm-3 control-label">Analysis Ledger</label>
-										<div class="col-md-9 col-lg-7">
-											<div class="ui-widget"><select required class="form-control col-md-5 col-xs-12" name="analysis_ledger_mongo_id" id="analysis_ledger_mongo_id" placeholder="Search or select analysis ledger"></select></div>
-                  						</div>
+										<label class="col-sm-4 control-label">Customer ref or PO</label>
+										<div class="col-md-8 col-lg-8">
+											<input name="customer_ref_po" class="form-control" type="text" value="<% if (typeof contentObj.customer_ref_po !== 'undefined' && contentObj.customer_ref_po !== null) { %><%= contentObj.customer_ref_po %><% } %>" id="customer_ref_po">
+										</div>
+									</div>     
+									<div class="form-group" >
+										<label class="col-sm-4 control-label">Currency Code</label>
+										<div class="col-md-8 col-lg-7">
+											<select id="currency_code" name="currency_code" class="form-control">
+												
+											</select>
+										</div>
 									</div> 
-									<div class="form-group" id="analysis_acc_ui" style="display:none;">
-										<label class="col-sm-3 control-label">Analysis Account</label>
-										<div class="col-md-9 col-lg-7">
-											<select name="analysis_account_mongo_id" class="form-control" id="analysis_account_mongo_id"></select>
+									 <div class="form-group" >
+										<label class="col-sm-4 control-label">Base Currency Code</label>
+										<div class="col-md-8 col-lg-7">
+											<input name="base_currency_code" class="form-control" type="text" value="<% if (typeof contentObj.base_currency_code !== 'undefined' && contentObj.base_currency_code !== null) { %><%= contentObj.base_currency_code %><% } %>" id="base_currency_code">
+										</div>
+									</div> 
+									<div class="form-group" >
+										<label class="col-sm-4 control-label">Exchange Customer Currency to Base Currency</label>
+										<div class="col-md-8 col-lg-7">
+											<input name="exchange_rate" class="form-control" type="text" value="<% if (typeof contentObj.exchange_rate !== 'undefined' && contentObj.exchange_rate !== null) { %><%= contentObj.exchange_rate %><% } else{ %>0<% } %>" id="exchange_rate">
 										</div>
 									</div> 
 									
@@ -212,7 +209,7 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
                 					</div>
               						<div class="row" STYLE="margin-top:10px;">
             						<div class="col-md-8 col-xs-12"><div class="box box-primary">
-            						<h4>Invoice Items</h4>
+            						<h4>Order Items</h4>
             						<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-12">
             						<div CLASS="ROW ">
 										<div CLASS="col-sm-12 itemsContent" STYLE="margin-left:13px;">
@@ -223,32 +220,34 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
 									</div>
 									<div CLASS="row">
 										<div class="itemsContent col-sm-12" id="itemsTable">
-    										<input type="hidden" id="invoice_items" name="invoice_items" value="<% if (typeof contentObj.invoice_items !== 'undefined' && contentObj.invoice_items !== null) { %><%= contentObj.invoice_items %><% } %>">
+    										<input type="hidden" id="order_items" name="order_items" value="<% if (typeof contentObj.order_items !== 'undefined' && contentObj.order_items !== null) { %><%= contentObj.order_items %><% } %>">
 											<div CLASS="table-responsive">
-										   		<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-invoice-items">
+										   		<table class="table table-striped  table-bordered table-hover custom-tbl-st bt" id="table-items">
 													<thead>
 												  		<tr class="item">
 												  			<th>Description</th>
 													  		<th>Rate</th>
-													 		<th>Hours</th>
+													  		<th>Hours</th>
+													 		<th>Discount(%)</th>
 													  		<th>Amount</th>
 													  		<th colspan="2" align="center">Actions</th>
 													  	</tr>
 											  	</thead>
 											  	<tbody id="link_items">
-											  		<% if (typeof contentObj.invoice_items !== 'undefined' && contentObj.invoice_items !== null  && contentObj.invoice_items != "") { 	
+											  		<% if (typeof contentObj.order_items !== 'undefined' && contentObj.order_items !== null  && contentObj.order_items != "") { 	
 											  			try{
-															var invoice_items = JSON.parse(contentObj.invoice_items); 
+															var order_items = JSON.parse(contentObj.order_items); 
         												}	catch (error){
-       														var invoice_items =  contentObj.invoice_items; 
+       														var order_items =  contentObj.order_items; 
     													} 
-											  			for(var i=0; i< invoice_items.length; i++){	%>
-											  			<tr class="itemClass itemtr_<%= invoice_items[i].uuid %>">
-											  				<td><input type="hidden" id="uuid" value="<%= invoice_items[i].uuid %>"><input type="hidden" id="description" value="<%= invoice_items[i].description %>"><%= invoice_items[i].description %></td>
-											  				<td><input type="hidden" class="price" id="rate" value="<%= invoice_items[i].rate %>"><%= invoice_items[i].rate %></td>
-											  				<td><input type="hidden" class="hours" id="hours" value="<%= invoice_items[i].hours %>"><%= invoice_items[i].hours %></td>
-															<td><input type="hidden" id="amount" value="<%= invoice_items[i].amount %>"><%= invoice_items[i].amount %></td>
-															<td><a href="javascript:void(0)" title="Edit" onClick="edit_item('<%= invoice_items[i].uuid %>')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item('<%= invoice_items[i].uuid %>')" title="Remove"><i class="fa fa-trash"></i></a></td>
+											  			for(var i=0; i< order_items.length; i++){	%>
+											  			<tr class="itemClass itemtr_<%= order_items[i].uuid %>">
+											  				<td><input type="hidden" id="uuid" value="<%= order_items[i].uuid %>"><input type="hidden" id="description" value="<%= order_items[i].description %>"><%= order_items[i].description %></td>
+											  				<td><input type="hidden" id="rate" value="<%= order_items[i].rate %>"><%= order_items[i].rate %></td>
+											  				<td><input type="hidden" class="hours" id="hours" value="<%= order_items[i].hours %>"><%= order_items[i].hours %></td>
+															<td><input type="hidden" id="discount" value="<%= order_items[i].discount %>"><%= order_items[i].discount %></td>
+															<td><input type="hidden" class="price" id="amount" value="<%= order_items[i].amount %>"><%= order_items[i].amount %></td>
+															<td><a href="javascript:void(0)" title="Edit" onClick="edit_item('<%= order_items[i].uuid %>')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item('<%= order_items[i].uuid %>')" title="Remove"><i class="fa fa-trash"></i></a></td>
 														</tr>
 											  	<%	}
 											  }	%>
@@ -269,17 +268,34 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
                    							<select required class="form-control col-md-5 col-xs-12" name="tax_code" id="tax_code"></select>
                   						</div>
                 					</div>
-                					                          		
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Tax</label>
+                  						<div class="col-md-9 col-lg-7">
+											<input readonly type="text" id="tax_rate" name="tax_rate" class="form-control num col-md-5 col-xs-12" value="<% if (typeof contentObj.tax_rate !== 'undefined' && contentObj.tax_rate !== null) { %><%= contentObj.tax_rate %><% } %>">
+                  						</div>
+                					</div>               		
 									<div class="form-group" >
 										<label class="col-sm-3 control-label">Total hours</label>
 										<div class="col-md-9 col-lg-7">
 											<input readonly name="total_hours" class="form-control num" type="text" value="<% if (typeof contentObj.total_hours !== 'undefined' && contentObj.total_hours !== null) { %><%= contentObj.total_hours %><% } %>" id="total_hours">
 										</div>
-									</div>     
+									</div> 
+									<div class="form-group" >
+										<label class="col-sm-3 control-label">Subtotal</label>
+										<div class="col-md-9 col-lg-7">
+											<input readonly name="subtotal" class="form-control num" type="text" value="<% if (typeof contentObj.subtotal !== 'undefined' && contentObj.subtotal !== null) { %><%= contentObj.subtotal %><% } %>" id="subtotal">
+										</div>
+									</div>   
+									<div class="form-group" >
+										<label class="col-sm-3 control-label">Discount(%)</label>
+										<div class="col-md-9 col-lg-7">
+											<input name="discount_applied" class="form-control num" type="text" value="<% if (typeof contentObj.discount_applied !== 'undefined' && contentObj.discount_applied !== null) { %><%= contentObj.discount_applied %><% } %>" id="discount_applied">
+										</div>
+									</div>       
 									<div class="form-group" >
 										<label class="col-sm-3 control-label">Total due</label>
 										<div class="col-md-9 col-lg-7">
-											<input readonly name="total_due" class="form-control num" type="text" value="<% if (typeof contentObj.total_due !== 'undefined' && contentObj.total_due !== null) { %><%= contentObj.total_due %><% } %>" id="total_due">
+											<input readonly name="total_due_without_tax" class="form-control num" type="text" value="<% if (typeof contentObj.total_due_without_tax !== 'undefined' && contentObj.total_due_without_tax !== null) { %><%= contentObj.total_due_without_tax %><% } %>" id="total_due_without_tax">
 										</div>
 									</div> 
 									 <div class="form-group" >
@@ -298,76 +314,13 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
                 					</div></div></div>
                 					
                 					</div>
-              					</div>
-              					<div class="chart tab-pane" id="second" >
-              		             	<div class="row" STYLE="margin-top:10px;">
-            						<div class="col-md-6 col-xs-12"><div class="box box-primary">
-            						<h4>Tax And Internal Notes</h4>
-            						<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-12">
-            						<div class="form-group">
-                  						<label class="control-label col-md-3" for="first-name">Invoice Pin or Passcode(For Paying Online)</label>
-                  						<div class="col-md-9 col-lg-9">
-                    						<input type="text" id="payment_pin_or_passcode" name="payment_pin_or_passcode" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.payment_pin_or_passcode !== 'undefined' && contentObj.payment_pin_or_passcode !== null) { %><%= contentObj.payment_pin_or_passcode %><% } %>">
-                  						</div>
-                					</div>
-                					<div class="form-group">
-                  						<label class="control-label col-md-3" for="">Tax</label>
-                  						<div class="col-md-9 col-lg-9">
-											<input type="text" id="tax_rate" name="tax_rate" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.tax_rate !== 'undefined' && contentObj.tax_rate !== null) { %><%= contentObj.tax_rate %><% } %>">
-                  						</div>
-                					</div>
-              						
-                					<div class="form-group">
-                  						<label class="control-label col-md-3" for="">Internal notes</label>
-                  						<div class="col-md-9 col-lg-9">
-                   							<textarea class="form-control col-md-5 col-xs-12" rows="4" id="internal_notes" name="internal_notes"><% if (typeof contentObj.internal_notes !== 'undefined' && contentObj.internal_notes !== null) { %><%= contentObj.internal_notes %><% } %></textarea>
-                  						</div>
-                					</div>
-                					                					
-                            		</div></div>
-                            		</div></div></div>
-							        <div class="col-md-6 col-xs-12"><div class="box box-primary">
-							        <h4>Currency Details</h4>
-            						<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-12">
-							        <div class="form-group" >
-										<label class="col-sm-3 control-label">Customer ref or PO</label>
-										<div class="col-md-9 col-lg-7">
-											<input name="customer_ref_po" class="form-control" type="text" value="<% if (typeof contentObj.customer_ref_po !== 'undefined' && contentObj.customer_ref_po !== null) { %><%= contentObj.customer_ref_po %><% } %>" id="customer_ref_po">
-										</div>
-									</div>     
-									<div class="form-group" >
-										<label class="col-sm-3 control-label">Customer Currency Code</label>
-										<div class="col-md-9 col-lg-7">
-											<select id="currency_code" name="currency_code" class="form-control">
-												
-											</select>
-										</div>
-									</div> 
-									 <div class="form-group" >
-										<label class="col-sm-3 control-label">Base Currency Code</label>
-										<div class="col-md-9 col-lg-7">
-											<input name="base_currency_code" class="form-control" type="text" value="<% if (typeof contentObj.base_currency_code !== 'undefined' && contentObj.base_currency_code !== null) { %><%= contentObj.base_currency_code %><% } %>" id="base_currency_code">
-										</div>
-									</div> 
-									<div class="form-group" >
-										<label class="col-sm-3 control-label">Exchange Customer Currency to Base Currency</label>
-										<div class="col-md-9 col-lg-7">
-											<input name="exchange_rate" class="form-control" type="text" value="<% if (typeof contentObj.exchange_rate !== 'undefined' && contentObj.exchange_rate !== null) { %><%= contentObj.exchange_rate %><% } else{ %>0<% } %>" id="exchange_rate">
-										</div>
-									</div> 
-									
-									</div></div>
-                					</div></div></div>
-                					
-                					</div>
-              					</div>
-              					
+              					</div>              					
               					<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
               					<div class="chart tab-pane" id="third" >
               										<div class="row">
               											<div class="col-sm-12" style="margin-top:20px;">
               												<input name="notes" type="hidden" value="" id="notes">
-															<a title="Add new note" onClick="$('#addNote').modal('show');" href="javascript:void(0)" class="btn btn-danger">Add new note</a>
+              												<a title="Add new note" onClick="$('#addNote').modal('show');" href="javascript:void(0)" class="btn btn-danger">Add new note</a>
               											</div>
               											<div class="content table-responsive table-full-width">
 		 													<div class="table-responsive" style="border:none;" >
@@ -394,7 +347,7 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
                    						<div class="col-md-9 col-lg-12" align="center">
                								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
                								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
-               									<a href="<%= backendDirectory %>/list/invoices" class="btn btn-danger btn-sm">Cancel</a>
+               									<a href="<%= backendDirectory %>/list/orders" class="btn btn-danger btn-sm">Cancel</a>
                								<%	}else{	%>
                									<button type="reset" class="btn btn-danger btn-sm">Reset</button>
                								<% } %>
@@ -429,7 +382,7 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
                        <span aria-hidden="true">&times;</span>
                        <span class="sr-only">Close</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel">Invoice Item</h4>
+                <h4 class="modal-title" id="myModalLabel">Order Item</h4>
             </div>
 			
 			<style>
@@ -453,6 +406,10 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
                	<div class="form-group" style="margin-top:5px;">
                 	<label><strong>Hours</strong><span class="f_req">*</span></label>
                 	<input class="form-control num" id="item_hours" placeholder="Hours" value="0" onblur="calculate_amount();" onkeyup="calculate_amount();"/>
+                </div>
+                <div class="form-group" style="margin-top:5px;">
+                	<label><strong>Discount(%)</label>
+                	<input class="form-control num" id="item_discount" placeholder="Discount" value="0" onblur="calculate_amount();" onkeyup="calculate_amount();"/>
                 </div>
                 <div class="form-group" style="margin-top:5px;">
                 	<label><strong>Amount</strong><span class="f_req">*</span></label>
@@ -509,26 +466,26 @@ var table_row_id="<% if (typeof contentObj._id !== 'undefined' && contentObj._id
 var auth_user_id="<% if (typeof authenticatedUser._id !== 'undefined' && authenticatedUser._id !== null) { %><%= authenticatedUser._id %><% } %>";
 var auth_user_name="<% if (typeof authenticatedUser.firstname !== 'undefined' && authenticatedUser.firstname !== null) { %><%= authenticatedUser.firstname %><% } %>";
 	auth_user_name+="<% if (typeof authenticatedUser.lastname !== 'undefined' && authenticatedUser.lastname !== null) { %>&nbsp;<%= authenticatedUser.lastname %><% } %>";
-var analysis_account_mongo_id ='<% if (typeof contentObj.analysis_account_mongo_id !== "undefined" && contentObj.analysis_account_mongo_id !== null) { %><%= contentObj.analysis_account_mongo_id %><% } %>';
 	
 $(function () {	
 	fetch_default_list("currency-list", "<% if (typeof contentObj.currency_code !== 'undefined' && contentObj.currency_code !== null) { %><%= contentObj.currency_code %><% } %>","currency_code");
-	
-	fetch_default_list("invoice-terms", "<% if (typeof contentObj.terms !== 'undefined' && contentObj.terms !== null) { %><%= contentObj.terms %><% } %>","terms");
 	fetch_default_list("tax-code", "<% if (typeof contentObj.tax_code !== 'undefined' && contentObj.tax_code !== null) { %><%= contentObj.tax_code %><% } %>","tax_code");
-	fetch_default_list("invoice-status", "<% if (typeof contentObj.invoice_status !== 'undefined' && contentObj.invoice_status !== null) { %><%= contentObj.invoice_status %><% } %>","invoice_status");
+	fetch_default_list("order-status", "<% if (typeof contentObj.order_status !== 'undefined' && contentObj.order_status !== null) { %><%= contentObj.order_status %><% } %>","order_status");
 	
 	<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { 
 		//
 	}else{ %>
-		setTimeout(function(){ $("#invoice_status").val("Invoiced"); }, 1000);	
+		setTimeout(function(){ 
+			$("#order_status").val("Quote");
+			$("#tax_code").val("UK").trigger('change');
+		}, 1000);	
 		
 		$.getJSON(backendDirectory+"/api_next_sequence_number?table="+$('#table_name').val(),function(result){
    			var nxt_no = 1;
    			if(result.seq_num){
    				nxt_no= result.seq_num;
    			}
-   			$('#invoice_no').val(nxt_no);
+   			$('#order_id').val(nxt_no);
 		});
 	<% }%>
 	
@@ -545,16 +502,9 @@ $(function () {
 		var project_mongo_id='';
 	<% } %>
 	fetch_collection_autocomplete_list('projects', 'project_mongo_id', project_mongo_id);
-	
-	<% if(typeof contentObj.analysis_ledger_mongo_id !== 'undefined' && contentObj.analysis_ledger_mongo_id !== null)	{ %>
-		var analysis_ledger_mongo_id="<%= contentObj.analysis_ledger_mongo_id %>";
-	<% }else{ %>
-		var analysis_ledger_mongo_id='';
-	<% } %>
-	fetch_collection_autocomplete_list('analysis_ledgers', 'analysis_ledger_mongo_id', analysis_ledger_mongo_id);
 });
 </script>
-<script src="scripts/invoice_cal.js"></script>
+<script src="scripts/order_cal.js"></script>
 <% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
 	<script src="scripts/manage_notes.js"></script>
 <%	}	%>

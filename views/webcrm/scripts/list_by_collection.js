@@ -77,14 +77,14 @@ function load_more(){
 	
 	function load_data(){
 		completeScroll=true;
-		$(".alert").remove();
+		$(".extra_alert").remove();
 		var jsonRow=backendDirectory+"/api_fetch_list?start="+start+"&limit="+pageSize+"&collection="+relatedCollectionStr+"&s="+searchStr+"&findFieldName="+relatedFieldName+"&findFieldValue="+relatedFieldValue;
 		if(xhrStatus) xhrStatus.abort();
 		xhrStatus=$.getJSON(jsonRow,function(html){
 			if(html.error){
 				complete=true;
 				$(".topOptionsClass").hide();
-				$("#"+tableDisplayID).before('<div class="alert alert-danger">'+html.error+'</div>');
+				$("#"+tableDisplayID).before('<div class="alert alert-danger extra_alert">'+html.error+'</div>');
 			}else{
 				var editorPage="javascript:void(0)";
 				
@@ -113,7 +113,7 @@ function load_more(){
 					}
      			}else{
      				complete=true;
-					$("#"+tableDisplayID).before('<div class="alert alert-danger alert-dismissable"><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>No more records found!</div>');
+					$("#"+tableDisplayID).before('<div class="alert alert-danger alert-dismissable extra_alert"><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>No more records found!</div>');
      			}
      				//initialize table
 					$('#'+tableDisplayID).basictable({

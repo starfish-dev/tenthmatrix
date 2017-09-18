@@ -57,7 +57,8 @@ font-size: 20px;
       								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
       								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
             						<input type="hidden" class="form-control" id="data" name="data" value="">
-            						
+            						<input name="notes" type="hidden" value="" id="notes">
+                        					
 									<div class="row" STYLE="margin-top:10px;">
 										<div class="col-md-6 col-xs-12">
           									<div class="box box-primary">
@@ -447,6 +448,8 @@ function draw_content_html (aaData) {
 				address_line_1: { required: true }
 			},
 			submitHandler: function(form) {
+				generateNotesJson();
+				
 				var startTimestampNum=return_timestamp_from_datetimepicker($('#followup_date').val(), false);
 				
 				$('#followup_timestamp').val(startTimestampNum);

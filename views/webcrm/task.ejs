@@ -71,6 +71,7 @@
       								<input type="hidden" class="form-control" id="editorField" name="editorField" value="<% if (typeof editorField !== 'undefined' && editorField !== null) { %><%= editorField %><% }else{ %>_id<% } %>">
       								<input type="hidden" class="form-control" id="editorValue" name="editorValue" value="<% if (typeof editorValue !== 'undefined' && editorValue !== null) { %><%= editorValue %><% } %>">
             						<input type="hidden" class="form-control" id="data" name="data" value="">
+            						<input name="notes" type="hidden" value="" id="notes">
             						
             						<div class="row" STYLE="margin-top:10px;">
             						<div class="col-md-6 col-xs-12"><div class="box box-primary">
@@ -521,6 +522,8 @@ $(function () {
 				status: { required: true }
 			},
 			submitHandler: function(form) {
+				generateNotesJson();
+				
 				$('#reported_by').val($('#reported_by_user_id option:selected').text());
 				$('#assigned_to').val($('#assigned_to_user_id option:selected').text());
 				
