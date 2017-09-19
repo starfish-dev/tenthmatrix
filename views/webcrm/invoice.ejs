@@ -196,7 +196,7 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
 									<div class="form-group" >
 										<label class="col-sm-3 control-label">Analysis Ledger</label>
 										<div class="col-md-9 col-lg-7">
-											<div class="ui-widget"><select required class="form-control col-md-5 col-xs-12" name="analysis_ledger_mongo_id" id="analysis_ledger_mongo_id" placeholder="Search or select analysis ledger"></select></div>
+											<div class="ui-widget"><select class="form-control col-md-5 col-xs-12" name="analysis_ledger_mongo_id" id="analysis_ledger_mongo_id" placeholder="Search or select analysis ledger"></select></div>
                   						</div>
 									</div> 
 									<div class="form-group" id="analysis_acc_ui" style="display:none;">
@@ -245,9 +245,9 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
 											  			for(var i=0; i< invoice_items.length; i++){	%>
 											  			<tr class="itemClass itemtr_<%= invoice_items[i].uuid %>">
 											  				<td><input type="hidden" id="uuid" value="<%= invoice_items[i].uuid %>"><input type="hidden" id="description" value="<%= invoice_items[i].description %>"><%= invoice_items[i].description %></td>
-											  				<td><input type="hidden" class="price" id="rate" value="<%= invoice_items[i].rate %>"><%= invoice_items[i].rate %></td>
+											  				<td><input type="hidden" id="rate" value="<%= invoice_items[i].rate %>"><%= invoice_items[i].rate %></td>
 											  				<td><input type="hidden" class="hours" id="hours" value="<%= invoice_items[i].hours %>"><%= invoice_items[i].hours %></td>
-															<td><input type="hidden" id="amount" value="<%= invoice_items[i].amount %>"><%= invoice_items[i].amount %></td>
+															<td><input type="hidden" class="price" id="amount" value="<%= invoice_items[i].amount %>"><%= invoice_items[i].amount %></td>
 															<td><a href="javascript:void(0)" title="Edit" onClick="edit_item('<%= invoice_items[i].uuid %>')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item('<%= invoice_items[i].uuid %>')" title="Remove"><i class="fa fa-trash"></i></a></td>
 														</tr>
 											  	<%	}
@@ -392,7 +392,11 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
               					<div class="col-xs-12" style="margin-top:20px;">
                 					<div class="form-group">
                    						<div class="col-md-9 col-lg-12" align="center">
-               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<div class="submit-btn-setting">
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/invoice/<%= contentObj._id %>" target="_blank" class="btn btn-danger btn-sm">Download Invoice</a>
+               								<%	} %>
+               								<button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
                								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
                									<a href="<%= backendDirectory %>/list/invoices" class="btn btn-danger btn-sm">Cancel</a>
                								<%	}else{	%>
@@ -432,13 +436,6 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
                 <h4 class="modal-title" id="myModalLabel">Invoice Item</h4>
             </div>
 			
-			<style>
-			.form-group {
-    			margin-bottom: 15px;
-    			overflow: hidden;
-			}
-			</style>
-            
             <!-- Modal Body -->
             <div class="modal-body">
             	<div class="form-group" id="messageId">

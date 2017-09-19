@@ -139,10 +139,10 @@ function savelinkitem(){
 				newEntryBool= true;
 			}
 			var htmlStr='<td><input type="hidden" id="uuid" value="'+item_uuid+'"><input type="hidden" id="description" value="'+item_description+'">'+item_description+'</td>';
-			htmlStr+='<td><input type="hidden" class="price" id="rate" value="'+item_rate+'">'+item_rate+'</td>';
+			htmlStr+='<td><input type="hidden" id="rate" value="'+item_rate+'">'+item_rate+'</td>';
 			htmlStr+='<td><input type="hidden" id="hours" class="hours" value="'+item_hours+'">'+item_hours+'</td>';
 			var tempAmountNum = item_rate*item_hours;
-			htmlStr+='<td><input type="hidden" id="amount" value="'+tempAmountNum+'">'+tempAmountNum+'</td>';
+			htmlStr+='<td><input type="hidden" class="price" id="amount" value="'+tempAmountNum+'">'+tempAmountNum+'</td>';
 			htmlStr+='<td><a href="javascript:void(0)" title="Edit" onClick="edit_item(\''+item_uuid+'\')"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onClick="remove_item(\''+item_uuid+'\')" title="Remove"><i class="fa fa-trash"></i></a></td>';
 														
 			if(newEntryBool){
@@ -234,7 +234,9 @@ $(function () {
 			},
 			submitHandler: function(form) {
 				generateObjectJson();
-				generateNotesJson();
+				if($("#id").val()!=""){
+					generateNotesJson();
+				}
 				$('#project_name').val($('#project_mongo_id option:selected').text());
 				$('#client_name').val($('#client_mongo_id option:selected').text());
 				

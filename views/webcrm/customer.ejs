@@ -448,7 +448,9 @@ function draw_content_html (aaData) {
 				address_line_1: { required: true }
 			},
 			submitHandler: function(form) {
-				generateNotesJson();
+				if($("#id").val()!=""){
+					generateNotesJson();
+				}
 				
 				var startTimestampNum=return_timestamp_from_datetimepicker($('#followup_date').val(), false);
 				

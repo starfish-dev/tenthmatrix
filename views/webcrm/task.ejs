@@ -522,7 +522,9 @@ $(function () {
 				status: { required: true }
 			},
 			submitHandler: function(form) {
-				generateNotesJson();
+				if($("#id").val()!=""){
+					generateNotesJson();
+				}
 				
 				$('#reported_by').val($('#reported_by_user_id option:selected').text());
 				$('#assigned_to').val($('#assigned_to_user_id option:selected').text());

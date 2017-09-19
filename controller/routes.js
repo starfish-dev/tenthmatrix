@@ -178,7 +178,78 @@ app.get(backendDirectoryPath+'/file/:filename', function(req, res){
             return readstream.pipe(res);
         });
 });
-     
+
+//download process template pdf
+app.get(backendDirectoryPath+'/invoice/:id', requireLogin, function(req, res) {
+	var sendResponse = res;
+	if(req.authenticationBool){
+		initFunctions.returnFindOneByMongoID(db, "invoices", req.params.id, function(resultObject) {
+			if(resultObject.aaData && resultObject.aaData != ""){
+				var invoice_content_obj = resultObject.aaData;
+				var templateStr= "gbp-invoice-template";
+				if(invoice_content_obj.template && invoice_content_obj.template!=""){
+					templateStr = invoice_content_obj.template;
+				}
+				initFunctions.returnTemplateContent(db, req.authenticatedUser.active_system_uuid.toString(), templateStr, function(templateResultObject) {
+					if(templateResultObject.success && templateResultObject.success!="") {
+						var templateContentStr= templateResultObject.success;
+						for(var key in invoice_content_obj) {
+							var tempKey = "__"+key+"__";
+							templateContentStr = templateContentStr.replace(new RegExp(tempKey, 'g'), invoice_content_obj[key]);
+							if(key=="invoice_items" && invoice_content_obj[key]!="" && invoice_content_obj[key].length>0){
+								var itemsObj = invoice_content_obj[key];
+								var subItemscontent = "";
+								for(var i=0; i < itemsObj.length; i++){
+									var itemDetails = itemsObj[i];
+									subItemscontent += '<tr><td align="center">'+itemDetails.hours+'</td><td>'+itemDetails.description+'</td><td align="right">'+itemDetails.rate+'</td><td align="right">'+itemsObj[i].amount+'</td></tr>';
+								}
+								templateContentStr = templateContentStr.replace("__loop_through_items__", subItemscontent);
+							}
+						}
+						var tempHTMLFilePathStr = "/tmp/"+invoice_content_obj._id+".html";
+						console.log(tempHTMLFilePathStr)
+						fs.writeFile(tempHTMLFilePathStr, templateContentStr, function(err) {
+    						if(err) {
+        						res.send("Sorry, error while generating file, please inform your developer to setup temporary upload folder!");
+    						}
+    						var pdf = require('html-pdf');
+							var html = fs.readFileSync(tempHTMLFilePathStr, 'utf8');
+							var options = {
+  								"format": "A4",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+  								"orientation": "portrait", // portrait or landscape
+								"border": "25px",             // default is 0, units: mm, cm, in, px
+  								"zoomFactor": "1", // default is 1 
+  								"footer": {
+   									"height": "10mm",
+    								"contents": {
+      									default: '<div style="border-top: 1px solid #333333; font-size: 9px; text-align: center; padding-top: 1mm;margin-top:10px;">Page {{page}} of {{pages}}</div>', // fallback value
+    								}
+  								}
+							};
+							var tempPDfFilePathStr = "/tmp/"+invoice_content_obj._id+".pdf";
+							pdf.create(html, options).toFile(tempPDfFilePathStr, function(err, res) {
+  								if (err) return console.log(err);
+  								fs.unlinkSync(tempHTMLFilePathStr);
+  								sendResponse.download(tempPDfFilePathStr, function (err) {
+       								if (err) {
+           								res.send("Sorry, error occurred while generating pdf!");
+       								}
+  								});
+							});
+						}); 
+					}else{
+						res.send("Sorry, no template found to generate invoice pdf!");
+					}
+				});
+			} else{
+				res.send("Sorry, no such invoice found!");
+			}
+		});
+	}else{
+  		res.send("Sorry you are not authorized for this action!");
+  	}
+});     
+
 //post action for save notes
 app.post(backendDirectoryPath+'/savenotes', requireLogin, (req, res) => {
 	var myObj = new Object();

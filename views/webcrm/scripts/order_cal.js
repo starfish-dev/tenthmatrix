@@ -255,7 +255,9 @@ $(function () {
 			},
 			submitHandler: function(form) {
 				generateObjectJson();
-				generateNotesJson();
+				if($("#id").val()!=""){
+					generateNotesJson();
+				}
 				
 				$('#project_name').val($('#project_mongo_id option:selected').text());
 				$('#client_name').val($('#client_mongo_id option:selected').text());

@@ -391,7 +391,9 @@ function draw_content_html (aaData) {
 				start_date: { required: true },
 			},
 			submitHandler: function(form) {
-				generateNotesJson();
+				if($("#id").val()!=""){
+					generateNotesJson();
+				}
 				var startTimestampNum=return_timestamp_from_datetimepicker($('#start_date').val(), false);
 				$('#start_timestamp').val(startTimestampNum);
 				
