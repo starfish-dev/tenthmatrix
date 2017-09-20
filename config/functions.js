@@ -1024,7 +1024,11 @@ generate_invoice_order_pdf : function (db, table_name, unique_id, active_system_
 						for(var key in invoice_content_obj) {
 							var tempKey = "__"+key+"__";
 							if(tempKey.indexOf("timestamp")>=0){
-								templateContentStr = templateContentStr.replace(new RegExp(tempKey, 'g'), self.dateFromTimestamp(invoice_content_obj[key]));
+								if(invoice_content_obj[key]!="" && invoice_content_obj[key]!==null){
+									templateContentStr = templateContentStr.replace(new RegExp(tempKey, 'g'), self.dateFromTimestamp(invoice_content_obj[key]));
+								}else{
+									templateContentStr = templateContentStr.replace(new RegExp(tempKey, 'g'), "");
+								}
 							}else{
 								templateContentStr = templateContentStr.replace(new RegExp(tempKey, 'g'), invoice_content_obj[key]);
 							}
