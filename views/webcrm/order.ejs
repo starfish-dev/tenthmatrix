@@ -345,7 +345,11 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
               					<div class="col-xs-12" style="margin-top:20px;">
                 					<div class="form-group">
                    						<div class="col-md-9 col-lg-12" align="center">
-               								<div class="submit-btn-setting"> <button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
+               								<div class="submit-btn-setting">
+               								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
+               									<a href="<%= backendDirectory %>/order/<%= contentObj._id %>" target="_blank" class="btn btn-danger btn-sm">Download Order</a>
+               								<%	} %>
+               								<button type="submit" class="btn btn-primary btn-color margin-right-5 btn-sm">Submit</button>
                								<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) {	%>
                									<a href="<%= backendDirectory %>/list/orders" class="btn btn-danger btn-sm">Cancel</a>
                								<%	}else{	%>

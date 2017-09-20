@@ -800,7 +800,8 @@ var self = module.exports =
 		if(req){
 			var formidable = require('formidable'); 
 			var path = require('path'), fs = require('fs');
-			var tempUploadPath = path.join(__dirname, '/../../../uploads');
+			//var tempUploadPath = path.join(__dirname, '/../../../uploads');
+			var tempUploadPath = '/tmp/';
 			var form = new formidable.IncomingForm(), savedFilePathStr='';
 			
 			if (fs.existsSync(tempUploadPath)) {
@@ -1001,5 +1002,105 @@ templateProcessTokens : function (db, system_id, templateContentStr, processedTo
     } else {
     	cb(outputResponseStr);
     }
+},
+
+generate_invoice_order_pdf : function (db, table_name, unique_id, active_system_id, cb){
+	var outputObj=new Object();
+	if(table_name!="" && unique_id!=""){
+		var fs = require('fs');
+		self.returnFindOneByMongoID(db, table_name, unique_id, function(resultObject) {
+			if(resultObject.aaData && resultObject.aaData != ""){
+				var invoice_content_obj = resultObject.aaData;
+				var templateStr= "gbp-invoice-template";
+				if(table_name=="orders"){
+					templateStr= "gbp-order-template";
+				}
+				if(invoice_content_obj.template && invoice_content_obj.template!=""){
+					templateStr = invoice_content_obj.template;
+				}
+				self.returnTemplateContent(db, active_system_id, templateStr, function(templateResultObject) {
+					if(templateResultObject.success && templateResultObject.success!="") {
+						var templateContentStr= templateResultObject.success;
+						for(var key in invoice_content_obj) {
+							var tempKey = "__"+key+"__";
+							if(tempKey.indexOf("timestamp")>=0){
+								templateContentStr = templateContentStr.replace(new RegExp(tempKey, 'g'), self.dateFromTimestamp(invoice_content_obj[key]));
+							}else{
+								templateContentStr = templateContentStr.replace(new RegExp(tempKey, 'g'), invoice_content_obj[key]);
+							}
+							if(key=="invoice_items" && invoice_content_obj[key]!="" && invoice_content_obj[key].length>0){
+								var itemsObj = invoice_content_obj[key];
+								var subItemscontent = "";
+								for(var i=0; i < itemsObj.length; i++){
+									var itemDetails = itemsObj[i];
+									subItemscontent += '<tr><td>'+itemDetails.description+'</td><td align="center">'+itemDetails.hours+'</td><td align="right">'+itemDetails.rate+'</td><td align="right">'+itemsObj[i].amount+'</td></tr>';
+								}
+								templateContentStr = templateContentStr.replace("__loop_through_items__", subItemscontent);
+							}else if(key=="order_items" && invoice_content_obj[key]!="" && invoice_content_obj[key].length>0){
+								var itemsObj = invoice_content_obj[key];
+								var subItemscontent = "";
+								for(var i=0; i < itemsObj.length; i++){
+									var itemDetails = itemsObj[i];
+									subItemscontent += '<tr><td>'+itemDetails.description+'</td><td align="center">'+itemDetails.hours+'</td><td align="right">'+itemDetails.rate+'</td><td align="right">'+itemDetails.discount+'</td><td align="right">'+itemsObj[i].amount+'</td></tr>';
+								}
+								templateContentStr = templateContentStr.replace("__loop_through_items__", subItemscontent);
+							}
+						}
+						var tempHTMLFilePathStr = "/tmp/"+invoice_content_obj._id+".html";
+						fs.writeFile(tempHTMLFilePathStr, templateContentStr, function(err) {
+    						if(err) {
+        						outputObj["error"]   = "Sorry, error while generating file, please inform your developer to setup temporary upload folder!";
+        						cb(outputObj);
+    						}
+    						var pdf = require('html-pdf');
+							var html = fs.readFileSync(tempHTMLFilePathStr, 'utf8');
+							var options = {
+  								"format": "A4",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+  								"orientation": "portrait", // portrait or landscape
+								"border": "25px",             // default is 0, units: mm, cm, in, px
+  								"zoomFactor": "1", // default is 1 
+  								"footer": {
+   									"height": "10mm",
+    								"contents": {
+      									default: '<div style="border-top: 1px solid #333333; font-size: 9px; text-align: center; padding-top: 1mm;margin-top:10px;">Page {{page}} of {{pages}}</div>', // fallback value
+    								}
+  								}
+							};
+							var tempPDfFilePathStr = "/tmp/"+invoice_content_obj._id+".pdf";
+							pdf.create(html, options).toFile(tempPDfFilePathStr, function(pdferr, res) {
+  								if (pdferr){
+  									outputObj["error"]   = "Sorry, error occurred while generating pdf!";
+           							cb(outputObj);
+  								}else{
+  									fs.unlinkSync(tempHTMLFilePathStr);
+  									outputObj["success"]   = tempPDfFilePathStr;
+           							cb(outputObj);
+       							}
+							});
+						}); 
+					}else{
+						outputObj["error"]   = "Sorry, no template found to generate pdf!";
+      					cb(outputObj);
+					}
+				});
+			} else{
+				outputObj["error"]   = "Sorry, no such record found!";
+      			cb(outputObj);
+			}
+		});
+	} else {
+		outputObj["error"]   = "Please pass all the required parameters to download pdf!";
+      	cb(outputObj);
+	}
+},
+dateFromTimestamp : function(timestamp){
+	var a = new Date(timestamp * 1000);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+	var year = a.getFullYear();
+	var month = months[a.getMonth()];
+	var dateNum = a.getDate();
+	
+	var time = month + ' ' + dateNum + ', ' + year;
+	return time;
 }
 };
