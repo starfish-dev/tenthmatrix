@@ -12,9 +12,24 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
     <a href="<%= backendDirectory %>/index" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       
-      <span class="logo-mini"><img src="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.thumbnail_logo_uuid !== 'undefined' && system_preferences.thumbnail_logo_uuid !== null && system_preferences.thumbnail_logo_uuid !== "") { %><%= backendDirectory %>/file/<%= system_preferences.thumbnail_logo_uuid %>?<%= Math.random(); %><% }else{ %>images/jobshout-small.gif<% } %>"  STYLE="padding-left:15px;"></span>
+      <span class="logo-mini">
+      	<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.thumbnail_logo_uuid !== 'undefined' && system_preferences.thumbnail_logo_uuid !== null && system_preferences.thumbnail_logo_uuid !== "") { %>
+      	<img src="<%= backendDirectory %>/file/<%= system_preferences.thumbnail_logo_uuid %>?<%= Math.random(); %>">
+      	<% } else { %>	
+      		<i class="fa fa-dot-circle-o"></i>
+      	<% } %>
+      </span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg"><IMG src="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.main_logo_uuid !== 'undefined' && system_preferences.main_logo_uuid !== null && system_preferences.main_logo_uuid !== "") { %><%= backendDirectory %>/file/<%= system_preferences.main_logo_uuid %>?<%= Math.random(); %><% }else{ %>images/webcrm-logo.png<% } %>" ALT=""/></span>
+      
+      <span class="logo-lg">
+      	<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.main_logo_uuid !== 'undefined' && system_preferences.main_logo_uuid !== null && system_preferences.main_logo_uuid !== "") { %>
+    		<IMG src="<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.main_logo_uuid !== 'undefined' && system_preferences.main_logo_uuid !== null && system_preferences.main_logo_uuid !== "") { %><%= backendDirectory %>/file/<%= system_preferences.main_logo_uuid %>?<%= Math.random(); %><% }else{ %>images/webcrm-logo.png<% } %>" ALT=""/>
+      	<% } else  if (typeof system_preferences !== 'undefined' && typeof system_preferences.name !== 'undefined' && system_preferences.name !== null && system_preferences.name !== "") { %>
+    		<i class="fa fa-dot-circle-o"></i> <%= system_preferences.name %>
+    	<% } else { %>
+    		<i class="fa fa-dot-circle-o"></i> WebCRM
+    	<% } %>
+      </span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
