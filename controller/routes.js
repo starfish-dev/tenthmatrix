@@ -201,13 +201,12 @@ app.get(backendDirectoryPath+'/invoice/:id', requireLogin, function(req, res) {
 								var subItemscontent = "";
 								for(var i=0; i < itemsObj.length; i++){
 									var itemDetails = itemsObj[i];
-									subItemscontent += '<tr><td align="center">'+itemDetails.hours+'</td><td>'+itemDetails.description+'</td><td align="right">'+itemDetails.rate+'</td><td align="right">'+itemsObj[i].amount+'</td></tr>';
+									subItemscontent += '<tr><td>'+itemDetails.description+'</td><td align="center">'+itemDetails.hours+'</td><td align="right">'+itemDetails.rate+'</td><td align="right">'+itemsObj[i].amount+'</td></tr>';
 								}
 								templateContentStr = templateContentStr.replace("__loop_through_items__", subItemscontent);
 							}
 						}
 						var tempHTMLFilePathStr = "/tmp/"+invoice_content_obj._id+".html";
-						console.log(tempHTMLFilePathStr)
 						fs.writeFile(tempHTMLFilePathStr, templateContentStr, function(err) {
     						if(err) {
         						res.send("Sorry, error while generating file, please inform your developer to setup temporary upload folder!");
@@ -228,13 +227,16 @@ app.get(backendDirectoryPath+'/invoice/:id', requireLogin, function(req, res) {
 							};
 							var tempPDfFilePathStr = "/tmp/"+invoice_content_obj._id+".pdf";
 							pdf.create(html, options).toFile(tempPDfFilePathStr, function(err, res) {
-  								if (err) return console.log(err);
+  								if (err){
+  									res.send("Sorry, error occurred while generating pdf!");
+  								}else{
   								fs.unlinkSync(tempHTMLFilePathStr);
   								sendResponse.download(tempPDfFilePathStr, function (err) {
        								if (err) {
            								res.send("Sorry, error occurred while generating pdf!");
        								}
   								});
+  								}
 							});
 						}); 
 					}else{
