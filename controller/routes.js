@@ -1492,7 +1492,13 @@ app.get(backendDirectoryPath+'/api_next_sequence_number/', requireLogin, functio
 	
 	if(req.authenticationBool){
 		if(req.query.table && req.query.table!=""){
-			db.collection(req.query.table).find({}).count(function (e, count) {
+			if(definedAdminTablesArr.indexOf(req.query.table)==-1){
+				var query = { 'uuid_system' : req.authenticatedUser.active_system_uuid.toString() };
+			} else {
+				var query = {};
+			}
+			
+			db.collection(req.query.table).find(query).count(function (e, count) {
 				if(count){
 					resultObj["seq_num"] = count+1;
 				} else {
