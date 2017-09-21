@@ -32,45 +32,75 @@ init.MongoClient.connect(init.mongoConnUrl, function (err, database) {
     	console.log('Unable to connect to the mongoDB server. Error:', err);
   	} else {
    		console.log('Connection established to', init.mongoConnUrl);
-   		
-   		var moduleIDArr=new Array(initFunctions.guid(), initFunctions.guid());
-   		//add basic modules first & assign to admin user
-   		initFunctions.crudOpertions(db, 'modules', 'findOne', null, 'code', 'modules', null, function(result) {
-   			if(result.aaData){
-   				console.log("Modules navigation already exists!");
-   			}	else	{
-				var addModuleObj= {
-				"name" : "Modules", "code" : "modules",  "icon_class" : "fa fa-file-text",  "icon_path" : "", "table" : "modules",  "displayOnDashboard" : "1", "sort_order" : "1", "active" : "1",
-    			"module_items" : [ 
-       				{
-           				"uuid" : moduleIDArr[0],
-            			"label" : "List",
-           			 	"link" : "/list/modules",
-           			 	"item_sort_order" : "0",
-            			"status" : "Active",
-           			    "target" : "1"
-        			}, 
-        			{
-           				"uuid" : moduleIDArr[2],
-            			"label" : "Add new",
-           				"link" : "/module",
-           				"item_sort_order" : "1",
-            			"status" : "Active",
-            			"target" : "1"
-        			}
-   				]
-   	 			};
-   				db.collection("modules").save(addModuleObj, (err, result) => {
+
+	//defined functions
+	//create module
+	var createModule =function (codeStr, insertDataObj, cb) {
+		initFunctions.crudOpertions(db, 'modules', 'findOne', null, 'code', codeStr, null, function(result) {
+			if(result.aaData){
+				console.log("Modules "+codeStr+" already exists!");
+			}else{
+				db.collection("modules").save(insertDataObj, (err, result) => {
       				if (err) console.log(err);
       				if(result){
-      					console.log("Created one basic module successfully ");
+      					console.log("Created "+codeStr+" module successfully ");
+    				}
+  				});				
+			}
+		});
+	}  	  		
+	//create admin group
+	var createAdminGroup =function (createdMongoID, cb) {
+		createdMongoID= createdMongoID.toString();
+		initFunctions.crudOpertions(db, 'groups', 'findOne', null, 'code', 'admin', null, function(result) {
+   			if(result.aaData){
+   				var groupDetails=result.aaData;
+   				var usersArr=groupDetails.users_list;
+   				var alreadyExistsBool=false;
+   			
+   				for(var key in usersArr) {
+   					if(usersArr[key]==createdMongoID){
+						alreadyExistsBool=true;
+						break;
+   					}
+				}
+				if(alreadyExistsBool){
+					console.log("User already exists in admin group");
+				} else{
+					db.collection("groups").update({_id:groupDetails._id}, { $push: { "users_list": createdMongoID } }, (err, result) => {
+   						console.log("Created admin user successfully!");
+   					});
+				}
+   			
+   			}	else	{
+				db.collection("groups").save({"name" : "Admin", "code" : "admin", "status" : 1, "users_list" : new Array(createdMongoID), "assigned_modules" : moduleIDArr, "modified" : initFunctions.currentTimestamp(), "created" : initFunctions.currentTimestamp()}, (err, result) => {
+      				if(result){
+    					console.log("Created admin user successfully!"+ result["ops"][0]["_id"]);
     				}
   				});
-  			}
+    		}
   		});
+	}  		
+ 		
+   		var moduleIDArr=new Array(initFunctions.guid(), initFunctions.guid());
    		
+   		//add basic modules first & assign to admin user
+   		console.log("Basic modules: ");
+  				var addModuleObj= [{ "name" : "Modules", "code" : "modules",  "icon_class" : "fa fa-file-text",  "icon_path" : "", "table" : "modules",  "displayOnDashboard" : "1", "sort_order" : "1", "active" : "1", "module_items" : [ { "uuid" : moduleIDArr[0], "label" : "List", "link" : "/list/modules", "item_sort_order" : "0", "status" : "Active", "target" : "1" }, { "uuid" : moduleIDArr[2], "label" : "Add new", "link" : "/module", "item_sort_order" : "1", "status" : "Active", "target" : "1" }]},
+				{ "name" : "Web pages", "code" : "web-pages",  "icon_class" : "fa fa-file-o",  "icon_path" : "", "table" : "documents",  "displayOnDashboard" : "1", "sort_order" : "2", "active" : "1", "module_items" : [ { "uuid" : moduleIDArr[0], "label" : "List", "link" : "/list/documents", "item_sort_order" : "0", "status" : "Active", "target" : "1" }, { "uuid" : moduleIDArr[2], "label" : "Add new", "link" : "/document", "item_sort_order" : "1", "status" : "Active", "target" : "1" }]},
+				{ "name" : "Categories", "code" : "categories",  "icon_class" : "fa fa-list-alt",  "icon_path" : "", "table" : "categories",  "displayOnDashboard" : "1", "sort_order" : "3", "active" : "1", "module_items" : [ { "uuid" : moduleIDArr[0], "label" : "List", "link" : "/list/categories", "item_sort_order" : "0", "status" : "Active", "target" : "1" }, { "uuid" : moduleIDArr[2], "label" : "Add new", "link" : "/category", "item_sort_order" : "1", "status" : "Active", "target" : "1" }]},
+				{ "name" : "Bookmarks", "code" : "bookmarks",  "icon_class" : "fa fa-list",  "icon_path" : "", "table" : "bookmarks",  "displayOnDashboard" : "1", "sort_order" : "5", "active" : "1", "module_items" : [ { "uuid" : moduleIDArr[0], "label" : "List", "link" : "/list/bookmarks", "item_sort_order" : "0", "status" : "Active", "target" : "1" }, { "uuid" : moduleIDArr[2], "label" : "Add new", "link" : "/bookmark", "item_sort_order" : "1", "status" : "Active", "target" : "1" }]}
+				];
+
+				for(var i=0; i < addModuleObj.length; i++){
+					var tempModuleObj = addModuleObj[i];
+					createModule(tempModuleObj['code'], tempModuleObj, function(g_response) {
+      					console.log(g_response);
+      				});
+				}
+				
    		//create admin user
-   		initFunctions.crudOpertions(db, 'users', 'findOne', null, 'email', 'admin', null, function(result) {
+   		initFunctions.crudOpertions(db, 'users', 'findOne', null, 'username', 'admin', null, function(result) {
    			if(result.aaData){
    				console.log("Amin user already exists!");
    				var userDetails=result.aaData;
@@ -91,42 +121,6 @@ init.MongoClient.connect(init.mongoConnUrl, function (err, database) {
     				}
   				});
   			}
-  		});
-	
-//create admin group
-var createAdminGroup =function (createdMongoID, cb) {
-	createdMongoID= createdMongoID.toString();
-	initFunctions.crudOpertions(db, 'groups', 'findOne', null, 'code', 'admin', null, function(result) {
-   		if(result.aaData){
-   			var groupDetails=result.aaData;
-   			var usersArr=groupDetails.users_list;
-   			var alreadyExistsBool=false;
-   			
-   			for(var key in usersArr) {
-   				if(usersArr[key]==createdMongoID){
-					alreadyExistsBool=true;
-					break;
-   				}
-			}
-			if(alreadyExistsBool){
-				console.log("User already exists in admin group");
-			} else{
-				db.collection("groups").update({_id:groupDetails._id}, { $push: { "users_list": createdMongoID } }, (err, result) => {
-   					console.log("Created admin user successfully!");
-   				});
-			}
-   			
-   		}	else	{
-			db.collection("groups").save({"name" : "Admin", "code" : "admin", "status" : 1, "users_list" : new Array(createdMongoID), "assigned_modules" : moduleIDArr, "modified" : initFunctions.currentTimestamp(), "created" : initFunctions.currentTimestamp()}, (err, result) => {
-      			
-      			if(result){
-    				console.log("Created admin user successfully!"+ result["ops"][0]["_id"]);
-    			}
-  			});
-    	}
-  	});
-}  		
-  		
-  		
+  		});  		
   	}
 });
