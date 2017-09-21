@@ -172,6 +172,7 @@ function loadTokens(){
 				contentHtml+="<li>"+row.code+"</li>";
 			});
      	}
+     	if(contentHtml!=""){
 		$("#DragWordList").html(contentHtml);
 		$("#DragWordList li").draggable({
 			appendTo: "body",
@@ -179,6 +180,9 @@ function loadTokens(){
         	cursor: "select",
         	revert: "invalid"
     	});
+    	}else{
+    		$("#DragWordList").before('<div class="alert alert-error">Sorry. no tokens found. To add a new token, please <a href="'+backendDirectory+'/token" target="_blank">click here</a>!</div>');
+    	}
 	});
 }
 

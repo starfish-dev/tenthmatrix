@@ -22,7 +22,7 @@
 		<div class="content-wrapper">
     	  	<!-- Content Header (Page header) -->
     		<section class="content-header">
-      			<h1>Basic details of your system</h1>
+      			<h1>Basic details of your business</h1>
       			<ol class="breadcrumb">
         			<% include include/dashboard-breadcrumb %>
         			<li class="active">Business</li>
@@ -38,7 +38,7 @@
              								<%= queryStr.success %>
             						</div>
             						
-            						<h3>Add basic modules to your system by clicking this button :</h3>
+            						<h3>Add basic modules to your business by clicking this button :</h3>
             						<a href="<%= backendDirectory %>/module" class="btn btn-danger">Set modules</a>
             					<% }else{	%>
             					<form class="form-horizontal" action="<%= backendDirectory %>/default_system" method="POST" id="contentForm"><% include system_form %></form>

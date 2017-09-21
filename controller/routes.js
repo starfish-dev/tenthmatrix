@@ -1,25 +1,26 @@
 	/**********************************************************************
-	*  Author: Neha Kapoor (neha@rootcrm.org)
-	*  Project Lead: Balinder WALIA (bwalia@rootcrm.org)
+	*  Author: Neha Kapoor (erkapoor.neha@gmail.com)
+	*  Project Lead: Balinder WALIA (balinder.walia@gmail.com)
 	*  Project Lead Web...: https://twitter.com/balinderwalia
-	*  Name..: ROOTCRM
-	*  Desc..: Root CRM (part of RootCrm Suite of Apps)
-	*  Web: http://rootcrm.org
-	*  License: http://rootcrm.org/LICENSE.txt
+	*  Name..: WEBCRM
+	*  Desc..: WEB CRM (part of WebCrm Suite of Apps)
+	*  Web: http://webcrm.io
+	*  License: http://webcrm.io/LICENSE.txt
 	**/
 
 	/**********************************************************************
 	*  routes.js handles the http requests
 	**/
 	
-var initFunctions = require('../config/functions');		
+var initFunctions = require('../config/functions');		 // called functions file
+
+//initialise required modules 
 var passwordHash = require('password-hash'),
-	cookieParser = require('cookie-parser');
-	
-var multer = require('multer');
-var GridFsStorage = require('multer-gridfs-storage');
-var Grid = require('gridfs-stream');
-var jwt = require('jwt-simple');
+	cookieParser = require('cookie-parser'),
+	multer = require('multer'),
+	GridFsStorage = require('multer-gridfs-storage'),
+	Grid = require('gridfs-stream'),
+	jwt = require('jwt-simple');
 
 const fs = require('fs');
 
@@ -41,7 +42,7 @@ app.get(backendDirectoryPath+'/sign-in', system_preferences, function(req, res) 
     });   
 })
 
-//reset password
+//reset password page
 app.get(backendDirectoryPath+'/reset_password', system_preferences, function(req, res) {
 	res.render(accessFilePath+'reset_password', {
       	 queryStr : req.query,
@@ -66,12 +67,13 @@ var upload = multer({ //multer settings for single upload
     storage: storage
 }).single('file');
 
-/** API path that will upload the files */
+/** API path that will upload the files, return data as json */
 app.post(backendDirectoryPath+'/upload', requireLogin, function(req, res) {
 	var myObj = new Object();
 	
 	if(req.authenticationBool){
 		var requested_Object=req;
+		// called this function to extract the data from upload file, i.e. used for job applications
 		initFunctions.create_file_on_disk_to_extract_content(db, requested_Object, function(resultObject) {
 			if(resultObject.path && resultObject.path!=""){
 				fs.unlinkSync(resultObject.path);
@@ -109,8 +111,10 @@ app.post(backendDirectoryPath+'/upload', requireLogin, function(req, res) {
   	}
 });
 
-//download file
+/** download file stored in gridFs (GET request)
+parameter : uuid (unique id)   **/
 app.get(backendDirectoryPath+'/download/:uuid', requireLogin, function(req, res) {
+	//search for unique id in metadata.uuid
     gfs.files.findOne({'metadata.uuid': req.params.uuid}, function(err, file) {
 		if (err) {
 			return res.status(400).send(err);
@@ -137,7 +141,8 @@ app.get(backendDirectoryPath+'/download/:uuid', requireLogin, function(req, res)
     });
 });
 
-//find and remove file
+/** find and remove file from gridFs (POST request)
+parameter : uuid (unique id), search this uuid in 'metadata.uuid'  **/
 app.post(backendDirectoryPath+'/find_remove_file', requireLogin, function(req, res) {
     var outputObj = new Object();
 	gfs.files.findOne({'metadata.uuid': req.body.uuid}, function(err, files) {
@@ -155,7 +160,8 @@ app.post(backendDirectoryPath+'/find_remove_file', requireLogin, function(req, r
     });
 });
 
-//fetch uploaded file content
+/** fetch uploaded file content and display in browser
+parameter : uuid (unique id), search this uuid in 'metadata.uuid'  **/
 app.get(backendDirectoryPath+'/file/:filename', function(req, res){
         /** First check if file exists */
         gfs.files.find({'metadata.uuid': req.params.filename}).toArray(function(err, files){
@@ -179,7 +185,7 @@ app.get(backendDirectoryPath+'/file/:filename', function(req, res){
         });
 });
 
-//download invoice by process pdf template
+//download invoice by processing pdf template saved in [template] table
 app.get(backendDirectoryPath+'/invoice/:id', requireLogin, function(req, res) {
 	var sendResponse = res;
 	if(req.authenticationBool){
@@ -201,7 +207,7 @@ app.get(backendDirectoryPath+'/invoice/:id', requireLogin, function(req, res) {
   	}
 });    
  
-//download order by process pdf template
+//download order by processing pdf template saved in [template] table
 app.get(backendDirectoryPath+'/order/:id', requireLogin, function(req, res) {
 	var sendResponse = res;
 	if(req.authenticationBool){
@@ -223,7 +229,9 @@ app.get(backendDirectoryPath+'/order/:id', requireLogin, function(req, res) {
   	}
 });     
 
-//post action for save notes
+/** post action for save notes for any table
+parameters : table (table name), note, added_by, user_name (user id and name of user added the comment), uuid (table record unique id), action = create, update and delete
+**/
 app.post(backendDirectoryPath+'/savenotes', requireLogin, (req, res) => {
 	var myObj = new Object();
 	if(req.authenticationBool){
@@ -307,7 +315,10 @@ app.post(backendDirectoryPath+'/savenotes', requireLogin, (req, res) => {
   	}
 });
 
-//post action to addComments for user and notify user
+/** addCommentForUser POST Request to add Comments for user and also notify user
+parameters : comment, id (table record unique id)
+table : availability
+**/
 app.post(backendDirectoryPath+'/addCommentForUser', requireLogin, (req, res) => {
 	var myObj = new Object();
 	if(req.authenticationBool){
@@ -437,7 +448,7 @@ app.post(backendDirectoryPath+'/saveplayers', (req, res) => {
 app.post(backendDirectoryPath+'/reset_password', (req, res) => {
 	var postJson=req.body;
 	var mongoIDField= new mongodb.ObjectID(postJson.token);
-	
+	//check for authentication token provided to user to reset password
 	initFunctions.returnFindOneByMongoID(db, 'authentication_token', mongoIDField, function(result) {
 		if (result.aaData) {
 			var document=result.aaData;
@@ -459,7 +470,7 @@ app.post(backendDirectoryPath+'/reset_password', (req, res) => {
     });
 })
 
-//forgot password
+//forgot password page
 app.get(backendDirectoryPath+'/forgot_password', system_preferences, function(req, res) {
 	res.render(accessFilePath+'forgot_password', {
       	 queryStr : req.query,
@@ -479,7 +490,7 @@ app.get(backendDirectoryPath+'/', requireLogin, system_preferences, function(req
 	}
 }); 
 
-//index
+//index page
 app.get(backendDirectoryPath+'/index', requireLogin, system_preferences, function(req, res) {
 	if(req.authenticationBool){
 		res.render(accessFilePath+'index', {
@@ -503,7 +514,7 @@ app.get(backendDirectoryPath+'/403', requireLogin, system_preferences, function(
 	}
 }); 
 
-//launchpad
+//launchpad page
 app.get(backendDirectoryPath+'/launchpad', requireLogin, system_preferences, function(req, res) {
 	if(req.authenticationBool){
 		var filesArr= new Array(), i=0;
@@ -511,6 +522,7 @@ app.get(backendDirectoryPath+'/launchpad', requireLogin, system_preferences, fun
  			filesArr[i]=file;
  			i++;
  		});
+ 		//on request of this page, save it in activity log
  		initFunctions.save_activity_log(db, 'Launchpad', req.url, req.authenticatedUser._id, req.authenticatedUser.active_system_uuid.toString(), function(result) {	
 			res.render(accessFilePath+'launchpad', {
  				directory_files : filesArr,
@@ -523,11 +535,12 @@ app.get(backendDirectoryPath+'/launchpad', requireLogin, system_preferences, fun
 	}
 }); 
 
-//logout
+//logout page
 app.get(backendDirectoryPath+'/logout', function(req, res) {
 	if(req.cookies[init.cookieName] != null && req.cookies[init.cookieName] != 'undefined' && req.cookies[init.cookieName]!=""){
 		var mongoIDField= new mongodb.ObjectID(req.cookies[init.cookieName]);
-		res.clearCookie(init.cookieName);
+		res.clearCookie(init.cookieName); // delete the cookie
+		// delete the record from sessions
 		db.collection('sessions').remove({"_id":mongoIDField},function(err,result){
     		res.redirect(backendDirectoryPath+'/sign-in');
     	});
@@ -536,17 +549,19 @@ app.get(backendDirectoryPath+'/logout', function(req, res) {
    	}	
 }); 
 
-//forgot password post
+//forgot password (POST request)
 app.post(backendDirectoryPath+'/forgot_password', (req, res) => {
 	var postJson=req.body;
 	var checkForExistence= '{"email": \''+postJson.email+'\', "status": { $in: [ 1, "1" ] }}';
 	
+	//check for active user with entered email address
 	initFunctions.crudOpertions(db, 'users', 'findOne', null, null, null, checkForExistence, function(result) {
 		if (result.aaData) {
 			var document= result.aaData, addAuthToken=new Object();
 			addAuthToken["user_id"]=document._id;
 			addAuthToken["status"]=true;
-				
+			
+			//create a secure token and send this token via email
 			initFunctions.crudOpertions(db, 'authentication_token', 'create', addAuthToken, null, null, null,function(result) {
 				var subjectStr='Reset your '+init.system_name+' password';
 				var nameStr=document.firstname;
@@ -579,15 +594,17 @@ app.post(backendDirectoryPath+'/forgot_password', (req, res) => {
     });
 })
 
-//validate user
+//validate user on login (POST)
 app.post(backendDirectoryPath+'/validlogin', (req, res) => {
 	var postJson=req.body;
+	//search user with email
 	var checkForExistence= '{"email": \''+postJson.email+'\', "status": { $in: [ 1, "1" ] }}';
 	initFunctions.crudOpertions(db, 'users', 'findOne', null, null, null, checkForExistence, function(result) {
 		if (result.aaData) {
 			var document= result.aaData;
+			//password hash is used to check passowrd
 			if(passwordHash.verify(postJson.password, document.password)){
-				initFunctions.saveSessionBeforeLogin(db, document._id, document.uuid_default_system, function(result) {
+				initFunctions.saveSessionBeforeLogin(db, document._id, document.uuid_default_system, function(result) {		//save the session if user is valid
 					if (result.success){
       					res.cookie(init.cookieName , result.cookie)
       					res.redirect(backendDirectoryPath+result.link);
@@ -606,7 +623,7 @@ app.post(backendDirectoryPath+'/validlogin', (req, res) => {
 					var document= result.aaData;
 					
 					if(passwordHash.verify(postJson.password, document.password)){
-						initFunctions.saveSessionBeforeLogin(db, document._id, document.uuid_default_system, function(result) {
+						initFunctions.saveSessionBeforeLogin(db, document._id, document.uuid_default_system, function(result) { 	//save the session if user is valid
 							if (result.success){
       								res.cookie(init.cookieName , result.cookie)
       								res.redirect(backendDirectoryPath+result.link);
@@ -625,7 +642,7 @@ app.post(backendDirectoryPath+'/validlogin', (req, res) => {
     });
 })
 
-//change notification status
+//change notification status (GET), change the status to read and redirect to required page
 app.get(backendDirectoryPath+'/change_notifications', requireLogin, function(req, res) {
 	var redirectURLStr="/";
 	var collectionStr="notifications";
@@ -687,7 +704,7 @@ app.get(backendDirectoryPath+'/change_notifications', requireLogin, function(req
 	}
 });
 
-//count results of passed collection user notification
+//api_get_count (GET) : count the total results of passed collection of the current selected system
 app.get(backendDirectoryPath+'/api_get_count', requireLogin, function(req, res) {
 	var myObj = new Object();
 	if(req.authenticationBool){
@@ -725,7 +742,7 @@ app.get(backendDirectoryPath+'/api_get_count', requireLogin, function(req, res) 
 	}
 });
 
-//fetch user notification
+//fetch logged in user's notification, by default it display only top 5 records
 app.get(backendDirectoryPath+'/load_notifications', requireLogin, function(req, res) {
 	var collectionStr="notifications";
 	var itemsPerPage = 5, pageNum=1;
@@ -775,7 +792,7 @@ app.get(backendDirectoryPath+'/load_notifications', requireLogin, function(req, 
 	}
 });
 
-// task scheduler
+// task scheduler page
 app.get(backendDirectoryPath+'/task_scheduler', (req, res) => {
 	var schedulerFrom = req.query.schedulerFrom, schedulerTo=req.query.schedulerTo, collectionStr=req.query.collection, outputObj = new Object();
 	
@@ -791,7 +808,7 @@ app.get(backendDirectoryPath+'/task_scheduler', (req, res) => {
 	
 });
 
-//post request to save task scheduler
+//post request to save task scheduler (work in progree)
 app.get(backendDirectoryPath+'/save_task_scheduler', (req, res) => {
 	var getJson=req.query;
 	var outputObj = new Object();
@@ -863,7 +880,7 @@ app.get(backendDirectoryPath+'/save_task_scheduler', (req, res) => {
 	}
 })
 
-//notify user one user : this is called from user entry form
+//notify user only the particular user : this is called from user entry form
 app.post(backendDirectoryPath+'/notifyUser/', requireLogin, function(req, res) {
 	var outputObj = new Object();
 	
@@ -879,7 +896,7 @@ app.post(backendDirectoryPath+'/notifyUser/', requireLogin, function(req, res) {
 	
 }); 
 
-//team selection notification
+//specify api team selection notification (POST)
 app.post(backendDirectoryPath+'/team_selection_notification/', requireLogin, function(req, res) {
 	var outputObj = new Object();
 	
@@ -1045,7 +1062,7 @@ app.post(backendDirectoryPath+'/team_selection_notification/', requireLogin, fun
 	}	
 }); 
 
-//batch notification
+//batch notification to multiple users (POST)
 app.post(backendDirectoryPath+'/batch_notification/', requireLogin, function(req, res) {
 	var outputObj = new Object();
 	
@@ -1169,7 +1186,7 @@ app.post(backendDirectoryPath+'/batch_notification/', requireLogin, function(req
 	}	
 }); 
 
-//push_team_to_history
+//push_team_to_history (POST) create history object for the team in the same record
 app.post(backendDirectoryPath+'/push_team_to_history/', requireLogin, function(req, res) {
 	var outputObj = new Object();
 	
@@ -1217,7 +1234,7 @@ app.post(backendDirectoryPath+'/push_team_to_history/', requireLogin, function(r
 	}	
 }); 
 
-//pull_team_from_history
+//pull_team_from_history (POST) fetch the history of the particular team
 app.post(backendDirectoryPath+'/pull_team_from_history/', requireLogin, function(req, res) {
 	var outputObj = new Object();
 	
@@ -1257,7 +1274,8 @@ app.post(backendDirectoryPath+'/pull_team_from_history/', requireLogin, function
 	}	
 }); 
 
-//post api of change status
+/** POST api of change status of passed number of records to new status value
+parameters : collection(table name), selected_values (selected unique value which need updation), status **/
 app.post(backendDirectoryPath+'/api_change_status/', requireLogin, function(req, res) {
 	var selected_values_str="", statusNum="", collectionStr="", fieldNameStr='';
 	var outputObj = new Object();
@@ -1313,7 +1331,7 @@ app.post(backendDirectoryPath+'/api_change_status/', requireLogin, function(req,
 	}
 }); 
 
-// post api to delete records
+// POST api to delete multiple records, parameters : collection(table name), selected_values (selected unique value)
 app.post(backendDirectoryPath+'/delete/', requireLogin, function(req, res) {
 	var selected_values_str="", collectionStr="", outputObj = new Object();
 	
@@ -1359,7 +1377,9 @@ app.post(backendDirectoryPath+'/delete/', requireLogin, function(req, res) {
 	}
 }); 
 
-//post api of CRUD
+/**  POST api of CRUD
+parameters : collection, action (findOne, create, update, delete), fieldName (unique field name), fieldValue (unique field value), postContent (all posted data)
+**/
 app.post(backendDirectoryPath+'/api_crud_post/', requireLogin, function(req, res) {
 	var uniqueFieldNameStr = "", uniqueFieldValueStr="", actionStr="", collectionStr="";
 	var outputObj = new Object();
@@ -1401,7 +1421,9 @@ app.post(backendDirectoryPath+'/api_crud_post/', requireLogin, function(req, res
 	}
 }); 
 
-//get api of CRUD
+/**  get api of CRUD
+parameters : collection, action (findOne, create, update, delete), fieldName (unique field name), fieldValue (unique field value), postContent (all posted data)
+**/
 app.get(backendDirectoryPath+'/api_crud_get/', requireLogin, function(req, res) {
 	var uniqueFieldNameStr = "", uniqueFieldValueStr="", actionStr="", collectionStr="";
 	var outputObj = new Object();
@@ -1449,7 +1471,7 @@ app.get(backendDirectoryPath+'/api_crud_get/', requireLogin, function(req, res) 
 	}
 }); 
 
-//api to fetch all collection names
+//api to fetch all collection/table names
 app.get(backendDirectoryPath+'/api_fetch_collections/', requireLogin, function(req, res) {
 	var outputObj = new Object();
 	
@@ -1463,7 +1485,7 @@ app.get(backendDirectoryPath+'/api_fetch_collections/', requireLogin, function(r
 	}
 }); 
 
-//change session for user selected system
+// api swtich_user_system : change session for user selected system
 app.get(backendDirectoryPath+'/swtich_user_system/', requireLogin, function(req, res) {
 	var outputObj = new Object();
 	
@@ -1486,7 +1508,7 @@ app.get(backendDirectoryPath+'/swtich_user_system/', requireLogin, function(req,
 	}
 });
 
-//api_next_sequence_number
+//api_next_sequence_number to return next id depending upon number of records
 app.get(backendDirectoryPath+'/api_next_sequence_number/', requireLogin, function(req, res) {
 	var resultObj = new Object();
 	
@@ -2951,10 +2973,11 @@ app.post(backendDirectoryPath+'/default_system', requireLogin, (req, res) => {
 		initFunctions.crudOpertions(db, table_nameStr, 'create', contentJson, unique_fieldStr, unique_fieldVal, null,function(result) {
     		if(result.success){
     			var default_system_id=result._id;
-    			db.collection("users").update({_id:req.authenticatedUser._id}, {'$set' : {"uuid_default_system" : default_system_id.toString(), "shared_systems" : new Array(default_system_id)}}, (err1	, result) => {
-    				db.collection("modules").update({'active':1}, {'$set' : {"uuid_system" : default_system_id}}, { multi: true });
-    				db.collection("session").update({'user_id':req.authenticatedUser._id}, {'$set' : {"active_system_uuid" : default_system_id}}, (err2	, result2) => {
-    					res.redirect(backendDirectoryPath+'/default_system?success=Saved the basic details successfully!');
+    			db.collection("users").update({_id:req.authenticatedUser._id}, {'$set' : {"uuid_system" : default_system_id.toString(), "uuid_default_system" : default_system_id.toString(), "shared_systems" : new Array(default_system_id)}}, (err1	, result) => {
+    				db.collection("modules").update({}, {'$set' : {"uuid_system" : default_system_id.toString()}}, { multi: true }, (err3, result3) => {
+    					db.collection("sessions").update({'user_id':req.authenticatedUser._id}, {'$set' : {"active_system_uuid" : default_system_id}}, (err2	, result2) => {
+    						res.redirect(backendDirectoryPath+'/default_system?success=Saved the basic details successfully!');
+    					});
     				});
   				});
     		}
@@ -3101,6 +3124,7 @@ app.post(backendDirectoryPath+'/saveMatchDetails', requireLogin, (req, res) => {
 required parameters are listed below : 
 table_name (collection name), unique_field (update collection row based on specified field), id (in case of already existing row, pass the mongoDb _id)
 editorField (field name passed in url), editorValue (field value passed in url in case of update), data (contain all the form fields)
+return : redirect to the requested page
 **/
 app.post(backendDirectoryPath+'/save/:id', requireLogin, (req, res) => {
 	if(req.authenticationBool){
@@ -3157,7 +3181,7 @@ app.post(backendDirectoryPath+'/save/:id', requireLogin, (req, res) => {
 	}
 	else if(table_nameStr=="email_queue"){
 		callMongoQueriesBool=true; 
-	}else if(table_nameStr=="users" || table_nameStr=="fixtures"){
+	}else if(table_nameStr=="users" || table_nameStr=="fixtures"){	//separated from common function because to update specific fields using $set
 		callMongoQueriesBool=false; 
 		if (table_nameStr=='users' && typeof contentJson.password !== 'undefined' && contentJson.password !== null && contentJson.password != "") {
       		contentJson['password'] = passwordHash.generate(contentJson.password);
@@ -3280,6 +3304,8 @@ app.post(backendDirectoryPath+'/save/:id', requireLogin, (req, res) => {
 		if(req.authenticatedUser.lastname && req.authenticatedUser.lastname!="")	{
 			loggedInUserNameStr += ' '+req.authenticatedUser.lastname;
 		}
+		
+		//create and update the record
 		initFunctions.saveEntry(db, table_nameStr, checkForExistence, contentJson, req.params.id, mongoIDField, unique_fieldStr, unique_fieldVal, loggedInUserNameStr, function(result) {
 			
 			var tempLink="";
@@ -3307,9 +3333,14 @@ app.post(backendDirectoryPath+'/save/:id', requireLogin, (req, res) => {
 	}
 })
 
+/** function returnUserAssignedModules
+parameters :  auth_user_id (logged in user unique id), res (HTTP request object), cb (callback)
+description : check user's assigned modules (which are dependent on user assigned to groups)
+**/
 function returnUserAssignedModules (auth_user_id, req, cb) {
 	var outputObj= new Object();
 	if(auth_user_id != null && auth_user_id != 'undefined' && auth_user_id !=""){
+		//check user in groups
 		db.collection('groups').find({"users_list": { $in: new Array(auth_user_id.toString()) }, "status": { $in: [ 1, "1" ] }}).toArray(function(g_err, g_details) {
 			if(g_err){
 				outputObj["error"]   = "no record found!";
@@ -3353,6 +3384,7 @@ function returnUserAssignedModules (auth_user_id, req, cb) {
 						return cb(outputObj);
       				} else if (items) {
       					var outputLinksOnlyArr= new Array();
+      					//if admin user return all modules
       					if(isUserAdmin){
       						outputObj["aaData"]   = items;
       						if(req.sendModuleLinks && req.sendModuleLinks==true){
@@ -3366,6 +3398,7 @@ function returnUserAssignedModules (auth_user_id, req, cb) {
 								}
 							}
       					}else{
+      						// if not admin user, send only accessed modules
       						var outputContentJson=new Array();
       						for (var j=0; j < items.length; j++) {
       							var moduleObj={};
@@ -3394,12 +3427,12 @@ function returnUserAssignedModules (auth_user_id, req, cb) {
 								}
 								outputContentJson[j]=moduleObj;
 							}
-							outputObj["aaData"]   = outputContentJson;
+							outputObj["aaData"]   = outputContentJson; // complete module details are sent
 						}
 						if(req.sendModuleLinks && req.sendModuleLinks==true){
 							var outputObjNew = new Object();
 							outputObjNew["admin_user"]   = isUserAdmin;
-							outputObjNew["modules"]   = outputLinksOnlyArr;
+							outputObjNew["modules"]   = outputLinksOnlyArr; // array of module links only
 							return cb(outputObjNew);
 						} else {
 							return cb(outputObj);
@@ -3413,7 +3446,14 @@ function returnUserAssignedModules (auth_user_id, req, cb) {
    		return cb(outputObj);
    	}
 }
+
+/** function : requireLogin (called in all api's for authentication)
+authentication can be:
+	-- based on cookie saved, cookieName is defined in init.js)
+	-- based on token passed in header 
+**/
 function requireLogin (req, res, next) {
+	// check for cookie in browser
 	if(req.cookies[init.cookieName] != null && req.cookies[init.cookieName] != 'undefined' && req.cookies[init.cookieName]!=""){
 		var session_id= req.cookies[init.cookieName];
 		
@@ -3427,7 +3467,10 @@ function requireLogin (req, res, next) {
 				next();
 			}
 		});
-	}else if(req.headers['token'] != null && req.headers['token'] != 'undefined' && req.headers['token']!=""){
+	}
+	//token value passed in headers
+	else if(req.headers['token'] != null && req.headers['token'] != 'undefined' && req.headers['token']!=""){
+		//check for [tokens]code = 'jwttokensecret'
 		initFunctions.crudOpertions(db, 'tokens', 'findOne', null, 'code', 'jwttokensecret', null, function(tokenResult) {
 			if(tokenResult.aaData){
 				var secretKeyValue=tokenResult.aaData.token_content;
@@ -3478,6 +3521,7 @@ function requireLogin (req, res, next) {
 		next();
    	}
 }
+/**	 return system preferences **/
 function system_preferences (req, res, next) {
 	initFunctions.crudOpertions(db, 'system_preferences', 'findOne', null, "type", "default", "", function(result) {
 		if (result.aaData) {
@@ -3487,10 +3531,13 @@ function system_preferences (req, res, next) {
 	});
 }
 
+/**		function : authenticatedUser 
+parameters : auth_session_id (current session id fetched from browser cookie), cb is callback/return parameter which contain logged in user's details
+**/
 var authenticatedUser =function (auth_session_id, cb) {
 	if(auth_session_id != null && auth_session_id != 'undefined' && auth_session_id !=""){
 		var mongoIDField= new mongodb.ObjectID(auth_session_id);
-		
+		//check for session with id find in cookie with active status
 		initFunctions.returnFindOneByMongoID(db, 'sessions', mongoIDField, function(result) {
 			if(result.error) {
 				return cb(null);	
@@ -3498,6 +3545,7 @@ var authenticatedUser =function (auth_session_id, cb) {
 				var session_result= result.aaData;
 				if(session_result.status==true || session_result.status=="true"){
 				var returnUserDetsils = new Array();
+				//fetch user details from user unique id found in session output
 				initFunctions.returnFindOneByMongoID(db, 'users', session_result.user_id, function(userDetails) {
 					if(userDetails.error) return cb(null);
 					if(userDetails.aaData){

@@ -1,15 +1,15 @@
 	/**********************************************************************
-	*  Author: Neha Kapoor (neha@rootcrm.org)
-	*  Project Lead: Balinder WALIA (bwalia@rootcrm.org)
+	*  Author: Neha Kapoor (erkapoor.neha@gmail.com)
+	*  Project Lead: Balinder WALIA (balinder.walia@gmail.com)
 	*  Project Lead Web...: https://twitter.com/balinderwalia
-	*  Name..: ROOTCRM
-	*  Desc..: Root CRM (part of RootCrm Suite of Apps)
-	*  Web: http://rootcrm.org
-	*  License: http://rootcrm.org/LICENSE.txt
+	*  Name..: WEBCRM
+	*  Desc..: WEB CRM (part of WebCrm Suite of Apps)
+	*  Web: http://webcrm.io
+	*  License: http://webcrm.io/LICENSE.txt
 	**/
 
 	/**********************************************************************
-	*  server.js handles the whole app
+	*  server.js initiate the app
 	**/
 	
 'use strict';
