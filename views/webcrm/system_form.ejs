@@ -146,6 +146,20 @@
                 							
                             				</div></div></div>
                             			</div></div>
+                            			<% if (typeof contentObj._id !== "undefined" && contentObj._id !== null) { %>
+                            			<div class="col-sm-6 col-xs-12"><div class="box box-primary">
+            								<h4>Access</h4>
+            								<div class="box-body"><div class="row"><div class=" col-sm-12 col-lg-11">
+            								
+            								<div class="form-group">
+            									<div class="col-md-6 col-lg-7">
+                  									<a href="<%= backendDirectory %>/list/users" class="btn btn-danger btn-sm">Give access to user(s) of this system</a>
+                  								</div>
+                							</div>
+                							
+                            				</div></div></div>
+                            			</div></div>
+                            			<% } %>
                             		</div>
                 					<div class="row">
                 					<div class="col-sm-6 col-xs-12">

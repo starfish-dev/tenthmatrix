@@ -1538,7 +1538,7 @@ app.get(backendDirectoryPath+'/api_next_sequence_number/', requireLogin, functio
 	}
 });
 
-//api_unique_username
+//api_unique_username, auto populate username depending upon first name & last name passed
 app.get(backendDirectoryPath+'/api_unique_username/', requireLogin, function(req, res) {
 	var resultObj = new Object();
 	
@@ -1590,7 +1590,7 @@ app.get(backendDirectoryPath+'/api_unique_username/', requireLogin, function(req
 	}
 });
 
-//get logged in user systems
+//get logged in user's all assigned systems
 app.get(backendDirectoryPath+'/fetch_user_systems/', requireLogin, function(req, res) {
 	var outputObj = new Object();
 	
@@ -1633,7 +1633,7 @@ app.get(backendDirectoryPath+'/fetch_user_systems/', requireLogin, function(req,
 	}
 });
 
-//load navigator
+//load navigator (GET)
 app.get(backendDirectoryPath+'/load_navigator/', requireLogin, function(req, res) {
 	var collectionStr="modules";
 	var outputObj = new Object();
@@ -1649,7 +1649,7 @@ app.get(backendDirectoryPath+'/load_navigator/', requireLogin, function(req, res
 	}
 });
 
-//api to fetch groups in which logged in user
+//api to fetch all the groups in which logged in user
 app.get(backendDirectoryPath+'/api_fetch_user_groups/', requireLogin, function(req, res) {
 	var outputObj= new Object();
 	if(req.authenticationBool){
@@ -1672,7 +1672,9 @@ app.get(backendDirectoryPath+'/api_fetch_user_groups/', requireLogin, function(r
 	}
 });
 
-//GENERIC: fetch listing depending upon collection or template passed
+/** api_fetch_applications (GET): to fetch "job_applications", applied radius search
+parameters : collection(table name), start, limit
+**/
 app.get(backendDirectoryPath+'/api_fetch_applications/', requireLogin, function(req, res) {
 	var itemsPerPage = 10, pageNum=1, collectionStr="job_applications", outputObj = new Object();
 	
@@ -1813,7 +1815,9 @@ app.get(backendDirectoryPath+'/api_fetch_applications/', requireLogin, function(
 	}
 }); 
 
-//fetch uploaded files for a particular collection and its id
+/** fetch uploaded files for a particular collection record
+parameters : collection(table name), id(unique mongo id), start, limit
+**/
 app.get(backendDirectoryPath+'/api_fetch_uploads/', requireLogin, function(req, res) {
 	var itemsPerPage = 10, pageNum=1, collectionStr="", collectionID="", outputObj = new Object();
 	
@@ -1867,7 +1871,11 @@ app.get(backendDirectoryPath+'/api_fetch_uploads/', requireLogin, function(req, 
 	}
 }); 
 
-//GENERIC: fetch listing depending upon collection or template passed
+/** GENERIC: fetch listing depending upon collection or template passed
+parameters required are : templateStr (defined in system_templates) or collection (table name),
+start, limit (if 'all' is passed in this parameter than it return all the rows of table), findFieldName (search according to some particular field, pass the field name in this parameter),
+findFieldValue (pass the value of field name passed)
+**/
 app.get(backendDirectoryPath+'/api_fetch_list/', requireLogin, function(req, res) {
 	var itemsPerPage = 10, pageNum=1, templateStr="", collectionStr="", returnAllResults="", findFieldNameStr="", findFieldValueStr="";
 	var outputObj = new Object();
@@ -1906,33 +1914,29 @@ app.get(backendDirectoryPath+'/api_fetch_list/', requireLogin, function(req, res
 					res.send(resultObject);
 				});
 			}else if(collectionStr!=""){
-				var query="{";
-				
+				var newQueryObj = {};
+				var userAccessRight = parseInt(req.authenticatedUser.access_right);
 				if (typeof activeSystemsStr !== 'undefined' && activeSystemsStr !== null && activeSystemsStr!="") {
 					if(definedAdminTablesArr.indexOf(collectionStr)==-1){
 						if(collectionStr=="fs.files"){
-							query+=" 'metadata.uuid_system': { $in: ['"+activeSystemsStr+"'] }, 'contentType' : new RegExp('^image') ";
+							newQueryObj['metadata.uuid_system'] = { $in: [activeSystemsStr] };
+							newQueryObj['contentType'] = new RegExp('^image');
 						}else{
-							query+=" $or: [ { 'uuid_system' : { $in: ['"+activeSystemsStr+"'] } }, { 'shared_systems': { $in: ['"+activeSystemsStr+"'] } } ] ";
+							newQueryObj['$or'] = [ { 'uuid_system' : { $in: [activeSystemsStr] } }, { 'shared_systems': { $in: [activeSystemsStr] } } ];
 						}
+					}else if(collectionStr=="systems" && userAccessRight<=10){
+						newQueryObj['_id'] = new mongodb.ObjectID(activeSystemsStr);
 					}
 				}
 				if(collectionStr=="activity_log"){
-					if(query!="{"){
-     					query+=",";
-     				}
-     				query+=" 'user_mongo_id': '"+req.authenticatedUser._id+"' ";
-				}
+					newQueryObj['user_mongo_id'] = req.authenticatedUser._id.toString();
+     			}
 				//search by criteria passed
 				if(findFieldValueStr!="" && findFieldNameStr!=""){
-					if(query!="{"){
-     					query+=",";
-     				}
-     				
-     				if(parseInt(findFieldValueStr)!=="NaN"){
-						query+=" '"+findFieldNameStr+"': { $in: ["+parseInt(findFieldValueStr)+", '"+findFieldValueStr+"'] } ";
+					if(parseInt(findFieldValueStr)!=="NaN"){
+     					newQueryObj[findFieldNameStr] = { $in: [parseInt(findFieldValueStr), findFieldValueStr] } ;
 					}else{
-						query+=" '"+findFieldNameStr+"': { $in: ['"+findFieldValueStr+"'] } ";
+						newQueryObj[findFieldNameStr] = { $in: [ "'"+findFieldValueStr+"'"] } ;
 					}
 				}
 				
@@ -1941,18 +1945,14 @@ app.get(backendDirectoryPath+'/api_fetch_list/', requireLogin, function(req, res
 				if(req.query.s){
 					//create text index
      				coll.createIndex({ "$**": "text" },{ name: "TextIndex" });
-     				if(query!="{"){
-     					query+=",";
-     				}
-     				query+=" '$text': { '$search': '"+req.query.s+"' } ";
+     				newQueryObj['$text'] = { '$search': req.query.s };
      			}
-     			query+= "}";
-     			eval('var queryObj='+query);
-     			coll.find(queryObj).count(function (e, count) {
-      				total_records= count;
+     			
+     			coll.find(newQueryObj).count(function (e, count) {
+     				total_records= count;
       			});
       			if(returnAllResults=="all"){
-      				coll.find(queryObj).sort({modified: -1}).toArray(function(err, items) {
+      				coll.find(newQueryObj).sort({modified: -1}).toArray(function(err, items) {
 						if (err) {
 							outputObj["total"]   = 0;
 							outputObj["iTotalRecordsReturned"]   = 0;
@@ -1966,7 +1966,7 @@ app.get(backendDirectoryPath+'/api_fetch_list/', requireLogin, function(req, res
      					}
 					});
       			}else{
-				coll.find(queryObj).sort({modified: -1}).skip(pageNum-1).limit(itemsPerPage).toArray(function(err, items) {
+				coll.find(newQueryObj).sort({modified: -1}).skip(pageNum-1).limit(itemsPerPage).toArray(function(err, items) {
 					if (err) {
 						outputObj["total"]   = 0;
 						outputObj["iTotalRecordsReturned"]   = 0;
@@ -1995,7 +1995,7 @@ app.get(backendDirectoryPath+'/api_fetch_list/', requireLogin, function(req, res
 	}
 }); 
 
-//fetch collection rows depending upon timestamp passed
+//fetch collection rows depending upon timestamp passed, tables with start_timestamp and end_timestamp as fields
 app.get(backendDirectoryPath+'/api_fetch_timestamp_based_list/', requireLogin, function(req, res) {
 	var collectionStr="", s_timestamp=0, e_timestamp=0;
 	var outputObj = new Object();
@@ -2031,7 +2031,7 @@ app.get(backendDirectoryPath+'/api_fetch_timestamp_based_list/', requireLogin, f
 				var coll= db.collection(collectionStr);
 				
      			query+= "}";
-     			//console.log(query);
+     			
      			eval('var queryObj='+query);
      			
       			coll.find(queryObj).toArray(function(err, items) {
@@ -2058,7 +2058,8 @@ app.get(backendDirectoryPath+'/api_fetch_timestamp_based_list/', requireLogin, f
 	}
 }); 
 
-//fetch history listing depending upon collection
+/** GET : fetch history of particular record depending upon collection
+parameters : collection(table name), start, limit and id (unique mongo id) **/
 app.get(backendDirectoryPath+'/api_fetch_history/', requireLogin, function(req, res) {
 	var itemsPerPage = 10, pageNum=1, collectionStr="", findFieldValueStr="";
 	var outputObj = new Object();
@@ -2106,7 +2107,9 @@ app.get(backendDirectoryPath+'/api_fetch_history/', requireLogin, function(req, 
 	}
 }); 
 
-//api_fixture_history
+/** api_fixture_history, fetch history of particular fixture
+parameters : start, limit, id(unique mongo id)
+**/
 app.get(backendDirectoryPath+'/api_fixture_history/', requireLogin, function(req, res) {
 	var itemsPerPage = 10, pageNum=1, collectionStr="fixtures_history", selectedTeamUUIDStr="", total_records=0;
 	var outputObj = new Object();
@@ -2172,7 +2175,7 @@ app.get(backendDirectoryPath+'/api_fixture_history/', requireLogin, function(req
 	}
 }); 
 
-// fetch record detail api
+// collection_details (GET) : to fetch record's detail of passed table, parameters : templateStr(defined in system_templates table) or collection (table name passed), id(mongo unique id)
 app.get(backendDirectoryPath+'/collection_details/', requireLogin, function(req, res) {
 	var templateStr="", collectionStr="", search_id="";
 	var outputObj = new Object();
@@ -2240,7 +2243,7 @@ app.get(backendDirectoryPath+'/players', requireLogin, system_preferences, funct
 	}
 });
 
-//images gallery
+//images gallery page
 app.get(backendDirectoryPath+'/image_gallery', requireLogin, system_preferences, function(req, res) {
 	if(req.authenticationBool){
 		var queryString= req.query;
@@ -2249,6 +2252,8 @@ app.get(backendDirectoryPath+'/image_gallery', requireLogin, system_preferences,
 		if(queryString.keyword){
 			keywordStr=queryString.keyword;
 		}
+		
+		//save this request in activity log
 		initFunctions.save_activity_log(db, 'Image Gallery', req.url, req.authenticatedUser._id, req.authenticatedUser.active_system_uuid.toString(), function(result) {
 			res.render(accessFilePath+'image_gallery', {
        			currentTemplate : '',
@@ -2544,7 +2549,7 @@ app.get(backendDirectoryPath+'/api_fetch_players/', requireLogin, function(req, 
 	}
 }); 
 
-// api update players status
+// api update players allow_web_access status from players listing form
 app.get(backendDirectoryPath+'/update_user_status', requireLogin, (req, res) => {
 	var outputObj = new Object();
 	if(req.authenticationBool){
@@ -2601,7 +2606,7 @@ app.get(backendDirectoryPath+'/api_fetch_fixtures/', requireLogin, function(req,
 		}
 		if(req.query.selected_team && req.query.selected_team!="null" && req.query.selected_team!="undefined" && req.query.selected_team!="") {
 			selectedTeamStr=req.query.selected_team;
-			//save in session selected team
+			//save in session selected team, so to display them selected on form each time user visit that page
     		db.collection("sessions").update({'_id':req.authenticatedUser.auth_id, 'user_id':req.authenticatedUser._id, 'status' : true }, {'$set' : {"fixture_page_selected_team" : selectedTeamStr}});
 		}
 		if(search_id!= ""){
@@ -2620,7 +2625,7 @@ app.get(backendDirectoryPath+'/api_fetch_fixtures/', requireLogin, function(req,
 							for(var i=0; i<matchesDetails.length; i++){
 								var pushSubObjectBool=true, currentRowTimestamp=matchesDetails[i].date_time;
 								
-								
+								//filter results according to search parameters passes
     							if(startTimestamp!="" || endTimestamp!=""){
     								pushSubObjectBool=false;
 									if(startTimestamp!="" && endTimestamp!="" && startTimestamp<=currentRowTimestamp && endTimestamp>=currentRowTimestamp){
@@ -2730,7 +2735,7 @@ app.get(backendDirectoryPath+'/api_fetch_fixtures/', requireLogin, function(req,
 	}
 }); 
 
-// listing pages ui
+// call listing pages ui
 app.get(backendDirectoryPath+'/list/:id', requireLogin, system_preferences, function(req, res) {
 	if(req.authenticationBool){
 		var pageRequested = req.params.id, loggedInUser = req.authenticatedUser, queryString= req.query, keywordStr="";
@@ -2738,6 +2743,7 @@ app.get(backendDirectoryPath+'/list/:id', requireLogin, system_preferences, func
 			keywordStr=queryString.keyword;
 		}
 		req.sendModuleLinks = true;
+		//check if user has access of this module or not
 		returnUserAssignedModules (loggedInUser._id, req, function(allowedNavigationData) {
 			var assignedModuleBool= false, requestedPageStr= "/list/"+pageRequested, module_label_str=pageRequested.toUpperCase();		
 				
@@ -2750,6 +2756,7 @@ app.get(backendDirectoryPath+'/list/:id', requireLogin, system_preferences, func
 					}
 				}
 			}
+			// if admin user allow all the modules
 			if(allowedNavigationData && allowedNavigationData.admin_user && allowedNavigationData.admin_user==true)	{
 				initFunctions.save_activity_log(db, module_label_str, req.url, req.authenticatedUser._id, req.authenticatedUser.active_system_uuid.toString(), function(result) {	
 					res.render(accessFilePath+'standard_listing', {
@@ -2779,7 +2786,7 @@ app.get(backendDirectoryPath+'/list/:id', requireLogin, system_preferences, func
 	}
 })
 
-//api fetch Table fields
+//api fetch Table fields or columns
 app.get(backendDirectoryPath+'/fetchTableColumns', requireLogin, function(req, res) {
 	if(req.authenticationBool){
 		initFunctions.fetchTableColumns(db, req.query.e, function(result) {	
@@ -2792,12 +2799,13 @@ app.get(backendDirectoryPath+'/fetchTableColumns', requireLogin, function(req, r
 	}
 });
 
-// render pages
+// render pages started with /
 app.get(backendDirectoryPath+'/:id', requireLogin, system_preferences, function(req, res) {
 	if(req.authenticationBool){
 		var pageRequested = req.params.id;
 		var requestedPageStr="/"+pageRequested;
-		
+
+		//check for unique values
 		if(req.query._id && req.query._id!=""){
 			editFieldName="_id";
 			editFieldVal=req.query._id;
@@ -2824,6 +2832,8 @@ app.get(backendDirectoryPath+'/:id', requireLogin, system_preferences, function(
 		pageRequested=accessFilePath+pageRequested;
 	
 		req.sendModuleLinks = true;
+		
+		//check if user has access to this page or not (acc. to the modules assigned), otherwise redirect to 403 page
 		returnUserAssignedModules (req.authenticatedUser._id, req, function(allowedNavigationData) {
 			var assignedModuleBool= false, module_label_str=req.params.id;		
 			if(allowedNavigationData && allowedNavigationData.modules && allowedNavigationData.modules.length>0)	{
@@ -2840,6 +2850,7 @@ app.get(backendDirectoryPath+'/:id', requireLogin, system_preferences, function(
 			}		
 			if(assignedModuleBool){
 				if(table_name==""){
+					//save in activity log about the request of page made
 					initFunctions.save_activity_log(db, module_label_str, req.url, req.authenticatedUser._id, req.authenticatedUser.active_system_uuid.toString(), function(result) {	
 						res.render(pageRequested, {
       						queryStr : req.query,
@@ -2849,38 +2860,18 @@ app.get(backendDirectoryPath+'/:id', requireLogin, system_preferences, function(
     					});
     				});
 				}else{
+					//check if unique field and its value is passed in url, then search for its record in database and auto populate fields on form
 					if (typeof editFieldVal !== 'undefined' && editFieldVal !== null) {
+						var queryStr={};
 						if(editFieldName=="_id"){
-							initFunctions.returnFindOneByMongoID(db, table_name, editFieldVal, function(resultObject) {
-					 			if (resultObject.aaData) {
-      								contentObj=resultObject.aaData;      						
-      								module_label_str=table_name+' details';
-      								for(var key in contentObj) {
-										if(key=="name" || key=="label" || key=="Document" || key=="username"){	
-											module_label_str = contentObj[key];
-											break;
-										}
-									}
-									if(table_name=="users"){
-										module_label_str +=": user detail's"; 
-									}
-      							}
-      							initFunctions.save_activity_log(db, module_label_str, req.url, req.authenticatedUser._id, req.authenticatedUser.active_system_uuid.toString(), function(result) {	
-      								res.render(pageRequested, {
-      	 								editorField : editFieldName,
-      	 								editorValue : editFieldVal,
-       									queryStr : req.query,
-       									contentObj : contentObj,
-       									authenticatedUser : req.authenticatedUser,
-       									system_preferences :  req.system_preferences
-    								});
-    							});
-    						}); 
+							queryStr[editFieldName] = new mongodb.ObjectID(editFieldVal);
 						}else{
-							var queryStr="{'"+editFieldName+"': '"+editFieldVal+"'}";
+							queryStr[editFieldName] = editFieldVal;
+						}
+							
 							initFunctions.crudOpertions(db, table_name, 'findOne', null, editFieldName, editFieldVal, queryStr, function(result) {
 								if (result.aaData) {
-      								contentObj=resultObject.aaData;      						
+      								contentObj=result.aaData;      						
       								module_label_str=table_name+' details';
       								for(var key in contentObj) {
 										if(key=="name" || key=="label" || key=="Document" || key=="username"){	
@@ -2892,6 +2883,7 @@ app.get(backendDirectoryPath+'/:id', requireLogin, system_preferences, function(
 										module_label_str +=": user detail's"; 
 									}
       							} 
+      							//save this request in activity log
       							initFunctions.save_activity_log(db, module_label_str, req.url, req.authenticatedUser._id, req.authenticatedUser.active_system_uuid.toString(), function(result) {	
       								res.render(pageRequested, {
       	 								editorField : editFieldName,
@@ -2903,8 +2895,8 @@ app.get(backendDirectoryPath+'/:id', requireLogin, system_preferences, function(
     								});
     							});
     						});
-    					} 
 					}else{
+						//save this request in activity log
 						initFunctions.save_activity_log(db, module_label_str, req.url, req.authenticatedUser._id, req.authenticatedUser.active_system_uuid.toString(), function(result) {	
 	      					res.render(pageRequested, {
 			      				queryStr : req.query,
@@ -2970,6 +2962,7 @@ app.post(backendDirectoryPath+'/default_system', requireLogin, (req, res) => {
     	}
 	}
 	
+	//create the system, and update its unique id in admin user, all modules and session records 
 		initFunctions.crudOpertions(db, table_nameStr, 'create', contentJson, unique_fieldStr, unique_fieldVal, null,function(result) {
     		if(result.success){
     			var default_system_id=result._id;
@@ -3335,7 +3328,7 @@ app.post(backendDirectoryPath+'/save/:id', requireLogin, (req, res) => {
 
 /** function returnUserAssignedModules
 parameters :  auth_user_id (logged in user unique id), res (HTTP request object), cb (callback)
-description : check user's assigned modules (which are dependent on user assigned to groups)
+description : check user's assigned modules (which are dependent on user assigned to groups), to return all active modules if user belongs to admin group
 **/
 function returnUserAssignedModules (auth_user_id, req, cb) {
 	var outputObj= new Object();
@@ -3531,7 +3524,7 @@ function system_preferences (req, res, next) {
 	});
 }
 
-/**		function : authenticatedUser 
+/**	function : authenticatedUser 
 parameters : auth_session_id (current session id fetched from browser cookie), cb is callback/return parameter which contain logged in user's details
 **/
 var authenticatedUser =function (auth_session_id, cb) {

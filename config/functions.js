@@ -169,6 +169,9 @@ var self = module.exports =
 
 				if(templateResponse.listing_columns){
 					eval('var obj='+query);
+					if(table_name=="systems" && parseInt(req.authenticatedUser.access_right)<=10){
+						obj['_id'] = new mongodb.ObjectID(activeSystemsStr);
+					}
 					eval('var fetchFieldsobj='+fetchFieldsObj);
 					var total_records=0;
 					var coll= db.collection(table_name);
@@ -307,9 +310,12 @@ var self = module.exports =
 		if (typeof checkForExistenceStr !== 'undefined' && checkForExistenceStr != "null" && checkForExistenceStr !== null && checkForExistenceStr!=""){
 			var checkForExistenceObj=checkForExistenceStr;
 		}else if((uniqueFieldNameStr!="" && uniqueFieldValueStr!="") || (uniqueFieldNameStr!=null && uniqueFieldValueStr!=null)){
-			var checkForExistenceObj= '{'+uniqueFieldNameStr +': \''+uniqueFieldValueStr+'\'}';
+			var checkForExistenceObj= {};
+			checkForExistenceObj[uniqueFieldNameStr]= uniqueFieldValueStr;
 			if(postContent && (postContent!=="" || postContent!==null) && (postContent['uuid_system'] && postContent['uuid_system']!= "")){
-				checkForExistenceObj= '{'+uniqueFieldNameStr +': \''+uniqueFieldValueStr+'\', "uuid_system" : \''+postContent['uuid_system']+'\'}';
+				var checkForExistenceObj = {};
+				checkForExistenceObj[uniqueFieldNameStr]=uniqueFieldValueStr;
+				checkForExistenceObj["uuid_system"]=postContent['uuid_system'];
 			}
 		}
 		
@@ -317,8 +323,11 @@ var self = module.exports =
 			if(postContent!="" && postContent!=null){
 				postContent.modified=self.currentTimestamp();
 			}
-			eval('var findStr='+checkForExistenceObj);
-						
+			if(typeof(checkForExistenceObj)=="array" || typeof(checkForExistenceObj)=="object"){
+				var findStr=checkForExistenceObj;
+			}else{
+				eval('var findStr='+checkForExistenceObj);
+			}			
 			switch (actionStr) {
     			case 'findOne':
         			db.collection(collectionStr).findOne(findStr, function(searchErr, document) {
@@ -520,7 +529,7 @@ var self = module.exports =
 						link+="_id="+result._id+"&success_msg="+result.success;
 						if(table_nameStr=="tasks" && postContent.assigned_to_user_id && postContent.assigned_to_user_id!=""){
 							self.send_notification(db, result._id, postContent.assigned_to_user_id, '', 'Task has been reported', 0, table_nameStr, result._id, function(notificationResult) {
-    							console.log(notificationResult)
+    							//console.log(notificationResult)
     							cb(link);
 							});
 	    				}	else	{

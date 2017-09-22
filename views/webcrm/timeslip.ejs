@@ -349,8 +349,8 @@ function return_timestamp_from_timepicker (startDateStr, timeStr)	{
 		fetch_default_list("billing-status", "<% if (typeof contentObj.billing_status !== 'undefined' && contentObj.billing_status !== null) { %><%= contentObj.billing_status %><% } %>","billing_status");
 	
 		var sVal="", reportedBy='';
-		<% if (typeof queryStr !== 'undefined' && queryStr !== null && typeof queryStr.customer_id !== 'undefined' && queryStr.customer_id !== null && queryStr.customer_id !=="") { %>
-			sVal="<%= queryStr.customer_id %>";
+		<% if (typeof queryStr !== 'undefined' && queryStr !== null && typeof queryStr.task_id !== 'undefined' && queryStr.task_id !== null && queryStr.task_id !=="") { %>
+			sVal="<%= queryStr.task_id %>";
 		<% }else if(typeof contentObj.task_mongo_id !== 'undefined' && contentObj.task_mongo_id !== null)	{ %>
 			sVal="<%= contentObj.task_mongo_id %>";
 		<% } %>
