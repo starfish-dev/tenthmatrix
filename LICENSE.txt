@@ -1,7 +1,7 @@
  /* 
- * Copyright (C) 2002-2017 Balinder Singh WALIA
- * Copyright (C) 2011-2017 Jobshout Limited, London, United Kingdom.
- * Lead Contributor and Coder: Neha Kapoor
+ * Copyright (C) 2016-2017 Balinder Singh WALIA
+ * Copyright (C) 2016-2017 Jobshout Limited, London, United Kingdom.
+ * Lead Contributor and our one of the best Ninja Coders: Neha Kapoor
  *
  * All rights reserved.
  *
