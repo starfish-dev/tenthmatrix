@@ -9,7 +9,7 @@
 	**/
 
 	/**********************************************************************
-	*  functions.js contain all the functions required for requests
+	*  functions.js contain all the functions required for requests, which will be called in the main file
 	**/
 	
 	var init = require('./init');
@@ -18,8 +18,9 @@
 	
 var self = module.exports = 
 {
-  // These functions which will be called in the main file, which is server.js
-  	
+  	/** returns the list as defined in system_templates table
+  	parameters: db, templateStr(code unique value), activeSystemStr (system id), req(request parameters), cb(callback)
+  	**/
   	templateSearch : function (db, templateStr, activeSystemsStr, req, cb){
      	var itemsPerPage = 10, pageNum=1, findFieldNameStr="", findFieldValueStr="";
 		var outputObj = new Object();
@@ -211,6 +212,7 @@ var self = module.exports =
       	});
 	},
 	
+	/** to fetch one record depending upon table/collection name, search_id(mongo id) **/
 	returnFindOneByMongoID : function (db, collectionName, search_id, cb){
 		var outputObj = new Object();
 		if(search_id!="" && search_id!="undefined" && search_id!=null){
@@ -231,7 +233,7 @@ var self = module.exports =
 			cb(outputObj);
 		}
 	},
-	
+	//to save the record in history database
 	maintain_table_history : function (collectionName, postContent, createEntryBool, modifiedByUser, cb){
 		var outputObj = new Object();
 		if((createEntryBool==true || createEntryBool=="true") && collectionName!="" && collectionName!="undefined" && collectionName!=null && init.maintainHistoryTablesArr.indexOf(collectionName)>=0){
@@ -262,7 +264,7 @@ var self = module.exports =
 			cb(outputObj);
 		}
 	},
-	
+	//create index on table name and columns passed
 	createIndexes : function (db, collectionName, columnsArr, cb){
 		var outputObj = new Object();
 		var fetchFieldsObj="";
@@ -289,6 +291,10 @@ var self = module.exports =
 		}
 	},
 	
+	/**crud function to find one, update, insert and delete records
+	parameters : db(database connection), collectionStr(table name), actionStr(action passed), postContent(data to be saved), 
+	uniqueFieldNameStr (unique field name), uniqueFieldNameStr
+	**/
 	crudOpertions: function(db, collectionStr, actionStr, postContent, uniqueFieldNameStr, uniqueFieldValueStr, checkForExistenceStr, cb){
 		var outputObj = new Object();
 		
@@ -1105,6 +1111,15 @@ generate_invoice_order_pdf : function (db, table_name, unique_id, active_system_
 		outputObj["error"]   = "Please pass all the required parameters to download pdf!";
       	cb(outputObj);
 	}
+},
+//return the static files on disk
+returnStaticDiskFiles : function(cb){
+	var fs = require('fs'), filesArr= new Array(), i=0;
+	fs.readdirSync('views/'+init.backendDirectoryName).forEach(file => {
+ 		filesArr[i]=file;
+ 		i++;
+ 	});
+ 	cb(filesArr);
 },
 dateFromTimestamp : function(timestamp){
 	var a = new Date(timestamp * 1000);

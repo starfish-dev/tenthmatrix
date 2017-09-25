@@ -40,8 +40,7 @@
 									for(var i=0; i< list_items.length; i++){
 										if(list_items[i]!=".DS_Store" && list_items[i]!="css" && list_items[i]!="js" && list_items[i]!="fonts" && list_items[i]!="images" && list_items[i]!="scripts" && list_items[i]!="include" && list_items[i]!="img"){
 											var pageContentHtml = list_items[i];
-											pageContentHtml = pageContentHtml.replace(".ejs", '');
-											console.log(pageContentHtml)
+											pageContentHtml = pageContentHtml.replace(".ejs", "");
 									%>
 										<tr class="itemClass">
 											<td><%= list_items[i] %></td>

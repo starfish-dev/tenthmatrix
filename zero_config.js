@@ -126,7 +126,17 @@ init.MongoClient.connect(init.mongoConnUrl, function (err, database) {
       					console.log(g_response);
       				});
 				}
-
+				
+				var addSystemListsObj= [{	"code": "system_templates",	"table": "system_templates", "status": "1",	"template_type": "list_view",	"editor_filename": "system_template",	"enable_editor": "1",	"editor_field": "_id",	"search_columns": [{ "code": "contains"	}, { "table": "contains" }], "index_columns": [ "code",	"table"	], "listing_columns": "code,table,modified", "search_condition": "or", "modified": 1499240915, "created": 1499240387,"uuid": "9b1f25b9-dc80-3862-0187-1942ad2d1e7f" },
+				{	"code" : "modules", "table" : "modules", "status" : "1", "template_type" : "list_view", "editor_filename" : "module", "enable_editor" : "1", "editor_field" : "_id", "search_columns" : [ { "name" : "contains" }, { "table" : "contains" }, {  "module_items" : "contains" }], "index_columns" : [ "name", "table", "module_items"], "listing_columns" : "name,table,displayOnDashboard,sort_order,active",  "search_condition" : "or", "modified" : 1499241017, "created" : 1499241017,"uuid" : "385ee279-07a8-a370-6734-7112088a2a5c" },
+				{	"code" : "users",  "table" : "users", "template_type" : "list_view", "status" : "1", "editor_filename" : "user", "enable_editor" : "1", "editor_field" : "_id", "search_columns" : [ { "firstname" : "contains" }, { "lastname" : "contains" }, { "email" : "contains" } ], "index_columns" : [ "firstname", "lastname", "email" ], "listing_columns" : "firstname,lastname,email,access_right,status", "search_condition" : "or", "modified" : 1500362100, "created" : 1500362100, "uuid" : "d0e4f804-37e3-27d0-d1bb-95660acda8df" }];
+				
+				for(var i=0; i < addSystemListsObj.length; i++){
+					var tempObj = addSystemListsObj[i];
+					createTableEntries('system_templates', tempObj['code'], tempObj, function(g_response) {
+      					console.log(g_response);
+      				});
+				}
    		//create admin user
    		initFunctions.crudOpertions(db, 'users', 'findOne', null, 'username', 'admin', null, function(result) {
    			if(result.aaData){

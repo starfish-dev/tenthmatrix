@@ -80,9 +80,10 @@
                   						</div>
                 					</div>
                 					<div class="form-group">
-                  						<label class="control-label col-md-2" for="first-name">Add filename for Detail View/Editor <span class="required">*</span></label>
+                  						<label class="control-label col-md-2" for="first-name">Add filename for Detail View/Editor</label>
                   						<div class="col-md-4">
-                   							<input type="text" required="required" value="<% if (typeof contentObj.editor_filename !== 'undefined' && contentObj.editor_filename !== null) { %><%= contentObj.editor_filename %><% } %>" class="form-control col-md-5 col-xs-12" id="editor_filename" name="editor_filename">
+                  							<select class="form-control" id="editor_filename" name="editor_filename"></select>
+                  							<!--   <input type="text" value="" class="form-control col-md-5 col-xs-12" id="editor_filename" name="editor_filename">-->
                   						</div>
                   						<div class="col-md-2">
                    							<div class="checkbox" STYLE="">
@@ -108,7 +109,7 @@
                 		<div class="form-group displayColumnsClass" style="display:none;">
                 			<input type="hidden" class="form-control col-md-5 col-xs-12" id="search_columns" name="search_columns">
                 			<input type="hidden" class="form-control col-md-5 col-xs-12" id="index_columns" name="index_columns">
-                			<input type="hidden" class="form-control col-md-5 col-xs-12" id="listing_columns" name="listing_columns">
+                			<input type="hidden" required class="form-control col-md-5 col-xs-12" id="listing_columns" name="listing_columns">
                  			<label class="control-label col-md-2 tablefieldClass" for="">Display Columns</label>
                   			<div class="col-md-3 tablefieldClass" id="tablefieldClass">
                   				
@@ -172,7 +173,6 @@ function returnAllCollections(){
 	$("#table").html('');
 	var jsonRow=backendDirectory+"/api_fetch_collections";
 	var sVal="<% if (typeof contentObj.table !== 'undefined' && contentObj.table !== null) { %><%= contentObj.table %><% } %>";
-	
 		$.getJSON(jsonRow,function(aaData){
 			var contentHtml="<option value=''>--Select--</option>";
 			if(aaData.length>0){
@@ -297,7 +297,35 @@ function table_options(){
 	}
 }
 
+function returnExistingEditorForms(){
+	var optionStr = '<option value="">--Select--</option>';
+	var selectedVal ='<% if (typeof contentObj.editor_filename !== 'undefined' && contentObj.editor_filename !== null) { %><%= contentObj.editor_filename %><% } %>';
+	
+	$.getJSON("<%= backendDirectory %>/return_static_files",function(response){
+		if (typeof response.aaData !== "undefined" && response.aaData !== null  && response.aaData != "") { 	
+			try{
+				var list_items = JSON.parse(response.aaData); 
+        	}	catch (error){
+       			var list_items = response.aaData; 
+    		} 
+			for(var i=0; i< list_items.length; i++){
+				if(list_items[i]!=".DS_Store" && list_items[i]!="css" && list_items[i]!="js" && list_items[i]!="fonts" && list_items[i]!="images" && list_items[i]!="scripts" && list_items[i]!="include" && list_items[i]!="img"){
+					var pageContentHtml = list_items[i].replace(".ejs", "");
+					optionStr += '<option value="'+pageContentHtml+'"';
+					if(selectedVal==pageContentHtml){
+						optionStr += ' selected ';
+					}
+					optionStr += '>'+pageContentHtml+'</option>';
+				}
+			}
+		}	
+		$("#editor_filename").html(optionStr);								
+	});
+}
+
 $(document).ready(function() {
+	returnExistingEditorForms();
+	
 	returnAllCollections();
 	$("#template_type").trigger('change');
 	
@@ -307,6 +335,7 @@ $(document).ready(function() {
 		}else{
 			$('.list_fields').prop('checked', false);
 		}
+		populateListingColumnsField();
 	});
 	
 	$(document).on("click","#all_search_field",function(e){
@@ -327,7 +356,10 @@ $(document).ready(function() {
 			}
 		});
 	});	
-		
+	
+	$(document).on("click",".list_fields",function(e){
+		populateListingColumnsField();
+	});	
 	$('#table').change(function(){
 		table_options();
 	});		
@@ -340,7 +372,11 @@ $(document).ready(function() {
 			validClass: 'valid',
 			errorElement: "em",
 			errorPlacement: function(error, element) {
-				$(element).closest('div').append(error);
+				if (element.attr("id") == "listing_columns" ) {
+					$("#tablefieldClass").append(error);
+				}else{
+					$(element).closest('div').append(error);
+				}
 			},
 			onfocusout: false,
 			invalidHandler: function(form, validator) {
@@ -353,12 +389,26 @@ $(document).ready(function() {
 				code: { required: true },
 				table: { required: true },
 				template_type: { required: true },
-				editor_filename: { required: true }
+				listing_columns : { required: true }
+			},
+			messages : {
+				listing_columns: "Please select columns to display on list page",
 			},
 			submitHandler: function(form) {
+				var submitFormBool= true;
+				if($('#enable_editor').is(':checked')){
+					if($("#editor_filename").val()!=""){
+						submitFormBool= true;
+					}else{
+						submitFormBool = false;
+ 						$("#editor_filename").focus();
+ 						$("#contentForm").before('<div class="alert alert-danger">Please select editor file name!</div>');
+ 					}
+ 				}
+ 				if(submitFormBool){
 				var selectedSearchFieldsArr=new Array;
 				var selectedIndexFieldsArr=new Array;
-				var i=0, j=0;
+				var i=0;
 				$('.search_fields').each(function(){
 					var valStr= $(this).val();
 					if( $('#search_fields_'+valStr+':checked').length ){
@@ -375,22 +425,27 @@ $(document).ready(function() {
 		
 				$("#index_columns").val(JSON.stringify(selectedIndexFieldsArr));
 		
-				var selectedListFieldsArr=new Array();
-				$('.list_fields').each(function(){
-					var valStr= $(this).val();
-					if( $('#list_fields_'+valStr+':checked').length ){
-						selectedListFieldsArr[j]= valStr;
-						j++;
-					}
-				});
-				var selectedListFieldsStr= selectedListFieldsArr.join();
-				$("#listing_columns").val(selectedListFieldsStr);
+				populateListingColumnsField();
 				
 				//save data as json in data field, use dataAsJson function to populate that field
  				dataAsJson('contentForm', form);
+ 				}
  			}
 		});	
 });
+function populateListingColumnsField(){
+	var j=0;
+	var selectedListFieldsArr=new Array();
+	$('.list_fields').each(function(){
+		var valStr= $(this).val();
+		if( $('#list_fields_'+valStr+':checked').length ){
+			selectedListFieldsArr[j]= valStr;
+			j++;
+		}
+	});
+	var selectedListFieldsStr= selectedListFieldsArr.join();
+	$("#listing_columns").val(selectedListFieldsStr);
+}
 
 </script>
 </body>

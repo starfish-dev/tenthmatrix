@@ -512,22 +512,33 @@ app.get(backendDirectoryPath+'/403', requireLogin, system_preferences, function(
     }else{
 		res.redirect(backendDirectoryPath+'/sign-in');
 	}
+});
+ 
+//return the static editor template files
+app.get(backendDirectoryPath+'/return_static_files', requireLogin, function(req, res) {
+	var myObj = new Object();
+	if(req.authenticationBool){
+ 		initFunctions.returnStaticDiskFiles(function(filesArr) {
+ 			myObj["aaData"]   =	filesArr;
+			res.send(myObj);
+   		});
+    }else{
+		myObj["error"]   = 'You are not authorized to check the content!';
+		res.send(myObj);
+	}
 }); 
 
 //launchpad page
 app.get(backendDirectoryPath+'/launchpad', requireLogin, system_preferences, function(req, res) {
 	if(req.authenticationBool){
-		var filesArr= new Array(), i=0;
-		fs.readdirSync('views/'+init.backendDirectoryName).forEach(file => {
- 			filesArr[i]=file;
- 			i++;
- 		});
- 		//on request of this page, save it in activity log
- 		initFunctions.save_activity_log(db, 'Launchpad', req.url, req.authenticatedUser._id, req.authenticatedUser.active_system_uuid.toString(), function(result) {	
-			res.render(accessFilePath+'launchpad', {
- 				directory_files : filesArr,
-      			authenticatedUser : req.authenticatedUser,
-      			system_preferences :  req.system_preferences
+ 		initFunctions.returnStaticDiskFiles(function(filesArr) {	
+			//on request of this page, save it in activity log
+ 			initFunctions.save_activity_log(db, 'Launchpad', req.url, req.authenticatedUser._id, req.authenticatedUser.active_system_uuid.toString(), function(result) {	
+				res.render(accessFilePath+'launchpad', {
+ 					directory_files : filesArr,
+      				authenticatedUser : req.authenticatedUser,
+      				system_preferences :  req.system_preferences
+   				});
    			});
    		});
     }else{
@@ -2969,7 +2980,9 @@ app.post(backendDirectoryPath+'/default_system', requireLogin, (req, res) => {
     			db.collection("users").update({_id:req.authenticatedUser._id}, {'$set' : {"uuid_system" : default_system_id.toString(), "uuid_default_system" : default_system_id.toString(), "shared_systems" : new Array(default_system_id)}}, (err1	, result) => {
     				db.collection("modules").update({}, {'$set' : {"uuid_system" : default_system_id.toString()}}, { multi: true }, (err3, result3) => {
     					db.collection("sessions").update({'user_id':req.authenticatedUser._id}, {'$set' : {"active_system_uuid" : default_system_id}}, (err2	, result2) => {
-    						res.redirect(backendDirectoryPath+'/default_system?success=Saved the basic details successfully!');
+    						db.collection("system_templates").update({}, {'$set' : {"uuid_system" : default_system_id.toString()}}, { multi: true }, (err4, result4) => {
+    							res.redirect(backendDirectoryPath+'/default_system?success=Saved the basic details successfully!');
+    						});
     					});
     				});
   				});
