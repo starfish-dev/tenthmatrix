@@ -321,6 +321,7 @@ function returnAllCollections(){
 		$.getJSON(jsonRow,function(aaData){
 			var contentHtml="<option value=''>--Select--</option>";
 			if(aaData.length>0){
+					aaData.sort();
 					$.each(aaData, function(i,row){
 						contentHtml+="<option value='"+row+"' ";
 						if(sVal==row){

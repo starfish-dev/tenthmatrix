@@ -131,6 +131,13 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
                    							<select required class="form-control col-md-5 col-xs-12" name="order_status" id="order_status"></select>
                   						</div>
                 					</div>
+                					<div class="form-group">
+                  						<label class="control-label col-md-2" for="">Template</label>
+                  						<div class="col-md-9 col-lg-10">
+                  							<input type="hidden" id="selected_template" value="<% if (typeof contentObj.template !== 'undefined' && contentObj.template !== null) { %><%= contentObj.template %><% } %>">
+                   							<select class="form-control" id="template" name="template"></select>
+                  						</div>
+                					</div> 
                             		</div></div>
                             		</div></div></div>
 							        <div class="col-md-5 col-xs-12"><div class="box box-primary">
@@ -465,6 +472,8 @@ var auth_user_name="<% if (typeof authenticatedUser.firstname !== 'undefined' &&
 	auth_user_name+="<% if (typeof authenticatedUser.lastname !== 'undefined' && authenticatedUser.lastname !== null) { %>&nbsp;<%= authenticatedUser.lastname %><% } %>";
 	
 $(function () {	
+	fetch_display_pdf_templates();
+
 	fetch_default_list("currency-list", "<% if (typeof contentObj.currency_code !== 'undefined' && contentObj.currency_code !== null) { %><%= contentObj.currency_code %><% } %>","currency_code");
 	fetch_default_list("tax-code", "<% if (typeof contentObj.tax_code !== 'undefined' && contentObj.tax_code !== null) { %><%= contentObj.tax_code %><% } %>","tax_code");
 	fetch_default_list("order-status", "<% if (typeof contentObj.order_status !== 'undefined' && contentObj.order_status !== null) { %><%= contentObj.order_status %><% } %>","order_status");

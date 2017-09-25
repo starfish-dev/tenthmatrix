@@ -171,8 +171,10 @@ function resetItemForm(){
 	$("#item_hours").val(0);
 	$("#item_amount").val(0);
 }
- 
+
 $(function () {	
+	fetch_display_pdf_templates();
+	
 	$("#paid").blur(update_balance);
 	$("#total_paid").blur( function() {
 		update_balance();

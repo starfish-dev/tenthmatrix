@@ -176,13 +176,14 @@ function returnAllCollections(){
 		$.getJSON(jsonRow,function(aaData){
 			var contentHtml="<option value=''>--Select--</option>";
 			if(aaData.length>0){
-					$.each(aaData, function(i,row){
-						contentHtml+="<option value='"+row+"' ";
-						if(sVal==row){
-							contentHtml+="selected";
-						}
-						contentHtml+=" >"+row+"</option>";
-					});
+				aaData.sort();
+				$.each(aaData, function(i,row){
+					contentHtml+="<option value='"+row+"' ";
+					if(sVal==row){
+						contentHtml+="selected";
+					}
+					contentHtml+=" >"+row+"</option>";
+				});
      		}
 			$("#table").html(contentHtml);
 			<% if (typeof contentObj._id !== 'undefined' && contentObj._id !== null) { %>
@@ -309,7 +310,7 @@ function returnExistingEditorForms(){
        			var list_items = response.aaData; 
     		} 
 			for(var i=0; i< list_items.length; i++){
-				if(list_items[i]!=".DS_Store" && list_items[i]!="css" && list_items[i]!="js" && list_items[i]!="fonts" && list_items[i]!="images" && list_items[i]!="scripts" && list_items[i]!="include" && list_items[i]!="img"){
+				if(list_items[i]!=".DS_Store" && list_items[i]!="css" && list_items[i]!="js" && list_items[i]!="fonts" && list_items[i]!="images" && list_items[i]!="scripts" && list_items[i]!="include" && list_items[i]!="img" && list_items[i]!="system_form.ejs" && list_items[i]!="default_system.ejs"){
 					var pageContentHtml = list_items[i].replace(".ejs", "");
 					optionStr += '<option value="'+pageContentHtml+'"';
 					if(selectedVal==pageContentHtml){

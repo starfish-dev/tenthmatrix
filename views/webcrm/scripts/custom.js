@@ -118,6 +118,7 @@ function getTimestampFromDate(dateString, dateFrom){
 	return date;
 }
 
+//used to draw autocomplete dropdown on load
 function fetch_collection_autocomplete_list(collectionStr, fieldID, sVal, searchFieldName, searchFieldValue){
 	$("#"+fieldID).html("");
 	if (typeof searchFieldName === "undefined") { 
@@ -251,6 +252,7 @@ function guid() {
     s4() + '-' + s4() + s4() + s4();
 }
 
+//function to do sorting depending upon field name passed
 function dynamicSort(property) {
     var sortOrder = 1;
     if(property[0] === "-") {
@@ -263,6 +265,7 @@ function dynamicSort(property) {
     }
 }
 
+//called from every entry form to pass all values as json to save request
 function dataAsJson(name, form){
 	var x = $("#"+name).serializeArray();
 	var outputObj = new Object();
@@ -276,6 +279,7 @@ function dataAsJson(name, form){
 	form.submit();
 }
 
+//call api to swtich in between systems 
 function switchInSystems(id){
 	var jsonRow = backendDirectory+'/swtich_user_system?id='+id;
 	$.getJSON(jsonRow,function(result){
@@ -285,6 +289,7 @@ function switchInSystems(id){
 	});
 }
 
+//to fetch logged in user accessed sites 
 function fetch_users_sites(){
 	$("#swtich_sites").html('');
 	var jsonRow = backendDirectory+'/fetch_user_systems';
@@ -322,6 +327,8 @@ function fetch_users_sites(){
 		}
 	});
 }
+
+//to draw sidebar navigation saved
 function load_navigation_data(){
 	$("#dashboard-menu").html('');
 	var jsonRow = backendDirectory+'/load_navigator';
@@ -400,10 +407,12 @@ function load_navigation_data(){
 	});
 }
 
+//uppercase first letter of string
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+//to fetch logged in user's activity
 function fetch_activity_log(){
 	var jsonRow=backendDirectory+"/api_fetch_list?limit=8&collection=activity_log";
 	$.getJSON(jsonRow,function(html){
@@ -424,6 +433,7 @@ function fetch_activity_log(){
 	});
 }
 
+//to load notoifications of logged in user
 function load_notifications(){
 	var jsonRow=backendDirectory+"/load_notifications?start=0&limit=10";
 	$.getJSON(jsonRow,function(html){
@@ -462,6 +472,7 @@ function load_notifications(){
 	});
 }
 
+//to fetch all the saved tags
 function fetch_saved_tags(val){
 	var jsonRow=backendDirectory+"/api_fetch_list?limit=all&collection=tags";
 	$.getJSON(jsonRow,function(html){
@@ -472,6 +483,8 @@ function fetch_saved_tags(val){
      	}
 	});
 }
+
+//to draw tags ui on form and also draw dropdown of saved tags in system
 function drawTagsUi(){
 	fetch_saved_tags();
 	
@@ -504,6 +517,7 @@ function drawTagsUi(){
 	});
 }
 
+//to fetch detail from "system_lists" table depending upon code
 function fetch_default_list(codeStr, sVal, drawDivID){
 	var jsonRow=backendDirectory+"/api_fetch_list?collection=system_lists&findFieldName=code&findFieldValue="+codeStr;
 	$.getJSON(jsonRow,function(result){
@@ -534,6 +548,7 @@ function fetch_default_list(codeStr, sVal, drawDivID){
 	});
 }
 
+//to call api to save new tags defined in a separate table
 function generate_default_tags(val){
 	var codeStr=val;
     var postContentURL=backendDirectory+"/api_crud_post";
@@ -553,6 +568,8 @@ function generate_default_tags(val){
  		$('#'+outputId).val(convertStr);
  	}
  }
+ 
+//to get age from timestamp passed
 function getAge(date) {
 	var now = new Date();
   	var birthDate = new Date(date * 1000);
@@ -575,6 +592,8 @@ function getAge(date) {
   	}
   	return age;
 }
+
+//to check entered digit is number
 	function checknumber(e)	{
 		var k = e.which;
 		/* numeric inputs can come from the keypad or the numeric row at the top */
@@ -598,3 +617,22 @@ $(function () {
     load_notifications();
 	fetch_activity_log();
 });
+
+//function to fetch pdf templates and draw as dropdown
+function fetch_display_pdf_templates (){
+	var jsonRow=backendDirectory+"/api_fetch_list?limit=all&collection=templates&findFieldName=type&findFieldValue=pdf_template";
+		
+		$.getJSON(jsonRow,function(html){
+			var contentHtml="<option value=''>--Select--</option>";
+			if(html.aaData.length>0){
+				$.each(html.aaData, function(i,row){
+					contentHtml+="<option value='"+row.code+"' ";
+					if($("#selected_template").val()==row._id){
+						contentHtml+="selected";
+					}
+					contentHtml+=" >"+row.name+"</option>";
+				});
+     		}
+			$("#template").html(contentHtml);
+		});
+}

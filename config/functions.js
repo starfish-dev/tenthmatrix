@@ -233,9 +233,13 @@ var self = module.exports =
 			cb(outputObj);
 		}
 	},
-	//to save the record in history database
+	/**to save the record in history database
+	parameters: collectionName(table name), postContent(content of row), createEntryBool, modifiedByUser(user created the history), cb(callback)
+	Description : it creates entry in for table history database
+	**/
 	maintain_table_history : function (collectionName, postContent, createEntryBool, modifiedByUser, cb){
 		var outputObj = new Object();
+		// to check table name exists in maintainHistoryTablesArr (defined in init.js file), this is create history only for defined tables
 		if((createEntryBool==true || createEntryBool=="true") && collectionName!="" && collectionName!="undefined" && collectionName!=null && init.maintainHistoryTablesArr.indexOf(collectionName)>=0){
 			if(postContent._id){
 				postContent.history_row_id=postContent._id;
@@ -244,6 +248,7 @@ var self = module.exports =
 			postContent.history_created_timestamp = self.currentTimestamp();
       		postContent.history_created_uuid = self.guid();
       		postContent.modified_by_user = modifiedByUser;
+      		//make connection with history database mentioned in init file
 			init.MongoClient.connect('mongodb://localhost:27017/'+init.historyDatabaseName, function (connErr, historyDB) {
 				if (connErr) {
     				outputObj["error"]  = 'Unable to connect to the mongoDB server.';	cb(outputObj);
@@ -264,7 +269,9 @@ var self = module.exports =
 			cb(outputObj);
 		}
 	},
-	//create index on table name and columns passed
+	/** create compound index on table name and columns passed
+	Parameters : db(database reference passed), collectionName(table name), columnsArr(Column used to create index), cb
+	**/
 	createIndexes : function (db, collectionName, columnsArr, cb){
 		var outputObj = new Object();
 		var fetchFieldsObj="";
@@ -428,6 +435,9 @@ var self = module.exports =
 			cb(outputObj);
 		}
 	},
+	/**	save_activity_log : to maintain user's click/log in db
+	parameters : db, labelStr(Label used while displaying log), linkStr(link to the page), loggedInUserID(current logged in user id), system_id(current system id), cb(callback)
+	**/
 	save_activity_log : function (db, labelStr, linkStr, loggedInUserID, system_id, cb) {
 		var table_name_str='activity_log', outputObj = new Object();
 		db.collection(table_name_str).findOne({last_clicked_link : linkStr, user_mongo_id: loggedInUserID.toString(), uuid_system : system_id }, function(err, existingDocument) {
@@ -448,6 +458,10 @@ var self = module.exports =
 			}
 		});
 	},
+	
+	/**	saveEntry : used by common save script to save the details in database
+	parameters : db(database), table_nameStr(table name), checkForExistence(used to check if record already exists in table), postContent(Data to save), parameterStr( to display error message), findmongoID(to check by unique mongo id), unique_fieldStr(unique field name), unique_fieldVal(field value), modifiedByUser(created by user), cb(callback)
+	**/
 	saveEntry : function(db, table_nameStr, checkForExistence, postContent, parameterStr, findmongoID, unique_fieldStr, unique_fieldVal, modifiedByUser, cb){
 		for(var key in postContent) {
 			var contentStr=postContent[key];
@@ -467,6 +481,7 @@ var self = module.exports =
 		var link="";
 		postContent['modified']=self.currentTimestamp();
 		
+		//check by mongo id
 		db.collection(table_nameStr).findOne({_id : findmongoID}, function(err, existingDocument) {
 			var checkForExistenceObj=checkForExistence;	
 			if (existingDocument) {
@@ -478,7 +493,7 @@ var self = module.exports =
 				}
 				
 				eval('var findObj='+checkForExistenceObj);
-				
+				//check for existence
 				db.collection(table_nameStr).find(findObj, {"_id" : 1}).toArray(function(err, items) {
 					var alreadyBool=false;
 					for(var i=0; i < items.length; i++) {
@@ -497,6 +512,7 @@ var self = module.exports =
 							addHistoryBool = postContent.maintain_history;
 							delete postContent.maintain_history;
 						}
+						//save details in database
 						self.maintain_table_history(table_nameStr, existingDocument, addHistoryBool, modifiedByUser, function(result) {
 							if(existingDocument.created){
 								postContent["created"]=existingDocument.created;
@@ -526,16 +542,15 @@ var self = module.exports =
 						checkForExistenceObj= '{'+unique_fieldStr +': \''+unique_fieldVal+'\', "uuid_system" : \''+postContent['uuid_system']+'\'}';
 					}
 				}
-				
+				//create entry in db
 				self.crudOpertions(db, table_nameStr, 'create', postContent, unique_fieldStr, unique_fieldVal, checkForExistenceObj,function(result) {
 					if(result.error){
 						link+="error_msg="+result.error;
       					cb(link);
 					}else if(result.success){
 						link+="_id="+result._id+"&success_msg="+result.success;
-						if(table_nameStr=="tasks" && postContent.assigned_to_user_id && postContent.assigned_to_user_id!=""){
+						if(table_nameStr=="tasks" && postContent.assigned_to_user_id && postContent.assigned_to_user_id!=""){	// to send notification if new task is created to assigned user
 							self.send_notification(db, result._id, postContent.assigned_to_user_id, '', 'Task has been reported', 0, table_nameStr, result._id, function(notificationResult) {
-    							//console.log(notificationResult)
     							cb(link);
 							});
 	    				}	else	{
@@ -547,23 +562,22 @@ var self = module.exports =
 		});
 		
 	},
-	
+	/**	saveSessionBeforeLogin : to save the details when logged in (in sessions table)
+	parameters : db, user_id(user unique mongo id), systems_access(system access to user), cb(Callback)
+	**/
 	saveSessionBeforeLogin : function(db, user_id, systems_access, cb){
 		var outputObj = new Object();
 		db.collection('sessions').save({"user_id": new mongodb.ObjectID(user_id), "status" : true, "active_system_uuid" : new mongodb.ObjectID(systems_access)}, (err, result) => {
 			if (result){
 				db.collection('systems').find({}).count(function (e, count) {
-					if(count==0){
-      					outputObj["cookie"]   = result["ops"][0]["_id"];
+					outputObj["cookie"]   = result["ops"][0]["_id"];	// set the cokkie
+      				outputObj["success"]   = 'OK';
+      				if(count==0){
       					outputObj["link"]   = '/default_system';
-      					outputObj["success"]   = 'OK';
-      					cb(outputObj);
       				}else{
-      					outputObj["cookie"]   = result["ops"][0]["_id"];
-      					outputObj["link"]   = '/index';
-      					outputObj["success"]   = 'OK';
-      					cb(outputObj);
+						outputObj["link"]   = '/index';
       				}
+      				cb(outputObj);
      			});
       		}else{
       			outputObj["error"]   = 'no';
@@ -571,28 +585,31 @@ var self = module.exports =
     		}
   		});
 	},
+	// return the current timestamp
 	currentTimestamp : function (){
 		var timeStampStr=Math.round(new Date().getTime()/1000)
 		return timeStampStr;
 	},
+	//convert miles into radian
 	milesToRadian : function(miles){
     	var earthRadiusInMiles = 3959;
     	return miles / earthRadiusInMiles;
 	},
+	//return all the active tokens, table name : tokens
 	returnActivetokens : function (db, cb){
 		db.collection('tokens').find({"Status": { $in: [ 1, "1" ] } }, {"name" : 1, "code" : 1}).toArray(function(err, tokens_result) {
 			if(err) return cb(null)
 			cb(tokens_result);
 		});
 	},
-	
+	//return all the active categories
 	returnActiveCategories : function (db, cb){
 		db.collection('categories').find({"status": { $in: [ 1, "1" ] } }, {"name" : 1, "code" : 1}).toArray(function(err, tokens_result) {
 			if(err) return cb(null)
 			cb(tokens_result);
 		});
 	},
-	
+	//return all the collection names exists in database
 	returnAllCollections : function (db, cb){
 		db.listCollections().toArray(function(err, coll) {
 			if(err) return cb(null)
@@ -605,7 +622,7 @@ var self = module.exports =
 			return cb(allCollections);
 		});
 	},
-	
+	//generate a 36 character unique id
 	guid : function () {
   		function s4() {
     		return Math.floor((1 + Math.random()) * 0x10000)
@@ -615,7 +632,7 @@ var self = module.exports =
   		return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	},
 	
-	//extract postcode from string
+	//extract postcode from string(passed as parameter0
 	extract_uk_postcode : function (contentStr){
 		var returnedPostcodeStr='';
 		var reg="/((GIR 0AA)|((([A-PR-UWYZ][0-9][0-9]?)|(([A-PR-UWYZ][A-HK-Y][0-9][0-9]?)|(([A-PR-UWYZ][0-9][A-HJKSTUW])|([A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY])))) [0-9][ABD-HJLNP-UW-Z]{2}))/i";
@@ -649,10 +666,12 @@ var self = module.exports =
 		}
 		return table_name;
 	},
-	
+	/**	fetchTableColumns : to fetch the table's all columns
+	Parameters : db(database), table(table name), cb(callback)
+	**/
 	fetchTableColumns : function (db, table, cb) {
 		var allKeys=new Array();
-		
+		//to check if table structure is defined in system_tables
   		db.collection('system_tables').findOne({name: table}, function(err, listDetails) {
   			var nofieldsExistBool=true;
   			if(listDetails && listDetails.fields && listDetails.fields.length>0){
@@ -661,6 +680,7 @@ var self = module.exports =
   			}
   			
   			if(nofieldsExistBool){
+  				//or fetch all table fields
   				db.collection(table).findOne({}, (err, result) => {
    					if(result){
    						for (key in result){
@@ -672,11 +692,13 @@ var self = module.exports =
   			}
   		});
 	},
-	
+	/**	send_email : function used to send emails, mailer secure details are saved in system_lists table with code "aws-email-details"
+	parameters : db(database), from_email(email by), sender_name(Sender name), to_email(email to), subject(Subject of email), plaintext(email as plain text), htmlContent(Email as html), cb(Callback)
+	**/
 	send_email : function (db, from_email, sender_name, to_email, subject, plaintext, htmlContent, cb){
   		var outputObj = new Object();
   		db.collection('system_lists').findOne({code: "aws-email-details"}, function(err, listDetails) {
-  			var emailApiUsername = process.env.emailApiUsername;
+  			var emailApiUsername = process.env.emailApiUsername;	//to check if mailer details are saved in environment variables
   			var emailApiHost = process.env.emailApiHost;
   		
   			if(listDetails && listDetails.list && listDetails.list.length>0){
@@ -722,6 +744,7 @@ var self = module.exports =
     				outputObj["success"]   = info.response;
     				insertEmail["status"]=-1;
     			}
+    			//also create entry in email_queue table to check the email status
     			self.crudOpertions(db, 'email_queue', 'create', insertEmail, null, null, null,function(email_response) {
 					cb(outputObj);
 				});
@@ -810,23 +833,25 @@ var self = module.exports =
 		}
 	},
 	
+	/** this function is used to fetch content of job applications & extract the content from it
+	parameters : db, req(request parameters), cb(callback)
+	**/
 	create_file_on_disk_to_extract_content : function (db, req, cb){
 		var outputObj = new Object();
 		if(req){
 			var formidable = require('formidable'); 
 			var path = require('path'), fs = require('fs');
-			//var tempUploadPath = path.join(__dirname, '/../../../uploads');
 			var tempUploadPath = '/tmp/';
 			var form = new formidable.IncomingForm(), savedFilePathStr='';
 			
 			if (fs.existsSync(tempUploadPath)) {
-			// store all uploads in the /uploads directory
+			// store all uploads in the /temp directory
   			form.uploadDir = tempUploadPath;
 			form.on('file', function(field, file) {
 				savedFilePathStr= path.join(form.uploadDir, Date.now()+'_'+file.name);
 				fs.rename(file.path, savedFilePathStr);
   			});
-			form.parse(req, function (diskUploadErr, fields, files) {
+			form.parse(req, function (diskUploadErr, fields, files) {	//create file temporarily on disk
 				var files_parameters=files['file'];
 					
 				outputObj["path"]   = savedFilePathStr;
@@ -846,6 +871,7 @@ var self = module.exports =
     				});
     				pdfParser.loadPDF(savedFilePathStr);
 				} else	{
+					//to extract content from the file
 					var textract = require('textract');
 					textract.fromFileWithPath(savedFilePathStr, function( textract_error, textract_text ) {
 						outputObj["extracted_data"]   = textract_text;
@@ -862,14 +888,18 @@ var self = module.exports =
       		cb(outputObj);
       	}
 	},
-	
+/** create_fixtures_history : to create history of team with all matches details and also set the [team]players= empty array
+parameters :db, fixtureHistoryObj(content to be saved), clearTeamPlayersArr(team unique mongo id), cb(callback)
+**/	
 	create_fixtures_history : function (db, fixtureHistoryObj, clearTeamPlayersArr, cb){
 		var outputObj = new Object();
 		if(fixtureHistoryObj){
 			fixtureHistoryObj.created=self.currentTimestamp();
 			fixtureHistoryObj.modified=self.currentTimestamp();
+			//save history
 			db.collection('fixtures_history').save(fixtureHistoryObj, (err, result) => {
       			if (result){
+      				//empty the players array of team, so user can assign new members to a team
       				db.collection("teams").updateMany({_id : { '$in': clearTeamPlayersArr } }, {'$set' : {"players" : new Array()}}, (err1, response1) => {
       					outputObj["success"]   = "Pushed to history successfully!";
       					cb(outputObj);
@@ -885,6 +915,9 @@ var self = module.exports =
       	}
 	},
 	
+/**	save_scores, parameters : db, fixtureHistoryObj(match details passed), cb(Callback)
+description : to save and update results table
+**/
 	save_scores : function (db, fixtureHistoryObj, cb){
 		var outputObj = new Object(), tablenameStr='results';
 		if(fixtureHistoryObj){
@@ -914,7 +947,10 @@ var self = module.exports =
       		cb(outputObj);
       	}
 	},
-
+/**	returnTemplateContent
+parameters : db, system_id(current system id), req_params_id(template code for search), cb(callback)
+description: Find template and even process its content
+**/
 returnTemplateContent : function (db, system_id, req_params_id, cb) {
 	var outputResponseStr=new Object();
 	db.collection('templates').findOne({code: req_params_id, uuid_system : system_id, status: { $in: [ 1, "1" ] } }, function(templateErr, returnTemplateContent) {
@@ -930,7 +966,9 @@ returnTemplateContent : function (db, system_id, req_params_id, cb) {
     	}
    	});
 },
-
+/** findTokensListInTemplate, parameters : templateContentStr(template content passed)
+description: to fetch all the tokens found in content and return the string, tokens can be identified as <*--token-code-here--*>
+**/
 findTokensListInTemplate : function (templateContentStr) {
 	var findTokensStr= '', searchParaCount=4, tempContentStr=templateContentStr;
 	var findTokenStartingPos = tempContentStr.indexOf("<*--");
@@ -962,7 +1000,10 @@ findTokensListInTemplate : function (templateContentStr) {
 escapeRegExp : function (str) {
     return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 },
-
+/** templateProcessTokens
+parameters : db, system_id(current system), templateContentStr(template content), processedTokenList(tokens arrays which are processed/got their value), cb(callback)
+Description :  this function will fetch all the tokens from template, get their values and print their values instead of their code i.e. <*--token-code-here--*> and returns the content for template
+**/
 templateProcessTokens : function (db, system_id, templateContentStr, processedTokenList, cb){
 	var outputResponseStr=templateContentStr, recursionOccurredToken='';
 	var listOfTokensStr= self.findTokensListInTemplate(outputResponseStr);
@@ -1018,11 +1059,18 @@ templateProcessTokens : function (db, system_id, templateContentStr, processedTo
     	cb(outputResponseStr);
     }
 },
-
+/** generate_invoice_order_pdf 
+parameters : db(database connection reference), table_name (table name), unique_id(mongo id), active_system_id(active system unique id)
+Description:  1. this will generate pdf depending upon template design,
+2. template content is process if it contain any token, and also to display sub objects like invoice/order items, place "__loop_through_items__" in template content where required
+3. So this function will automatically replace "__loop_through_items__" with invoice/order items
+4. if pdf does not work just try command "npm rebuild phantomjs-prebuilt" (one solution on EPIPE error)
+**/
 generate_invoice_order_pdf : function (db, table_name, unique_id, active_system_id, cb){
 	var outputObj=new Object();
 	if(table_name!="" && unique_id!=""){
 		var fs = require('fs');
+		//search for invoice/order
 		self.returnFindOneByMongoID(db, table_name, unique_id, function(resultObject) {
 			if(resultObject.aaData && resultObject.aaData != ""){
 				var invoice_content_obj = resultObject.aaData;
@@ -1031,14 +1079,15 @@ generate_invoice_order_pdf : function (db, table_name, unique_id, active_system_
 					templateStr= "gbp-order-template";
 				}
 				if(invoice_content_obj.template && invoice_content_obj.template!=""){
-					templateStr = invoice_content_obj.template;
+					templateStr = invoice_content_obj.template; 		//get from database
 				}
+				// fetch template from details
 				self.returnTemplateContent(db, active_system_id, templateStr, function(templateResultObject) {
 					if(templateResultObject.success && templateResultObject.success!="") {
 						var templateContentStr= templateResultObject.success;
 						for(var key in invoice_content_obj) {
 							var tempKey = "__"+key+"__";
-							if(tempKey.indexOf("timestamp")>=0){
+							if(tempKey.indexOf("timestamp")>=0){	// if field name contain timestamp replace with it date format
 								if(invoice_content_obj[key]!="" && invoice_content_obj[key]!==null){
 									templateContentStr = templateContentStr.replace(new RegExp(tempKey, 'g'), self.dateFromTimestamp(invoice_content_obj[key]));
 								}else{
@@ -1054,7 +1103,7 @@ generate_invoice_order_pdf : function (db, table_name, unique_id, active_system_
 									var itemDetails = itemsObj[i];
 									subItemscontent += '<tr><td>'+itemDetails.description+'</td><td align="center">'+itemDetails.hours+'</td><td align="right">'+itemDetails.rate+'</td><td align="right">'+itemsObj[i].amount+'</td></tr>';
 								}
-								templateContentStr = templateContentStr.replace("__loop_through_items__", subItemscontent);
+								templateContentStr = templateContentStr.replace("__loop_through_items__", subItemscontent);		//replace '__loop_through_items__' with desired data
 							}else if(key=="order_items" && invoice_content_obj[key]!="" && invoice_content_obj[key].length>0){
 								var itemsObj = invoice_content_obj[key];
 								var subItemscontent = "";
@@ -1066,12 +1115,12 @@ generate_invoice_order_pdf : function (db, table_name, unique_id, active_system_
 							}
 						}
 						var tempHTMLFilePathStr = "/tmp/"+invoice_content_obj._id+".html";
-						fs.writeFile(tempHTMLFilePathStr, templateContentStr, function(err) {
+						fs.writeFile(tempHTMLFilePathStr, templateContentStr, function(err) {	//create first html file in temp directory
     						if(err) {
         						outputObj["error"]   = "Sorry, error while generating file, please inform your developer to setup temporary upload folder!";
         						cb(outputObj);
     						}
-    						var pdf = require('html-pdf');
+    						var pdf = require('html-pdf');	//initialise html-pdf
 							var html = fs.readFileSync(tempHTMLFilePathStr, 'utf8');
 							var options = {
   								"format": "A4",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
@@ -1086,12 +1135,12 @@ generate_invoice_order_pdf : function (db, table_name, unique_id, active_system_
   								}
 							};
 							var tempPDfFilePathStr = "/tmp/"+invoice_content_obj._id+".pdf";
-							pdf.create(html, options).toFile(tempPDfFilePathStr, function(pdferr, res) {
+							pdf.create(html, options).toFile(tempPDfFilePathStr, function(pdferr, res) {	//create pdf file from html file generated above
   								if (pdferr){
   									outputObj["error"]   = "Sorry, error occurred while generating pdf!";
            							cb(outputObj);
   								}else{
-  									fs.unlinkSync(tempHTMLFilePathStr);
+  									fs.unlinkSync(tempHTMLFilePathStr);	//removed the html file
   									outputObj["success"]   = tempPDfFilePathStr;
            							cb(outputObj);
        							}
@@ -1121,6 +1170,7 @@ returnStaticDiskFiles : function(cb){
  	});
  	cb(filesArr);
 },
+//return "mm/dd/yyyy" from timestamp passed
 dateFromTimestamp : function(timestamp){
 	var a = new Date(timestamp * 1000);
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];

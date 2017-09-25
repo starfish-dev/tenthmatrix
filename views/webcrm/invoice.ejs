@@ -316,14 +316,19 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
 											<input type="text" id="tax_rate" name="tax_rate" class="form-control col-md-5 col-xs-12" value="<% if (typeof contentObj.tax_rate !== 'undefined' && contentObj.tax_rate !== null) { %><%= contentObj.tax_rate %><% } %>">
                   						</div>
                 					</div>
-              						
                 					<div class="form-group">
                   						<label class="control-label col-md-3" for="">Internal notes</label>
                   						<div class="col-md-9 col-lg-9">
                    							<textarea class="form-control col-md-5 col-xs-12" rows="4" id="internal_notes" name="internal_notes"><% if (typeof contentObj.internal_notes !== 'undefined' && contentObj.internal_notes !== null) { %><%= contentObj.internal_notes %><% } %></textarea>
                   						</div>
                 					</div>
-                					                					
+                					<div class="form-group">
+                  						<label class="control-label col-md-3" for="">Template</label>
+                  						<div class="col-md-9 col-lg-9">
+                  							<input type="hidden" id="selected_template" value="<% if (typeof contentObj.template !== 'undefined' && contentObj.template !== null) { %><%= contentObj.template %><% } %>">
+                   							<select class="form-control" id="template" name="template"></select>
+                  						</div>
+                					</div>   					       					
                             		</div></div>
                             		</div></div></div>
 							        <div class="col-md-6 col-xs-12"><div class="box box-primary">

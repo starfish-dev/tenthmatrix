@@ -1,3 +1,4 @@
+<% var firstTimeSetup = false; %>
 <% include include/main-header %>
 
 <link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet"><style>
@@ -22,7 +23,7 @@
 		<div class="content-wrapper">
     	  	<!-- Content Header (Page header) -->
     		<section class="content-header">
-      			<h1>Basic details of your business</h1>
+      			<h1>Please fill the basic details of your business and save it<small>(to complete the setup)</small></h1>
       			<ol class="breadcrumb">
         			<% include include/dashboard-breadcrumb %>
         			<li class="active">Business</li>
@@ -33,14 +34,18 @@
       						<div class="panel-body no-padding-top bg-white"> 
             					<div class="panel-body no-padding-top bg-white"> 
             					<% include include/display_returned_msg %>
-            					<% if (typeof queryStr.success !== 'undefined' && queryStr.success !== null) {	%>
+            					<% if (typeof queryStr.success !== 'undefined' && queryStr.success !== null) {
+            						firstTimeSetup = false;
+            					%>
             						<div class="alert alert-success alert-dismissable">
              								<%= queryStr.success %>
             						</div>
             						
             						<h3>Add basic modules to your business by clicking this button :</h3>
             						<a href="<%= backendDirectory %>/module" class="btn btn-danger">Set modules</a> and <a href="<%= backendDirectory %>/list/users" class="btn btn-danger btn-sm">Give access to user(s) of this system</a>
-            					<% }else{	%>
+            					<% }else{	
+            						firstTimeSetup = true;
+            					%>
             					<form class="form-horizontal" action="<%= backendDirectory %>/default_system" method="POST" id="contentForm"><% include system_form %></form>
               					<% } %>
               				</div>
@@ -61,6 +66,19 @@
 <script type="text/javascript">
 
 $(function () {
+	var disableLinksbool = '<%= firstTimeSetup %>';
+	if(disableLinksbool==true || disableLinksbool=="true"){
+		$('body').on('click.myDisable', 'a', function(e) { 
+			if($(this).attr('href')=="/webcrm/logout"){
+			
+			}else{
+				$(".setupError").remove();
+				e.preventDefault(); 
+				$('#contentForm').before('<div class="alert alert-danger setupError">Please complete and save this form first!</div>');
+			}
+		});
+	}
+	
 	<% if (typeof contentObj._id == 'undefined' && contentObj._id == null) { %>
 		$("input[name=status][value=1]").prop("checked",true);
 	<% } %>
