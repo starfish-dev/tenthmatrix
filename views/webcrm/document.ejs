@@ -271,18 +271,16 @@ border:1px solid #8a0024;
                      					<div class="form-group">
                               				<label for="" class="col-sm-2 control-label">Order By<sup class="required">*</sup></label>
                              				<div class="col-sm-9">
-                              					<input type="text" class="form-control" id="obj_order__<%=  objectArr[i].uuid %>" placeholder="" value="<%=  objectArr[i].order_by %>">
+                              					<input type="text" class="form-control num" id="obj_order__<%=  objectArr[i].uuid %>" placeholder="" value="<%=  objectArr[i].order_by %>">
                              				</div>
                         				</div>
                         				<div class="form-group">
-    										<label for="" class="col-sm-2 control-label">Status</label>
+    										<label for="" class="col-sm-2 control-label"></label>
     										<div class="col-sm-9"style="margin-top:6px;">
     											<div STYLE="float:left; margin-right:10px;display:inline-block;">
-      		  										<label> <input type="radio" id="obj_status__<%=  objectArr[i].uuid %>" value="1" <% if (objectArr[i].status == 1 || objectArr[i].status == "1") { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
+      		  										<label> <input type="checkbox" id="obj_status__<%=  objectArr[i].uuid %>" value="1" <% if (objectArr[i].status == 1 || objectArr[i].status == "1") { %>checked<% } %> > <strong style="font-weight:600">Active</strong></label>
     			  								</div>
-				  								<div class="radio" STYLE="float:left;display:inline-block;">
-      		  										<label> <input type="radio" id="obj_status_<%=  objectArr[i].uuid %>" value="0" <% if (objectArr[i].status == 0 || objectArr[i].status == "0") { %>checked<% } %>> <strong style="font-weight:600">Inactive</strong></label>
-    			  								</div>
+				  								
 											</div>
 										</div>
                      				</div>

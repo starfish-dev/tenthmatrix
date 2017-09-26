@@ -55,15 +55,12 @@ function addNewObject(){
     htmlStr+='</div>';
     htmlStr+='<div class="col-lg-5">';
     htmlStr+='<div class="form-group"><label for="" class="col-sm-2 control-label">Order By<sup class="required">*</sup></label><div class="col-sm-9">';
-    htmlStr+='<input type="text" class="form-control" id="obj_order__'+newUUIDStr+'" placeholder="" value="0">';
+    htmlStr+='<input type="text" class="form-control num" id="obj_order__'+newUUIDStr+'" placeholder="" value="0">';
     htmlStr+='</div></div>';
-    htmlStr+='<div class="form-group"><label for="" class="col-sm-2 control-label">Status</label>';
+    htmlStr+='<div class="form-group"><label for="" class="col-sm-2 control-label"></label>';
     htmlStr+='<div class="col-sm-9" style="margin-top:6px;">';
 	htmlStr+='<div STYLE="float:left; margin-right:10px;display:inline-block;">';
-    htmlStr+='<label> <input type="radio" id="obj_status__'+newUUIDStr+'" value="1" checked> <strong style="font-weight:600">Active</strong></label>';
-    htmlStr+='</div>';
-	htmlStr+='<div class="radio" STYLE="float:left;display:inline-block;">';
-    htmlStr+='<label> <input type="radio" id="obj_status_'+newUUIDStr+'" value="0"> <strong style="font-weight:600">Inactive</strong></label>';
+    htmlStr+='<label> <input type="checkbox" id="obj_status__'+newUUIDStr+'" value="1" checked> <strong style="font-weight:600">Active</strong></label>';
     htmlStr+='</div>';
 	htmlStr+='</div>';
 	htmlStr+='</div>';
@@ -91,8 +88,10 @@ function generateObjectsJson(){
   			}
   			createObject['chk_manual']=checkManualNum;
   		
-  			var statusNum=$(this).find('#obj_status__'+uuid).val();
-  		
+  			var statusNum=0;
+  			if($(this).find('#obj_status__'+uuid).is(":checked")){
+  				statusNum=1;
+  			}
   			if(statusNum=="" || statusNum==null || statusNum === 'undefined'){
   				statusNum=0;
   			}
