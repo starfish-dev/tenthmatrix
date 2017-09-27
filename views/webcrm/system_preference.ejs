@@ -83,7 +83,11 @@
     										<div class="col-md-6">
     											<input type="file" id="file" class="form-control col-md-5 col-xs-12" value="">
     										</div>
-    										<div class="col-md-3"><button type="reset" class="btn btn-danger btn-sm" onClick="upload_single_file('file', 'main_logo_uuid');">Upload</button></div>
+    										<div class="col-md-3"><button type="reset" class="btn btn-danger btn-sm" onClick="upload_single_file('file', 'main_logo_uuid');">Upload</button>
+    										<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.main_logo_uuid !== 'undefined' && system_preferences.main_logo_uuid !== null && system_preferences.main_logo_uuid !== "") { %>
+    										&nbsp;<button type="reset" class="btn btn-primary btn-sm" onClick="delete_file('main_logo_uuid', '<%= system_preferences.main_logo_uuid %>');"><i class="fa fa-trash"></i></button>
+    										<% } %>
+    										</div>
   										</div>
   										</div>
   										<div class="col-md-6 col-sm-6 col-xs-12">
@@ -97,7 +101,12 @@
     										<div class="col-md-6">
     											<input type="file" id="thumbnail_file" class="form-control col-md-5 col-xs-12" value="">
     										</div>
-    										<div class="col-md-3"><button type="reset" class="btn btn-danger btn-sm" onClick="upload_single_file('thumbnail_file', 'thumbnail_logo_uuid');">Upload</button></div>
+    										<div class="col-md-3">
+    											<button type="reset" class="btn btn-danger btn-sm" onClick="upload_single_file('thumbnail_file', 'thumbnail_logo_uuid');">Upload</button>
+    											<% if (typeof system_preferences !== 'undefined' && typeof system_preferences.thumbnail_logo_uuid !== 'undefined' && system_preferences.thumbnail_logo_uuid !== null && system_preferences.thumbnail_logo_uuid !== "") { %>
+    												&nbsp;<button type="reset" class="btn btn-primary btn-sm" onClick="delete_file('thumbnail_logo_uuid', '<%= system_preferences.thumbnail_logo_uuid %>');"><i class="fa fa-trash"></i></button>
+    											<% } %>
+    										</div>
   										</div>
   										</div>
   										</div>
@@ -140,7 +149,23 @@
 <!-- Page-Level Plugin Scripts-->
 <script src="js/jquery.validate.js"></script>
 <script type="text/javascript">
-
+function delete_file(uuid_div_id, guidStr){
+	$('.removedFile').remove();
+	$.ajax({
+		url: backendDirectory+'/find_remove_file',
+		type: 'POST',
+		data: {'uuid' : guidStr},
+		dataType: 'json',
+		success: function(response){
+			if(response.success){
+				$("#"+uuid_div_id).val('');
+				$( "#submitBtn" ).trigger( "click" );
+			}else{
+				$('#contentForm').before('<div class="alert alert-error alert-dismissable removedFile"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>Error, failed to delete the file!</div>');
+			}
+		}
+	});
+}
 function upload_single_file(id, uuid_div_id){
 $(".uploadFile").remove();
 if( $('#'+id).length )	{

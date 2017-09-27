@@ -130,9 +130,11 @@ if (typeof authenticatedUser !== 'undefined' && authenticatedUser !== null) {
             
           </li>
           <% } %>
+          <% if (typeof authenticatedUser.access_right !== 'undefined' && authenticatedUser.access_right !== null  && authenticatedUser.access_right == "11"  && authenticatedUser.access_right == 11) {	%>
           <li>
             <a href="<%= backendDirectory %>/system_preference" title="System Preferences"><i class="fa fa-gears"></i></a>
           </li>
+          <% } %>
           <!-- Control Sidebar Toggle Button -->
                 </ul>
       </div>
