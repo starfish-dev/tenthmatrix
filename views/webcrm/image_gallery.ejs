@@ -263,14 +263,14 @@ function load_more(){
 						if(displayedViewStr=="list") {
 							contentHtml+='<tr><td><img src="'+imageStr+'" class="img-responsive" style="border-radius: 0 0 3px 3px; border: 1px solid #ddd;" width=100" onerror="this.src=\''+noImageStr+'\'"/></td><td>'+imageNameStr+'</td><td>'+row.contentType+'</td><td>'+row.uploadDate+'</td>';
 							contentHtml+='<td class="actions-list"><a href="image?_id='+row._id+'" title="Edit '+imageNameStr+'"><i class="fa fa-pencil"></i></a>';
-							if(access_right && access_right==11){
+							if(access_right && access_right!=0){
 								contentHtml+='&nbsp;<a href="javascript:void(0)" onClick="delete_gridfs_single_file(\''+row.metadata.uuid+'\')" title="Delete '+imageNameStr+'"><i class="fa fa-trash"></i></a>';
 							}
 							contentHtml+='</td></tr>';
 						}	else	{
 							contentHtml+='<div class="item col-lg-3 col-sm-6 col-xs-12"><div class="thumbnail" style="overflow:hidden;">';
                 			contentHtml+='<img style="height:250px; width:300px;" class="group list-group-image" src="'+imageStr+'" onerror="this.src=\''+noImageStr+'\'"/><span style="float:left;font-weight:bold">'+imageNameStr+'</span><span style="float:right;"><a href="image?_id='+row._id+'" title="Edit '+imageNameStr+'"><i class="fa fa-pencil"></i></a>';
-                			if(access_right && access_right==11){
+                			if(access_right && access_right!=0){
 								contentHtml+='&nbsp;<a href="javascript:void(0)" onClick="delete_gridfs_single_file(\''+row.metadata.uuid+'\')" title="Delete '+imageNameStr+'"><i class="fa fa-trash"></i></a>';
 							}
              				contentHtml+='</span></div></div>';
